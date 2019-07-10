@@ -1,0 +1,214 @@
+import numpy as np
+from scipy.spatial import distance
+
+
+class Molecule:
+
+    def __init__(self, coordinates, state):
+        self.coordinates = coordinates
+        self.state = state
+        self.characteristic_length = 0.000000001
+
+    def decay_rate(self):
+        return
+
+
+"""
+def get_system(morphology, excitons):
+
+    if morphology['Homogeneity'] is True:
+        return get_homogeneous_system(morphology, excitons)
+
+    else:
+        return get_inhomogeneous_system(morphology, excitons)
+"""
+
+
+def get_homogeneous_system(conditions,
+                           num_molecules,           # Only if order = Disordered
+                           num_dimensions=2,
+                           dimensions=[10, 10],
+                           lattice_parameter=0.1,   # Only if order = Ordered
+                           excitons=1,
+                           order='Ordered'):
+
+    if order == 'Ordered':
+        return get_ordered_system(conditions, num_dimensions, dimensions, lattice_parameter, excitons)
+
+    elif order == 'Disordered':
+        return get_disordered_system(conditions, num_dimensions, dimensions, num_molecules, excitons)
+
+    else:
+        print('A valid Order parameter is needed')
+
+
+def get_disordered_system(conditions,               # External conditions of the system such as temperature
+                          num_dimensions=2,
+                          dimensions=[10, 10],
+                          number_molecules=1000,
+                          excitons=1):
+
+    capacity = get_capacity(num_dimensions, dimensions)
+    if number_molecules > capacity:
+        print('Only %1d molecules could be fitted' % capacity)
+
+    molecules = []
+    molecule_count = 0
+    while molecule_count <= number_molecules:
+
+        too_close = True
+        while too_close is True:
+            coordinates = []
+            for dimension in dimensions:
+                x = dimension*np.random.random() - dimension/2
+                # We want the distribution center at (0,0,0)
+                coordinates.append(x)
+
+            too_close = distance_checking(coordinates, molecules)
+
+        molecules.append(Molecule(coordinates=coordinates, state=0))
+        molecule_count += 1
+
+        if molecule_count == capacity:
+            break
+
+    molecules = excited_system(molecules, excitons)
+    conditions['Dimensions'] = dimensions
+    system = {'molecules': molecules, 'conditions': conditions}
+
+    return system
+
+
+def get_ordered_system(conditions,
+                       num_dimensions=2,
+                       dimensions=[10,10],
+                       lattice_parameter=0.1,
+                       excitons=1):
+
+    if num_dimensions == 1:
+        return get_1d_ordered_system(conditions, dimensions, lattice_parameter, excitons)
+
+    elif num_dimensions == 2:
+        return get_2d_ordered_system(conditions, dimensions, lattice_parameter, excitons)
+
+    elif num_dimensions == 3:
+        return get_3d_ordered_system(conditions, dimensions, lattice_parameter, excitons)
+
+    else:
+        print('A number of dimensions must be provided')
+
+
+def get_1d_ordered_system(conditions,
+                          dimension=10,
+                          lattice_parameter=0.1,
+                          excitons=1):
+
+    if check_lattice(lattice_parameter) is False:
+        print('Lattice parameter smaller than molecular characteristic length')
+        return
+
+    molecules = []
+    x_max = dimension/2
+    # We want the distribution center at 0
+    for x in np.arange(-x_max, x_max, lattice_parameter):
+        molecules.append(Molecule([x], state=0))
+
+    molecules = excited_system(molecules, excitons)
+    conditions['Lattice_parameter'] = lattice_parameter
+    conditions['Dimensions'] = dimension
+    system = {'molecule': molecules, 'conditions': conditions}
+
+    return system
+
+
+def get_2d_ordered_system(conditions,
+                          dimensions=[10, 10],
+                          lattice_parameter=0.1,
+                          excitons=1):
+
+    if check_lattice(lattice_parameter) is False:
+        print('Lattice parameter smaller than molecular characteristic length')
+        return
+
+    molecules = []
+    x_max = dimensions[0]/2
+    y_max = dimensions[1]/2
+    # We want the center of the distribution at (0,0)
+    for x in np.arange(-x_max, x_max, lattice_parameter):
+        for y in np.arange(-y_max, y_max, lattice_parameter):
+            molecules.append(Molecule([x, y], state=0))
+
+    molecules = excited_system(molecules, excitons)
+    conditions['Lattice_parameter'] = lattice_parameter
+    conditions['Dimensions'] = dimensions
+    system = {'molecules': molecules, 'conditions': conditions}
+
+    return system
+
+
+def get_3d_ordered_system(conditions,
+                          dimensions=[10, 10, 10],
+                          lattice_parameter=0.1,
+                          excitons=1):
+
+    if check_lattice(lattice_parameter) is False:
+        print('Lattice parameter smaller than molecular characteristic length')
+        return
+
+    molecules = []
+    x_max = dimensions[0]/2
+    y_max = dimensions[1]/2
+    z_max = dimensions[2]/2
+    step = lattice_parameter
+    # We want the center of the distribution at (0,0,0)
+    for x in np.arange(-x_max, x_max, step):
+        for y in np.arange(-y_max, y_max, step):
+            for z in np.arange(-z_max, z_max, step):
+                molecules.append(Molecule([x, y, z], state=0))
+
+    molecules = excited_system(molecules, excitons)
+    conditions['Lattice_parameter'] = lattice_parameter
+    conditions['Dimensions'] = dimensions
+    system = {'molecules': molecules, 'conditions': conditions}
+
+    return system
+
+
+def distance_checking(coordinates, molecules):
+    coordinates = np.array(coordinates)
+
+    for molecule in molecules:
+        molecular_coordinates = np.array(molecule.coordinates)
+
+        if distance.euclidean(coordinates, molecular_coordinates) < molecule.molecular_volume:
+            return True
+
+    return False
+
+
+def excited_system(molecules, excitons):
+
+    if type(excitons) is int:
+        for i in range(excitons):
+            molecules[np.random.randint(0, len(molecules))].state = 1
+
+    return molecules
+
+
+def get_capacity(num_dimensions, dimensions):
+    molecule = Molecule(0, 0)
+    elemental_site = molecule.characteristic_length ** num_dimensions
+
+    total_volume = 1
+    for dimension in dimensions:
+        total_volume = total_volume*dimension
+
+    return int(total_volume/elemental_site)
+
+
+def check_lattice(lattice_parameter):
+    molecule = Molecule(0, 0)
+    if lattice_parameter < molecule.characteristic_length:
+        return False
+    else:
+        return True
