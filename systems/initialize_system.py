@@ -4,7 +4,12 @@ from scipy.spatial import distance
 
 class Molecule:
 
-    def __init__(self, coordinates, state):
+    def __init__(self, coordinates, state=0):
+        """
+        :param coordinates: Coordinates of the molecule
+        :param state: state of the molecule. For now an integer: 0-ground state, 1-excited singlet (...)
+        :param characteristic_length: Dimensions (length) of the molecule. We consider it finite.
+        """
         self.coordinates = coordinates
         self.state = state
         self.characteristic_length = 0.000000001
@@ -25,12 +30,22 @@ def get_system(morphology, excitons):
 
 
 def get_homogeneous_system(conditions,
-                           num_molecules,           # Only if order = Disordered
+                           num_molecules=0,           # Only if order = Disordered
                            num_dimensions=2,
                            dimensions=[10, 10],
                            lattice_parameter=0.1,   # Only if order = Ordered
                            excitons=1,
                            order='Ordered'):
+    """
+    :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
+    :param num_molecules: Number of molecules in the system. Only needed for a disordered system.
+    :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
+    :param dimensions: Dimensions of the system. A list with len = num_dimensions
+    :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
+    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :param order: String argument. Indicates if we want an ordered system (crystal) or an amorphous system.
+    :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
+    """
 
     if order == 'Ordered':
         return get_ordered_system(conditions, num_dimensions, dimensions, lattice_parameter, excitons)
@@ -47,7 +62,14 @@ def get_disordered_system(conditions,               # External conditions of the
                           dimensions=[10, 10],
                           number_molecules=1000,
                           excitons=1):
-
+    """
+    :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
+    :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
+    :param dimensions: Dimensions of the system. A list with len = num_dimensions
+    :param num_molecules: Number of molecules in the system. Only needed for a disordered system.
+    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
+    """
     capacity = get_capacity(num_dimensions, dimensions)
     if number_molecules > capacity:
         print('Only %1d molecules could be fitted' % capacity)
@@ -66,14 +88,14 @@ def get_disordered_system(conditions,               # External conditions of the
 
             too_close = distance_checking(coordinates, molecules)
 
-        molecules.append(Molecule(coordinates=coordinates, state=0))
+        molecules.append(Molecule(coordinates=coordinates))
         molecule_count += 1
 
         if molecule_count == capacity:
             break
 
     molecules = excited_system(molecules, excitons)
-    conditions['Dimensions'] = dimensions
+    conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions}
 
     return system
@@ -81,9 +103,17 @@ def get_disordered_system(conditions,               # External conditions of the
 
 def get_ordered_system(conditions,
                        num_dimensions=2,
-                       dimensions=[10,10],
+                       dimensions=[10, 10],
                        lattice_parameter=0.1,
                        excitons=1):
+    """
+    :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
+    :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
+    :param dimensions: Dimensions of the system. A list with len = num_dimensions
+    :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
+    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
+    """
 
     if num_dimensions == 1:
         return get_1d_ordered_system(conditions, dimensions, lattice_parameter, excitons)
@@ -111,11 +141,11 @@ def get_1d_ordered_system(conditions,
     x_max = dimension/2
     # We want the distribution center at 0
     for x in np.arange(-x_max, x_max, lattice_parameter):
-        molecules.append(Molecule([x], state=0))
+        molecules.append(Molecule([x]))
 
     molecules = excited_system(molecules, excitons)
-    conditions['Lattice_parameter'] = lattice_parameter
-    conditions['Dimensions'] = dimension
+    conditions['lattice_parameter'] = lattice_parameter
+    conditions['dimensions'] = dimension
     system = {'molecule': molecules, 'conditions': conditions}
 
     return system
@@ -136,18 +166,18 @@ def get_2d_ordered_system(conditions,
     # We want the center of the distribution at (0,0)
     for x in np.arange(-x_max, x_max, lattice_parameter):
         for y in np.arange(-y_max, y_max, lattice_parameter):
-            molecules.append(Molecule([x, y], state=0))
+            molecules.append(Molecule([x, y]))
 
     molecules = excited_system(molecules, excitons)
-    conditions['Lattice_parameter'] = lattice_parameter
-    conditions['Dimensions'] = dimensions
+    conditions['lattice_parameter'] = lattice_parameter
+    conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions}
 
     return system
 
 
 def get_3d_ordered_system(conditions,
-                          dimensions=[10, 10, 10],
+                          dimensions=[10, 10, 0],
                           lattice_parameter=0.1,
                           excitons=1):
 
@@ -164,17 +194,22 @@ def get_3d_ordered_system(conditions,
     for x in np.arange(-x_max, x_max, step):
         for y in np.arange(-y_max, y_max, step):
             for z in np.arange(-z_max, z_max, step):
-                molecules.append(Molecule([x, y, z], state=0))
+                molecules.append(Molecule([x, y, z]))
 
     molecules = excited_system(molecules, excitons)
-    conditions['Lattice_parameter'] = lattice_parameter
-    conditions['Dimensions'] = dimensions
+    conditions['lattice_parameter'] = lattice_parameter
+    conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions}
 
     return system
 
 
 def distance_checking(coordinates, molecules):
+    """
+    :param coordinates: coordinates of the studied molecule
+    :param molecules: list of the molecules already defined
+    :return: Boolean. Indicates if the new molecule is too close to some of the already defined.
+    """
     coordinates = np.array(coordinates)
 
     for molecule in molecules:
@@ -187,6 +222,11 @@ def distance_checking(coordinates, molecules):
 
 
 def excited_system(molecules, excitons):
+    """
+    :param molecules: List of the defined molecules
+    :param excitons: Information about the desired excitation
+    :return: Excited system
+    """
 
     if type(excitons) is int:
         for i in range(excitons):
@@ -196,6 +236,11 @@ def excited_system(molecules, excitons):
 
 
 def get_capacity(num_dimensions, dimensions):
+    """
+    :param num_dimensions: Dimensionality of the system (1, 2, 3)
+    :param dimensions: Size of the system
+    :return: Integer. Maximus number of molecules that could fit in the system.
+    """
     molecule = Molecule(0, 0)
     elemental_site = molecule.characteristic_length ** num_dimensions
 
@@ -207,6 +252,10 @@ def get_capacity(num_dimensions, dimensions):
 
 
 def check_lattice(lattice_parameter):
+    """
+    :param lattice_parameter: Lattice parameter
+    :return: Boolean. Checks if the lattice parameter chosen is smaller than the molecular characteristic length.
+    """
     molecule = Molecule(0, 0)
     if lattice_parameter < molecule.characteristic_length:
         return False
