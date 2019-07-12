@@ -4,6 +4,7 @@ class Molecule:
         """
         :param coordinates: Coordinates of the molecule
         :param state: state of the molecule. For now an integer: 0-ground state, 1-excited singlet (...)
+        Think about state structure.
         :characteristic_length: Dimensions (length) of the molecule. We consider it finite.
         """
         self.coordinates = coordinates
@@ -14,6 +15,7 @@ class Molecule:
         """
         :param state: Indicates the excitonic state of the molecule
         :return: A dictionary with the possible decay processes as keys and its rates as arguments.
+        (State argument structure may change)
         """
         if state == 1:
             decay = 1/3
