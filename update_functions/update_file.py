@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.spatial import distance
 from kmc_implementation.kmc_file import kmc_algorithm
-from kmc_implementation.kmc_file import time_advance
 
 
 def update_system(system):
@@ -19,17 +18,19 @@ def update_system(system):
     center_indexes = get_centers(molecules)
 
     rate_collector = []
+    path_collector = []
     for center in center_indexes:
         neighbours_index = neighbourhood(center, molecules)
 
-        path, center_rates = evolution(center, neighbours_index, system)
-        rate_collector += center_rates
+        path_list, rate_list = get_rates_paths(center, neighbours_index, system)
+        rate_collector += rate_list
+        path_collector += path_list
 
-    times = time_advance(rate_collector, center_indexes)
+    chosen_path, time = kmc_algorithm(rate_collector, path_collector)
+    plan = update_step(chosen_path)
 
-    # Merge plans. Choose a time, study coinciding situations...
+    return plan, time
 
-    return
 
 
 def get_centers(molecules):
@@ -65,15 +66,18 @@ def neighbourhood(center, molecules, radius = 0.2):
     return neighbours
 
 
-def evolution(center, neighbour_index, system):
+def get_rates_paths(center, neighbour_index, system):
     """
     :param center: Index of the studied excited molecule
     :param neighbour_index: Indexes of the neighbours (candidates to accept the exciton)
     :param system: Dictionary with the information of the system.
-    Using a KMC algorithm chooses a path for the exciton.
-    :return:   path: List with the name of the process and the index where the exciton is transferred
-               rates: List with all the calculated rates. Will be later used for computing the
-               duration (time) of the process (KMC).
+    Computes the transfer and decay rates and builts two dictionaries:
+            One with the decay process as key and its rate as argument
+            One with the transferred molecule index as key and the list(process, rate) as argument
+
+    :return:    path_list: List of elements like list(index of the new excited molecule, process)
+                rate_list: List with the respective rates
+                The list indexes coincide.
     """
     physical_conditions = system['conditions']
 
@@ -82,11 +86,35 @@ def evolution(center, neighbour_index, system):
         i_rates = get_transfer_rate(center, i, physical_conditions)
         transfer_rates[str(i)] = i_rates
 
-    decay_rates = system['molecules'][center].state
+    decay_rates = system['molecules'][center].decay_rate
 
-    path, rates = kmc_algorithm(decay_rates, transfer_rates, center)
+    path_list, rate_list = path_rate_splitter(transfer_rates, decay_rates, center)
 
-    return path, rates
+    return path_list, rate_list
+
+
+def path_rate_splitter(transfer_rates, decay_rates, center_index):
+    """
+    :param transfer_rates: Dictionary with the transferred molecule index as key and the list(process, rate) as argument
+    :param decay_rates: Dictionary with the decay process as key and its rate as argument
+    :return: Two lists:
+            Process list. List with elements (affected molecule, process)
+            Rate_list. List with the respective rates
+    """
+    process_list = []
+    rates_list = []
+
+    for decay in decay_rates:
+        process_list.append([center_index, decay])
+        rates_list.append(decay_rates[decay])
+
+    for neighbour_index in transfer_rates:
+        for process in transfer_rates[neighbour_index]:
+            process_list.append([int(neighbour_index), process])
+            rates_list.append(transfer_rates[neighbour_index][process])
+
+    return process_list, rates_list
+
 
 
 

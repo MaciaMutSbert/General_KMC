@@ -2,38 +2,20 @@ import numpy as np
 import random as rd
 
 
-def kmc_algorithm(decay_rates, transfer_rates, center_index):
+def kmc_algorithm(rate_list, process_list):
     """
-    :param decay_rates: Dictionary with decay process as keys and decay rates as arguments
-    :param transfer_rates: Dictionary with the transferred molecule index as key
-    and a list [process between molecules, transfer_rate] as argument.
-    :param center_index: Index of the studied exciton
-    Two list are built:
-        process_list collects all the possible processes
-        rates_list collects the respective rates
-        The indexes for each process coincides with the index in rates
-    We implement the KMC algorithm to rates_list.
-    :return: path: chosen process:
-                    if it is a transfer process: list(transferred molecule index, process)
-                    if it is a decay process:  decay_process
-             rates_list
+    :param rate_list: List with all the computed rates for all the neighbours for all the centers
+    :param process_list: The associated process to each rate and the new molecule affected
+    :return:    plan: The chosen proces and the new molecule affected
+                time: the duration of the process
     """
-    process_list = []
-    rates_list = []
 
-    for decay in decay_rates:
-        process_list.append([center_index, decay])
-        rates_list.append(decay_rates[decay])
+    process_index = select_process(rate_list)
+    chosen_process = process_list[process_index]
 
-    for neighbour_index in transfer_rates:
-        for process in transfer_rates[neighbour_index]:
-            process_list.append([int(neighbour_index), process])
-            rates_list.append(transfer_rates[neighbour_index][process])
+    time = time_advance(rate_list)
 
-    process_index = select_process(rates_list)
-    path = process_list[process_index]
-
-    return path, rates_list
+    return chosen_process, time
 
 
 def select_process(constant_list):
@@ -46,15 +28,10 @@ def select_process(constant_list):
     return len(list_[0])
 
 
-def time_advance(rate_list, centers_index):
+def time_advance(rate_list, ):
     """
     :param rate_list: List with all the rates. Considering all the processes for all exciton
-    :param centers_index: List with the indexes of every excited molecule.
-    :return: Process duration for each excitation.
+    :return: Process duration
     """
-    process_time = {}
-    for index in centers_index:
-        r = rd.random() + 0.0001        # In order to exclude r = 0 we add a quite small quantity.
-        process_time[str(index)] = (-np.log(r))/np.sum(rate_list)
-
-    return process_time
+    r = rd.random()
+    return (-np.log(r))/np.sum(rate_list)
