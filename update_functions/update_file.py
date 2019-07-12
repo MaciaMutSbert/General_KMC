@@ -1,19 +1,33 @@
 import numpy as np
 from scipy.spatial import distance
 from kmc_implementation.kmc_file import kmc_algorithm
+from kmc_implementation.kmc_file import time_advance
 
 
 def update_system(system):
+    """
+    :param system: Dictionary with all the information of the system
+    1. Looks for the excited molecules (center_indexs).
+    2. Looks for the neighbourhood of every molecule.
+    2(bis). Chooses a path for every exciton
+    3. Considering all the calculated rates computes the time interval for each process.
+    4. (Merge plans)
+    :return:
+    """
     molecules = system['molecules']
 
     center_indexs = get_centers(molecules)
 
+    rate_collector = []
     for center in center_indexs:
         neigbours_index = neighbourhood(center, molecules)
 
-        something = evolution(center, neigbours_index, system)
+        path, center_rates = evolution(center, neigbours_index, system)
+        rate_collector += center_rates
 
-    return something
+    times = time_advance(rate_collector, center_indexs)
+
+    return
 
 
 def get_centers(molecules):
@@ -59,9 +73,9 @@ def evolution(center, neighbour_index, system):
 
     decay_rates = system['molecules'][center].state
 
-    path, time = kmc_algorithm(decay_rates, transfer_rates)
+    path, rates = kmc_algorithm(decay_rates, transfer_rates, center)
 
-    return path, time
+    return path, rates
 
 
 
