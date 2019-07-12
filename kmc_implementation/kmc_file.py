@@ -16,7 +16,7 @@ def kmc_algorithm(decay_rates, transfer_rates, center_index):
     :return: path: chosen process:
                     if it is a transfer process: list(transferred molecule index, process)
                     if it is a decay process:  decay_process
-             time: advanced time
+             rates_list
     """
     process_list = []
     rates_list = []
@@ -50,7 +50,7 @@ def time_advance(rate_list, centers_index):
     """
     :param rate_list: List with all the rates. Considering all the processes for all exciton
     :param centers_index: List with the indexes of every excited molecule.
-    :return:
+    :return: Process duration for each excitation.
     """
     center_time = {}
     for index in centers_index:

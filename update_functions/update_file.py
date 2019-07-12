@@ -7,7 +7,7 @@ from kmc_implementation.kmc_file import time_advance
 def update_system(system):
     """
     :param system: Dictionary with all the information of the system
-    1. Looks for the excited molecules (center_indexs).
+    1. Looks for the excited molecules (center_indexes).
     2. Looks for the neighbourhood of every molecule.
     2(bis). Chooses a path for every exciton
     3. Considering all the calculated rates computes the time interval for each process.
@@ -16,16 +16,18 @@ def update_system(system):
     """
     molecules = system['molecules']
 
-    center_indexs = get_centers(molecules)
+    center_indexes = get_centers(molecules)
 
     rate_collector = []
-    for center in center_indexs:
-        neigbours_index = neighbourhood(center, molecules)
+    for center in center_indexes:
+        neighbours_index = neighbourhood(center, molecules)
 
-        path, center_rates = evolution(center, neigbours_index, system)
+        path, center_rates = evolution(center, neighbours_index, system)
         rate_collector += center_rates
 
-    times = time_advance(rate_collector, center_indexs)
+    times = time_advance(rate_collector, center_indexes)
+
+    # Merge plans. Choose a time, study coinciding situations...
 
     return
 
@@ -64,6 +66,15 @@ def neighbourhood(center, molecules, radius = 0.2):
 
 
 def evolution(center, neighbour_index, system):
+    """
+    :param center: Index of the studied excited molecule
+    :param neighbour_index: Indexes of the neighbours (candidates to accept the exciton)
+    :param system: Dictionary with the information of the system.
+    Using a KMC algorithm chooses a path for the exciton.
+    :return:   path: List with the name of the process and the index where the exciton is transferred
+               rates: List with all the calculated rates. Will be later used for computing the
+               duration (time) of the process (KMC).
+    """
     physical_conditions = system['conditions']
 
     transfer_rates = {}

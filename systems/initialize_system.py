@@ -1,21 +1,6 @@
 import numpy as np
 from scipy.spatial import distance
-
-
-class Molecule:
-
-    def __init__(self, coordinates, state=0):
-        """
-        :param coordinates: Coordinates of the molecule
-        :param state: state of the molecule. For now an integer: 0-ground state, 1-excited singlet (...)
-        :param characteristic_length: Dimensions (length) of the molecule. We consider it finite.
-        """
-        self.coordinates = coordinates
-        self.state = state
-        self.characteristic_length = 0.000000001
-
-    def decay_rate(self):
-        return
+from systems.molecules import Molecule
 
 
 """
@@ -109,7 +94,7 @@ def get_ordered_system(conditions,
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
-    :param dimensions: Dimensions of the system. A list with len = num_dimensions
+    :param dimensions: Dimensions of the system. A list with len = num_dimensions. By default = [10, 10]
     :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
     :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
@@ -132,6 +117,13 @@ def get_1d_ordered_system(conditions,
                           dimension=10,
                           lattice_parameter=0.1,
                           excitons=1):
+    """
+    :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
+    :param dimensions: Dimensions of the system. A list with len = num_dimensions. By default = 10
+    :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
+    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
+    """
 
     if check_lattice(lattice_parameter) is False:
         print('Lattice parameter smaller than molecular characteristic length')
@@ -155,6 +147,13 @@ def get_2d_ordered_system(conditions,
                           dimensions=[10, 10],
                           lattice_parameter=0.1,
                           excitons=1):
+    """
+    :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
+    :param dimensions: Dimensions of the system. A list with len = num_dimensions. By default [10, 10]
+    :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
+    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
+    """
 
     if check_lattice(lattice_parameter) is False:
         print('Lattice parameter smaller than molecular characteristic length')
@@ -180,6 +179,13 @@ def get_3d_ordered_system(conditions,
                           dimensions=[10, 10, 0],
                           lattice_parameter=0.1,
                           excitons=1):
+    """
+    :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
+    :param dimensions: Dimensions of the system. A list with len = num_dimensions. By deafult [10, 10, 10]
+    :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
+    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
+    """
 
     if check_lattice(lattice_parameter) is False:
         print('Lattice parameter smaller than molecular characteristic length')
@@ -226,6 +232,7 @@ def excited_system(molecules, excitons):
     :param molecules: List of the defined molecules
     :param excitons: Information about the desired excitation
     :return: Excited system
+    It could be defined in the file where all processes and excitations will be defined (??)
     """
 
     if type(excitons) is int:
