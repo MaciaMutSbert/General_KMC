@@ -52,9 +52,9 @@ def time_advance(rate_list, centers_index):
     :param centers_index: List with the indexes of every excited molecule.
     :return: Process duration for each excitation.
     """
-    center_time = {}
+    process_time = {}
     for index in centers_index:
         r = rd.random() + 0.0001        # In order to exclude r = 0 we add a quite small quantity.
-        center_time[str(index)] = (-np.log(r))/np.sum(rate_list)
+        process_time[str(index)] = (-np.log(r))/np.sum(rate_list)
 
-    return center_time
+    return process_time
