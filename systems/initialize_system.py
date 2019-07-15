@@ -19,7 +19,7 @@ def get_homogeneous_system(conditions,
                            num_dimensions=2,
                            dimensions=[10, 10],
                            lattice_parameter=0.1,   # Only if order = Ordered
-                           excitons=1,
+                           excitons={'number': 1, 'positions': [4950]},
                            order='Ordered'):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
@@ -27,7 +27,7 @@ def get_homogeneous_system(conditions,
     :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
     :param dimensions: Dimensions of the system. A list with len = num_dimensions
     :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
-    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :param excitons: Number of excitons in the system. Default  1 in the 5000th molecule of the list (...)
     :param order: String argument. Indicates if we want an ordered system (crystal) or an amorphous system.
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
@@ -46,13 +46,13 @@ def get_disordered_system(conditions,               # External conditions of the
                           num_dimensions=2,
                           dimensions=[10, 10],
                           number_molecules=1000,
-                          excitons=1):
+                          excitons={'number': 1, 'positions': [5000]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
     :param dimensions: Dimensions of the system. A list with len = num_dimensions
     :param number_molecules: Number of molecules in the system. Only needed for a disordered system.
-    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :param excitons: Number of excitons in the system. Default  1 in the 5000th molecule of the list
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
     capacity = get_capacity(num_dimensions, dimensions)
@@ -90,13 +90,13 @@ def get_ordered_system(conditions,
                        num_dimensions=2,
                        dimensions=[10, 10],
                        lattice_parameter=0.1,
-                       excitons=1):
+                       excitons={'number': 1, 'positions': [4950]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
     :param dimensions: Dimensions of the system. A list with len = num_dimensions. By default = [10, 10]
     :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
-    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :param excitons: Number of excitons in the system. Default  1 in the 5000th molecule of the list (...)
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
@@ -116,12 +116,12 @@ def get_ordered_system(conditions,
 def get_1d_ordered_system(conditions,
                           dimension=10,
                           lattice_parameter=0.1,
-                          excitons=1):
+                          excitons={'number': 1, 'positions': [50]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param dimensions: Dimensions of the system. A list with len = num_dimensions. By default = 10
     :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
-    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :param excitons: Number of excitons in the system. Default  1 in the 5000th molecule of the list (...)
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
@@ -138,7 +138,7 @@ def get_1d_ordered_system(conditions,
     molecules = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimension
-    system = {'molecule': molecules, 'conditions': conditions}
+    system = {'molecules': molecules, 'conditions': conditions}
 
     return system
 
@@ -146,12 +146,12 @@ def get_1d_ordered_system(conditions,
 def get_2d_ordered_system(conditions,
                           dimensions=[10, 10],
                           lattice_parameter=0.1,
-                          excitons=1):
+                          excitons={'number': 1, 'positions': [4950]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param dimensions: Dimensions of the system. A list with len = num_dimensions. By default [10, 10]
     :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
-    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :param excitons: Number of excitons in the system. Default  1 in the 5000th molecule of the list (...)
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
@@ -178,12 +178,12 @@ def get_2d_ordered_system(conditions,
 def get_3d_ordered_system(conditions,
                           dimensions=[10, 10, 0],
                           lattice_parameter=0.1,
-                          excitons=1):
+                          excitons={'number': 1, 'positions': [4950]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param dimensions: Dimensions of the system. A list with len = num_dimensions. By deafult [10, 10, 10]
     :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
-    :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
+    :param excitons: Number of excitons in the system. Default  1 in the 5000th molecule of the list (...)
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
@@ -235,9 +235,13 @@ def excited_system(molecules, excitons):
     It could be defined in the file where all processes and excitations will be defined (??)
     """
 
-    if type(excitons) is int:
-        for i in range(excitons):
+    if excitons['positions'] == 'random':
+        for i in range(excitons['number']):
             molecules[np.random.randint(0, len(molecules))].state = 1
+
+    else:
+        for position in excitons['positions']:
+            molecules[position].state = 1
 
     return molecules
 

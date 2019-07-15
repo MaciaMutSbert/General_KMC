@@ -1,7 +1,8 @@
 import numpy as np
+from systems.molecules import Molecule
 from scipy.spatial import distance
 from kmc_implementation.kmc_file import kmc_algorithm
-from processes.processes import get_transfer_rates, updade_step
+from processes.processes import get_transfer_rates, update_step
 
 
 def update_system(system):
@@ -28,14 +29,20 @@ def update_system(system):
         process_collector += path_list
 
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
-    update_step(chosen_process, time, center_indexes)
+    update_step(chosen_process, time, system)
     return chosen_process, time
+
+
+def check_finish(path_list):
+
+    if path_list[-1]['donor'] == path_list[-1]['acceptor']:
+        return True
 
 
 def get_centers(molecules):
     """
     :param molecules: List of objects Molecule
-    :return: The indexs of the excited elements
+    :return: The indexes of the excited elements
     """
     centers = []
     for i, molecule in enumerate(molecules):
@@ -58,7 +65,7 @@ def neighbourhood(center, molecules, radius=0.11):
     for i, molecule in enumerate(molecules):
         coordinates = np.array(molecule.coordinates)
 
-        if distance.euclidean(center_position, coordinates) <\
+        if 0 < distance.euclidean(center_position, coordinates) <\
                 radius:
             neighbours.append(i)
 
@@ -78,14 +85,12 @@ def get_rates_process(centre, neighbour_index, system):
                 rate_list: List with the respective rates
                 The list indexes coincide.
     """
-    physical_conditions = system['conditions']
-
     transfer_rates = {}
     for i in neighbour_index:
-        i_rates = get_transfer_rates(centre, i, physical_conditions)
+        i_rates = get_transfer_rates(centre, i, system)
         transfer_rates[str(i)] = i_rates
 
-    decay_rates = system['molecules'][centre].decay_rate
+    decay_rates = system['molecules'][centre].decay_rate()
 
     process_list, rate_list = process_rate_splitter(transfer_rates, decay_rates, centre)
 
@@ -95,7 +100,7 @@ def get_rates_process(centre, neighbour_index, system):
 def process_rate_splitter(transfer_rates, decay_rates, centre_index):
     """
     :param transfer_rates: Dictionary with the transferred molecule index as key and
-    a new dictionary {'proces': rate} as argument
+    a new dictionary {'process': rate} as argument
     :param decay_rates: Dictionary with the decay process as key and its rate as argument
     :param centre_index: Index of the studied excited molecule
     :return: Two lists:

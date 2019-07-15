@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.spatial import distance
+from systems.molecules import Molecule
 
 
 def get_transfer_rates(center, neighbour_index, system):
@@ -16,7 +17,7 @@ def get_transfer_rates(center, neighbour_index, system):
     molecules = system['molecules']
     directional_rates = np.array([1/5, 1/7])
 
-    process = 'Singlet transfering'
+    process = 'Singlet_transfering'
 
     center_vector = np.array(molecules[center].coordinates)
     neighbour_vector = np.array(molecules[neighbour_index].coordinates)
@@ -27,16 +28,19 @@ def get_transfer_rates(center, neighbour_index, system):
     return {process: rate}
 
 
-def update_step(choosen_process, time, system):
+def update_step(chosen_process, time, system):
     """
-    :param choosen_process: dictionary like dict(center, process, neighbour)
+    :param chosen_process: dictionary like dict(center, process, neighbour)
     :param time: Duration of the process
     :param system: dictionary with the molecule list and the additional information of the system
     Modifies system.
     """
-    molecules = system['molecules']
 
-    if choosen_process['process'] is 'Singlet transfering':
-        molecules[choosen_process['donor']].state = 0
-        molecules[choosen_process['acceptor']].stater = 1
+    if chosen_process['process'] is 'Singlet_transfering':
+        system['molecules'][chosen_process['donor']].state = 0
+        system['molecules'][chosen_process['acceptor']].state = 1
+
+    if chosen_process['process'] is 'Singlet_radiative_decay_rate':
+        system['molecules'][chosen_process['donor']].state = 0
+
 
