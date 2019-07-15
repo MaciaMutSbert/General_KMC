@@ -22,7 +22,7 @@ def update_system(system):
     rate_collector = []
     process_collector = []
     for center in center_indexes:
-        neighbours_index = neighbourhood(center, molecules)
+        neighbours_index = neighbourhood(center, molecules, radius=1.1)
 
         path_list, rate_list = get_rates_process(center, neighbours_index, system)     # Include a time
         rate_collector += rate_list
@@ -91,7 +91,6 @@ def get_rates_process(centre, neighbour_index, system):
         transfer_rates[str(i)] = i_rates
 
     decay_rates = system['molecules'][centre].decay_rate()
-
     process_list, rate_list = process_rate_splitter(transfer_rates, decay_rates, centre)
 
     return process_list, rate_list

@@ -2,6 +2,15 @@ import numpy as np
 from scipy.spatial import distance
 
 
+def path_distance(path, system):
+    molecules = system['molecules']
+
+    donor_position = molecules[path['donor']].coordinates
+    acceptor_position = molecules[path['acceptor']].coordinates
+
+    return distance.euclidean(np.array(donor_position), np.array(acceptor_position))
+
+
 def final_position(path_list, system):
     """
     :param path_list: List indicating the path of the exciton with dict(donor, process, acceptor)

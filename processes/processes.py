@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.spatial import distance
-from systems.molecules import Molecule
 
 
 def get_transfer_rates(center, neighbour_index, system):
@@ -15,16 +14,22 @@ def get_transfer_rates(center, neighbour_index, system):
     Where u_direction is the unit directional vector between both molecules
     """
     molecules = system['molecules']
-    directional_rates = np.array([1/5, 1/7])
 
-    process = 'Singlet_transfering'
+    process = 'Singlet_transfer'
 
-    center_vector = np.array(molecules[center].coordinates)
-    neighbour_vector = np.array(molecules[neighbour_index].coordinates)
-    u_direction = (center_vector - neighbour_vector) / distance.euclidean(center_vector, neighbour_vector)
+    k = 2      # orientational factor. Taken as a constant in an ideal system
 
-    rate = np.abs(np.inner(u_direction, directional_rates))
+    alfa = 1.15      # correcting factor for short distances
+    hopping_distance = distance.euclidean(np.array(molecules[center].coordinates), np.array(molecules[neighbour_index].coordinates))
+    corrected_distance = alfa*molecules[int(center)].transition_dipole + hopping_distance
 
+    n = system['conditions']['refractive_index']
+    sigma = 0.3     # deviation of the absorption and emission spectra considered gaussian
+
+    factor_1 = k**2 * np.pi ** 2 * molecules[int(center)].transition_dipole**4
+    factor_2 = n**4 * corrected_distance**6 * sigma
+
+    rate = factor_1 / factor_2
     return {process: rate}
 
 
@@ -36,11 +41,15 @@ def update_step(chosen_process, time, system):
     Modifies system.
     """
 
-    if chosen_process['process'] is 'Singlet_transfering':
+    if chosen_process['process'] is 'Singlet_transfer':
         system['molecules'][chosen_process['donor']].state = 0
         system['molecules'][chosen_process['acceptor']].state = 1
 
     if chosen_process['process'] is 'Singlet_radiative_decay_rate':
         system['molecules'][chosen_process['donor']].state = 0
+
+
+
+
 
 
