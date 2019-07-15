@@ -51,7 +51,7 @@ def get_disordered_system(conditions,               # External conditions of the
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
     :param dimensions: Dimensions of the system. A list with len = num_dimensions
-    :param num_molecules: Number of molecules in the system. Only needed for a disordered system.
+    :param number_molecules: Number of molecules in the system. Only needed for a disordered system.
     :param excitons: Number of excitons in the system. Default = 1 (meaning one singlet exciton at a random position) (...)
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
