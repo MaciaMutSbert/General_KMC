@@ -6,9 +6,19 @@ import numpy as np
 from systems.molecules import Molecule
 
 
-conditions = {'temperature': 273.15, 'refractive_index': 2}
-lattice_parameter = 1   # nm
-dimensions = [100, 100]    # nm
+"""
+In conditons the physical conditions of the system and molecule are defined.
+Global condition: temperature
+Material parameters: refractive index (n), orientational factor, k
+Molecule parameters:    singlet (excitation) energy, must be given in eV
+                        transition dipole, must be given in atomic units
+"""
+conditions = {'temperature': 273.15, 'refractive_index': 2, 'orientational_factor': 2, 'molecule_type': 1,
+              'singlet_energy': 2.5,
+              'transition_dipole': 1}
+
+lattice_parameter = 0.45       # nm
+dimensions = [90, 90]     # nm
 
 
 final_positions = []

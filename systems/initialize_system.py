@@ -73,7 +73,11 @@ def get_disordered_system(conditions,               # External conditions of the
 
             too_close = distance_checking(coordinates, molecules)
 
-        molecules.append(Molecule(coordinates=coordinates))
+        e_s = conditions['singlet_energy']
+        u = conditions['transition_dipole']
+        type = conditions['molecule_type']
+        molecules.append(Molecule(coordinates=coordinates, transition_dipole=u, singlet_excitation_energy=e_s,
+                                  molecule_type=type))
         molecule_count += 1
 
         if molecule_count == capacity:
@@ -133,7 +137,11 @@ def get_1d_ordered_system(conditions,
     x_max = dimension/2
     # We want the distribution center at 0
     for x in np.arange(-x_max, x_max, lattice_parameter):
-        molecules.append(Molecule([x]))
+        e_s = conditions['singlet_energy']
+        u = conditions['transition_dipole']
+        type = conditions['molecule_type']
+
+        molecules.append(Molecule(coordinates=[x], transition_dipole=u, singlet_excitation_energy=e_s, molecule_type=type))
 
     molecules = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -165,7 +173,12 @@ def get_2d_ordered_system(conditions,
     # We want the center of the distribution at (0,0)
     for x in np.arange(-x_max, x_max, lattice_parameter):
         for y in np.arange(-y_max, y_max, lattice_parameter):
-            molecules.append(Molecule([x, y]))
+            e_s = conditions['singlet_energy']
+            u = conditions['transition_dipole']
+            type = conditions['molecule_type']
+
+            molecules.append(Molecule(coordinates=[x, y], transition_dipole=u, singlet_excitation_energy=e_s,
+                                      molecule_type=type))
 
     molecules = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -200,7 +213,12 @@ def get_3d_ordered_system(conditions,
     for x in np.arange(-x_max, x_max, step):
         for y in np.arange(-y_max, y_max, step):
             for z in np.arange(-z_max, z_max, step):
-                molecules.append(Molecule([x, y, z]))
+                e_s = conditions['singlet_energy']
+                u = conditions['transition_dipole']
+                type = conditions['molecule_type']
+
+                molecules.append(Molecule(coordinates=[x, y, z], transition_dipole=u, singlet_excitation_energy=e_s,
+                                          molecule_type=type))
 
     molecules = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
