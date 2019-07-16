@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.spatial import distance
+from numpy import pi
 
 
 def get_transfer_rates(center, neighbour_index, system):
@@ -9,28 +10,34 @@ def get_transfer_rates(center, neighbour_index, system):
     :param system: Dictionary with the list of molecules and additional physical information
     :return: Dictionary with the possible transfer processes between the two involved molecules
     as keys and its rates as arguments.
-    In this simple example we will consider that the rate is given by:
-    rate = asb(directional_rates * u_direction)
-    Where u_direction is the unit directional vector between both molecules
     """
     molecules = system['molecules']
+    transfer_rates = {}
 
-    process = 'Singlet_transfer'
+    if molecules[center].type == 1:
+        if molecules[neighbour_index].type == 1:
+            k = system['conditions']['orientational_factor_1']
 
-    k = 2      # orientational factor. Taken as a constant in an ideal system
+            if molecules[center].state == 1:
+                if molecules[neighbour_index].state == 0:
+                    process = 'Singlet_transfer'
 
-    alfa = 1.15      # correcting factor for short distances
-    hopping_distance = distance.euclidean(np.array(molecules[center].coordinates), np.array(molecules[neighbour_index].coordinates))
-    corrected_distance = alfa*molecules[int(center)].transition_dipole + hopping_distance
+                    n = system['conditions']['refractive_index']
+                    alfa = 1.15                                                          # short distances correction
+                    sigma = system['conditions']['a_e_spectra_deviation'] / 27.211       # atomic units
 
-    n = system['conditions']['refractive_index']
-    sigma = 0.3     # deviation of the absorption and emission spectra considered gaussian
+                    u = system['conditions']['transition_dipole']
+                    center_position = np.array(molecules[center].coordinates)
+                    neighbour_position = np.array(molecules[neighbour_index].coordinates)
+                    inter_distance = distance.euclidean(center_position, neighbour_position)/0.053    # atomic units
 
-    factor_1 = k**2 * np.pi ** 2 * molecules[int(center)].transition_dipole**4
-    factor_2 = n**4 * corrected_distance**6 * sigma
+                    factor_1 = k**2 * pi**(3/2) * u**4
+                    factor_2 = n**4 * (alfa*u + inter_distance)**6 * sigma
 
-    rate = factor_1 / factor_2
-    return {process: rate}
+                    rate = factor_1 / factor_2                              # atomic units
+                    transfer_rates[process] = rate / (2.4189*10**-8)      # in ns⁻¹
+
+    return transfer_rates
 
 
 def update_step(chosen_process, time, system):
@@ -45,7 +52,7 @@ def update_step(chosen_process, time, system):
         system['molecules'][chosen_process['donor']].state = 0
         system['molecules'][chosen_process['acceptor']].state = 1
 
-    if chosen_process['process'] is 'Singlet_radiative_decay_rate':
+    if chosen_process['process'] is 'Singlet_radiative_decay':
         system['molecules'][chosen_process['donor']].state = 0
 
 

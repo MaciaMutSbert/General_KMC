@@ -129,7 +129,7 @@ def get_1d_ordered_system(conditions,
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    if check_lattice(lattice_parameter) is False:
+    if check_lattice(lattice_parameter, conditions) is False:
         print('Lattice parameter smaller than molecular characteristic length')
         return
 
@@ -140,8 +140,10 @@ def get_1d_ordered_system(conditions,
         e_s = conditions['singlet_energy']
         u = conditions['transition_dipole']
         type = conditions['molecule_type']
+        length = conditions['characteristic_length']
 
-        molecules.append(Molecule(coordinates=[x], transition_dipole=u, singlet_excitation_energy=e_s, molecule_type=type))
+        molecules.append(Molecule(coordinates=[x], transition_dipole=u, singlet_excitation_energy=e_s,
+                                  molecule_type=type, characteristic_length=length))
 
     molecules = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -163,7 +165,7 @@ def get_2d_ordered_system(conditions,
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    if check_lattice(lattice_parameter) is False:
+    if check_lattice(lattice_parameter, conditions) is False:
         print('Lattice parameter smaller than molecular characteristic length')
         return
 
@@ -176,9 +178,10 @@ def get_2d_ordered_system(conditions,
             e_s = conditions['singlet_energy']
             u = conditions['transition_dipole']
             type = conditions['molecule_type']
+            length = conditions['characteristic_length']
 
             molecules.append(Molecule(coordinates=[x, y], transition_dipole=u, singlet_excitation_energy=e_s,
-                                      molecule_type=type))
+                                      molecule_type=type, characteristic_length=length))
 
     molecules = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -200,7 +203,7 @@ def get_3d_ordered_system(conditions,
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    if check_lattice(lattice_parameter) is False:
+    if check_lattice(lattice_parameter, conditions) is False:
         print('Lattice parameter smaller than molecular characteristic length')
         return
 
@@ -216,9 +219,10 @@ def get_3d_ordered_system(conditions,
                 e_s = conditions['singlet_energy']
                 u = conditions['transition_dipole']
                 type = conditions['molecule_type']
+                length = conditions['characteristic_length']
 
                 molecules.append(Molecule(coordinates=[x, y, z], transition_dipole=u, singlet_excitation_energy=e_s,
-                                          molecule_type=type))
+                                          molecule_type=type, characteristic_length=length))
 
     molecules = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -280,13 +284,13 @@ def get_capacity(num_dimensions, dimensions):
     return int(total_volume/elemental_site)
 
 
-def check_lattice(lattice_parameter):
+def check_lattice(lattice_parameter, conditions):
     """
     :param lattice_parameter: Lattice parameter
     :return: Boolean. Checks if the lattice parameter chosen is smaller than the molecular characteristic length.
     """
-    molecule = Molecule(0, 0)
-    if lattice_parameter < molecule.characteristic_length:
+    characteristic_length = conditions['characteristic_length']
+    if lattice_parameter < characteristic_length:
         return False
     else:
         return True

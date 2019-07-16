@@ -29,7 +29,7 @@ def select_process(constant_list):
     return len(list_[0])
 
 
-def time_advance(rate_list, ):
+def time_advance(rate_list):
     """
     :param rate_list: List with all the rates. Considering all the processes for all exciton
     :return: Process duration
