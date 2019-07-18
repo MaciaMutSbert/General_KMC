@@ -5,7 +5,7 @@ from kmc_implementation.kmc_file import kmc_algorithm
 from processes.processes import get_transfer_rates, update_step
 
 
-def update_system(system):
+def update_system(system, rate_memory, molecular_memory):
     """
     :param system: Dictionary with all the information of the system
     1. Looks for the excited molecules (center_indexes).
@@ -24,7 +24,8 @@ def update_system(system):
     for center in center_indexes:
         neighbours_index = neighbourhood(center, molecules, radius=system['conditions']['neighbourhood_radius'])
 
-        path_list, rate_list = get_rates_process(center, neighbours_index, system)     # Include a time
+        path_list, rate_list = get_rates_process(center, neighbours_index, system, rate_memory,
+                                                 molecular_memory)
         rate_collector += rate_list
         process_collector += path_list
 
@@ -74,7 +75,7 @@ def neighbourhood(center, molecules, radius=0.11):
     return neighbours
 
 
-def get_rates_process(centre, neighbour_index, system):
+def get_rates_process(centre, neighbour_index, system, rate_memory, molecular_memory):
     """
     :param centre: Index of the studied excited molecule
     :param neighbour_index: Indexes of the neighbours (candidates to accept the exciton)
@@ -89,7 +90,7 @@ def get_rates_process(centre, neighbour_index, system):
     """
     transfer_rates = {}
     for i in neighbour_index:
-        i_rates = get_transfer_rates(centre, i, system)
+        i_rates = get_transfer_rates(centre, i, system, rate_memory, molecular_memory)
         transfer_rates[str(i)] = i_rates
     decay_rates = system['molecules'][centre].decay_rate()
     process_list, rate_list = process_rate_splitter(transfer_rates, decay_rates, centre)

@@ -37,11 +37,13 @@ for i in (1.9, 1.7):
 
         total_time = 0
         path_list = []
+        molecular_memory = []
+        rate_memory = []
 
         finished = False
         it = 0
         while finished is False:
-            path, time = update_system(system)
+            path, time = update_system(system, rate_memory, molecular_memory)
             total_time += time
             path_list.append(path)
             it += 1
@@ -59,7 +61,7 @@ for i in (1.9, 1.7):
 
     df_deviation = np.float(np.std(np.array(diffusion_length))) / 10
 
-    lt_deviation = np.float(np.std(np.array(life_time))) / 10.0000
+    lt_deviation = np.float(np.std(np.array(life_time))) / 10
 
     iterations = np.arange(0, 100, 1)
 
