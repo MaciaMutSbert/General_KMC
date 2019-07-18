@@ -25,16 +25,17 @@ def get_transfer_rates(center, neighbour_index, system):
                     n = system['conditions']['refractive_index']
                     alfa = 1.15                                                          # short distances correction
                     sigma = system['conditions']['a_e_spectra_deviation'] / 27.211       # atomic units
+                    delta = system['conditions']['delta'] / 27.211
 
                     u = system['conditions']['transition_dipole']
                     center_position = np.array(molecules[center].coordinates)
                     neighbour_position = np.array(molecules[neighbour_index].coordinates)
                     inter_distance = distance.euclidean(center_position, neighbour_position)/0.053    # atomic units
 
-                    factor_1 = k**2 * pi**(3/2) * u**4
+                    factor_1 = k**2 * pi**(3/2) * u**4 * np.exp(-(delta**2) / (2*sigma)**2)
                     factor_2 = n**4 * (alfa*u + inter_distance)**6 * sigma
 
-                    rate = factor_1 / factor_2                              # atomic units
+                    rate = factor_1 / factor_2      # atomic units
                     transfer_rates[process] = rate / (2.4189*10**-8)      # in ns⁻¹
 
     return transfer_rates

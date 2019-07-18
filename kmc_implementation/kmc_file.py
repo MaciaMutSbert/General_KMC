@@ -35,4 +35,4 @@ def time_advance(rate_list):
     :return: Process duration
     """
     r = rd.random()
-    return (-np.log(r))/np.sum(rate_list)
+    return (-np.log(r)) / (np.sum(rate_list))

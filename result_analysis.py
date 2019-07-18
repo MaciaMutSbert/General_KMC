@@ -2,13 +2,8 @@ import numpy as np
 from scipy.spatial import distance
 
 
-def path_distance(path, system):
-    molecules = system['molecules']
-
-    donor_position = molecules[path['donor']].coordinates
-    acceptor_position = molecules[path['acceptor']].coordinates
-
-    return distance.euclidean(np.array(donor_position), np.array(acceptor_position))
+def moved_length(initial_position, final_position):
+    return distance.euclidean(np.array(initial_position), np.array(final_position))
 
 
 def final_position(path_list, system):
