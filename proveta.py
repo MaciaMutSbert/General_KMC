@@ -1,5 +1,5 @@
 from systems.initialize_system import get_homogeneous_system
-from update_functions.update_file import update_system, check_finish
+from update_functions.update_file import update_system, check_finish, get_centers
 from result_analysis import initial_position, final_position, x_y_splitter, moved_length
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,64 +17,75 @@ Absorption and emission spectra deviation  (considered as gaussian)       (uncla
 
 
 lattice_parameter = 0.45           # nm
-dimensions = [90, 90]          # nm
+dimensions = [26.1, 26.1]          # nm
 num_dimensions = 2
+excitons = {'number': 1, 'positions': 1653}
 
-for i in (1.9, 1.7):
-    conditions = {'temperature': 273.15, 'refractive_index': 2, 'orientational_factor_1': 2,
+
+conditions = {'temperature': 273.15, 'refractive_index': 2, 'orientational_factor_1': 2,
                   'neighbourhood_radius': 0.46,
-                  'a_e_spectra_deviation': 0.3, 'delta': i, 'molecule_type': 1,
+                  'a_e_spectra_deviation': 0.3, 'delta': 1.65, 'molecule_type': 1,
                   'singlet_energy': 2.5, 'transition_dipole': 1, 'characteristic_length': 10 ** -8}
-    initial_positions = []
-    final_positions = []
-    time_list = []
-    life_time = []
-    diffusion_length = []
-    exciton_lengths = []
 
-    for j in range(100):
-        system = get_homogeneous_system(conditions, dimensions=dimensions, lattice_parameter=lattice_parameter)
+# Lists for further analysis
+initial_positions = []
+final_positions = []
+time_list = []
+life_time = []
+diffusion_length = []
+exciton_lengths = []
 
-        total_time = 0
-        path_list = []
-        molecular_memory = []
-        rate_memory = []
+# Memory of the system
+molecular_memory = []
+rate_memory = []
+decay_memory = []
+state_memory = []
 
-        finished = False
-        it = 0
-        while finished is False:
-            path, time = update_system(system, rate_memory, molecular_memory)
-            total_time += time
-            path_list.append(path)
-            it += 1
-            finished = check_finish(path_list)
+for j in range(100):
+    system = get_homogeneous_system(conditions, dimensions=dimensions, lattice_parameter=lattice_parameter)
 
-        final_positions.append(final_position(path_list, system))
+    total_time = 0
+    path_list = []
 
-        exciton_lengths.append(moved_length(initial_position(path_list, system), final_position(path_list, system)))
-        diffusion_length.append(np.average(np.array(exciton_lengths)))
+    finished = False
+    it = 0
+    path = None
+    center_indexes = []
+    while finished is False:
+        get_centers(system, path, center_indexes)
+        path, time = update_system(system, center_indexes, rate_memory, molecular_memory, decay_memory, state_memory)
+        print(path)
+        total_time += time
+        path_list.append(path)
+        it += 1
+        finished = check_finish(path_list)
 
-        time_list.append(total_time)
-        life_time.append(np.average(np.array(time_list)))
+    final_positions.append(final_position(path_list, system))
+    print('Iteratció' + str(j))
+    exciton_lengths.append(moved_length(initial_position(path_list, system), final_position(path_list, system)))
+    diffusion_length.append(np.average(np.array(exciton_lengths)))
 
-    final_x_list, final_y_list = x_y_splitter(final_positions)
+    time_list.append(total_time)
+    life_time.append(np.average(np.array(time_list)))
 
-    df_deviation = np.float(np.std(np.array(diffusion_length))) / 10
+final_x_list, final_y_list = x_y_splitter(final_positions)
 
-    lt_deviation = np.float(np.std(np.array(life_time))) / 10
+df_deviation = np.float(np.std(np.array(diffusion_length))) / 10
 
-    iterations = np.arange(0, 100, 1)
+lt_deviation = np.float(np.std(np.array(life_time))) / 10
 
-    plt.plot(iterations, diffusion_length, 'ro')
-    plt.xlabel('Number of iterations')
-    plt.ylabel('Diffusion length')
-    plt.show()
+iterations = np.arange(0, 100, 1)
 
-    plt.plot(iterations, life_time, 'ro')
-    plt.xlabel('Number of iterations')
-    plt.ylabel('Life_time')
-    plt.show()
+plt.plot(iterations, diffusion_length, 'ro')
+plt.xlabel('Number of iterations')
+plt.ylabel('Diffusion length')
+plt.show()
 
-    print('Average distance: %.5f +- %.5f' % (diffusion_length[-1], df_deviation))
-    print('Average time %.5f +- %.5f' % (life_time[-1], lt_deviation))
+plt.plot(iterations, life_time, 'ro')
+plt.xlabel('Number of iterations')
+plt.ylabel('Life_time')
+plt.show()
+
+print('Average distance: %.5f +- %.5f' % (diffusion_length[-1], df_deviation))
+print('Average time %.5f +- %.5f' % (life_time[-1], lt_deviation))
 

@@ -8,6 +8,8 @@ def get_transfer_rates(center, neighbour_index, system, rate_memory, molecular_m
     :param center: Index of the studies excited molecule
     :param neighbour_index: Index of a nearby molecule (possible acceptor of the exciton)
     :param system: Dictionary with the list of molecules and additional physical information
+    :param rate_memory:
+    :param molecular_memory:
     :return: Dictionary with the possible transfer processes between the two involved molecules
     as keys and its rates as arguments.
     """
@@ -17,7 +19,6 @@ def get_transfer_rates(center, neighbour_index, system, rate_memory, molecular_m
 
     if molecules[center].type == 1:
         if molecules[neighbour_index].type == 1:
-
             molecular_info.append(molecules[center].type)
             molecular_info.append(molecules[neighbour_index].type)
 
@@ -30,23 +31,13 @@ def get_transfer_rates(center, neighbour_index, system, rate_memory, molecular_m
             if molecules[center].state == 1:
                 if molecules[neighbour_index].state == 0:
                     process = 'Singlet_transfer'
-
                     u = system['conditions']['transition_dipole']
                     center_position = np.array(molecules[center].coordinates)
                     neighbour_position = np.array(molecules[neighbour_index].coordinates)
                     inter_distance = distance.euclidean(center_position, neighbour_position)/0.053    # atomic units
-                    """
-                    Per ara el rate sols depen de la distància intermolecular, doncs la resta de paràmetres venen
-                    fixats per les condicions del material. 
-                    Per això estaria bé que guardar el rate calculat per una determinada distància a fi de salvar cost
-                    computacional.
-                    En una mateixa simulació en general tendrem paràmetres
-                    del material que no variaran. Sols variaran el moment de transició dipolar (en quan a modul) i 
-                    les posicions relatives. 
-                    """
 
                     molecular_info.append(molecules[center].state)
-                    molecular_info.append(molecules[neighbour_index.state])
+                    molecular_info.append(molecules[neighbour_index].state)
                     molecular_info.append(u)
                     molecular_info.append(inter_distance)
 
@@ -63,7 +54,7 @@ def get_transfer_rates(center, neighbour_index, system, rate_memory, molecular_m
                         transfer_rates[process] = rate / (2.4189*10**-8)      # in ns⁻¹
 
                         molecular_memory.append(molecular_info)
-                        rate_memory.append(rate)
+                        rate_memory.append(transfer_rates[process])
 
     return transfer_rates
 
@@ -84,7 +75,18 @@ def update_step(chosen_process, time, system):
         system['molecules'][chosen_process['donor']].state = 0
 
 
+def get_decay_rates(system, centre, decay_memory, state_memory):
 
+    molecule = system['molecules'][centre]
+
+    if molecule.state in state_memory:
+        index = state_memory.index(molecule.state)
+        return decay_memory[index]
+
+    else:
+        decay_memory.append(molecule.decay_rate())
+        state_memory.append(molecule.state)
+        return molecule.decay_rate()
 
 
 

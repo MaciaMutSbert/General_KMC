@@ -19,7 +19,7 @@ def get_homogeneous_system(conditions,
                            num_dimensions=2,
                            dimensions=[10, 10],
                            lattice_parameter=0.1,   # Only if order = Ordered
-                           excitons={'number': 1, 'positions': [4950]},
+                           excitons={'number': 1, 'positions': [85]},
                            order='Ordered'):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
@@ -46,7 +46,7 @@ def get_disordered_system(conditions,               # External conditions of the
                           num_dimensions=2,
                           dimensions=[10, 10],
                           number_molecules=1000,
-                          excitons={'number': 1, 'positions': [5000]}):
+                          excitons={'number': 1, 'positions': [500]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
@@ -94,7 +94,7 @@ def get_ordered_system(conditions,
                        num_dimensions=2,
                        dimensions=[10, 10],
                        lattice_parameter=0.1,
-                       excitons={'number': 1, 'positions': [4950]}):
+                       excitons={'number': 1, 'positions': [85]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param num_dimensions: Dimensionality of the system (1, 2, 3). Default = 2
@@ -156,7 +156,7 @@ def get_1d_ordered_system(conditions,
 def get_2d_ordered_system(conditions,
                           dimensions=[10, 10],
                           lattice_parameter=0.1,
-                          excitons={'number': 1, 'positions': [4950]}):
+                          excitons={'number': 1, 'positions': [85]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param dimensions: Dimensions of the system. A list with len = num_dimensions. By default [10, 10]
@@ -194,7 +194,7 @@ def get_2d_ordered_system(conditions,
 def get_3d_ordered_system(conditions,
                           dimensions=[10, 10, 0],
                           lattice_parameter=0.1,
-                          excitons={'number': 1, 'positions': [4950]}):
+                          excitons={'number': 1, 'positions': [85]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param dimensions: Dimensions of the system. A list with len = num_dimensions. By deafult [10, 10, 10]
