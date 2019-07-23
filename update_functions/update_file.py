@@ -1,26 +1,25 @@
 import numpy as np
-from systems.molecules import Molecule
 from scipy.spatial import distance
 from kmc_implementation.kmc_file import kmc_algorithm
 from processes.processes import get_transfer_rates, update_step, get_decay_rates
 
 
-def update_system(system, center_indexes,  rate_memory, molecular_memory, decay_memory, state_memory):
+def update_system(system,  rate_memory, molecular_memory, decay_memory, state_memory):
     """
     :param system: Dictionary with all the information of the system
     :param rate_memory:
     :param molecular_memory:
     :param decay_memory:
     :param state_memory:
-    :param center_indexes:
-    1. Looks for the excited molecules (center_indexes).
-    2. Looks for the neighbourhood of every centre.
-    2(bis). Chooses a process for every exciton. This paths includes: dict(centre, process, new molecule)
+    Dictionary system already has the indexes of the excited molecules
+    1. Looks for the neighbourhood of every centre.
+    2. Chooses a process for every exciton. This paths includes: dict(centre, process, new molecule)
     3. Considering all the calculated rates computes the time interval for each process.
     4. Updates the system according to the chosen path and the time passed.
     :return:
     """
     molecules = system['molecules']
+    center_indexes = system['centers']
 
     rate_collector = []
     process_collector = []
@@ -41,30 +40,32 @@ def check_finish(path_list):
 
     if path_list[-1]['donor'] == path_list[-1]['acceptor']:
         return True
+
     else:
         return False
 
 
-def get_centers(system, path, center_indexes):
+def get_centers(system, path):
     """
-    :param system: List of objects Molecule
+    :param system: Dictionary with the information of the system. Only the list of the excited molecules
+    indexes is used.
     :param path: dict(donor, process, acceptor) the acceptor is the new center
-    :param center_indexes:
-    :return: The indexes of the excited elements
+    Changes the list of centers when the exciton is transferred from a 'donor' to an 'acceptor'.
     """
 
-    if path is None:
+    """
         molecules = system['molecules']
         for i, molecule in enumerate(molecules):
             if molecule.state != 0:
                 center_indexes.append(i)
+        """
+
+    if path is not None:
+        system['centers'].remove(path['donor'])
+        system['centers'].append(path['acceptor'])
 
 
-    else:
-        center_indexes.remove(path['donor'])
-        center_indexes.append(path['acceptor'])
-
-
+#############################################################################################
 def neighbourhood(center, molecules, radius=0.11):
     """
     :param center: Index of an excited Molecule object
@@ -78,8 +79,7 @@ def neighbourhood(center, molecules, radius=0.11):
     for i, molecule in enumerate(molecules):
         coordinates = np.array(molecule.coordinates)
 
-        if 0 < distance.euclidean(center_position, coordinates) <\
-                radius:
+        if 0 < distance.euclidean(center_position, coordinates) < radius:
             neighbours.append(i)
 
     return neighbours
@@ -103,9 +103,11 @@ def get_rates_process(centre, neighbour_index, system, rate_memory, molecular_me
                 The list indexes coincide.
     """
     transfer_rates = {}
+
     for i in neighbour_index:
         i_rates = get_transfer_rates(centre, i, system, rate_memory, molecular_memory)
         transfer_rates[str(i)] = i_rates
+
     decay_rates = get_decay_rates(system, centre, decay_memory, state_memory)
     process_list, rate_list = process_rate_splitter(transfer_rates, decay_rates, centre)
 

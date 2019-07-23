@@ -29,7 +29,8 @@ def get_homogeneous_system(conditions,
     :param lattice_parameter: Parameter of the lattice we want to construct. Default = 0.1
     :param excitons: Number of excitons in the system. Default  1 in the 5000th molecule of the list (...)
     :param order: String argument. Indicates if we want an ordered system (crystal) or an amorphous system.
-    :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
+    :return: A dictionary with a list of molecules, an updated dictionary with the physical conditions
+    and a list with the indexes of the excited molecules.
     """
 
     if order == 'Ordered':
@@ -83,9 +84,9 @@ def get_disordered_system(conditions,               # External conditions of the
         if molecule_count == capacity:
             break
 
-    molecules = excited_system(molecules, excitons)
+    centre_indexes = excited_system(molecules, excitons)
     conditions['dimensions'] = dimensions
-    system = {'molecules': molecules, 'conditions': conditions}
+    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
 
     return system
 
@@ -145,10 +146,10 @@ def get_1d_ordered_system(conditions,
         molecules.append(Molecule(coordinates=[x], transition_dipole=u, singlet_excitation_energy=e_s,
                                   molecule_type=type, characteristic_length=length))
 
-    molecules = excited_system(molecules, excitons)
+    centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimension
-    system = {'molecules': molecules, 'conditions': conditions}
+    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
 
     return system
 
@@ -183,10 +184,10 @@ def get_2d_ordered_system(conditions,
             molecules.append(Molecule(coordinates=[x, y], transition_dipole=u, singlet_excitation_energy=e_s,
                                       molecule_type=type, characteristic_length=length))
 
-    molecules = excited_system(molecules, excitons)
+    centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
-    system = {'molecules': molecules, 'conditions': conditions}
+    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
 
     return system
 
@@ -224,14 +225,15 @@ def get_3d_ordered_system(conditions,
                 molecules.append(Molecule(coordinates=[x, y, z], transition_dipole=u, singlet_excitation_energy=e_s,
                                           molecule_type=type, characteristic_length=length))
 
-    molecules = excited_system(molecules, excitons)
+    centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
-    system = {'molecules': molecules, 'conditions': conditions}
+    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
 
     return system
 
 
+######################################################################################
 def distance_checking(coordinates, molecules):
     """
     :param coordinates: coordinates of the studied molecule
@@ -253,19 +255,22 @@ def excited_system(molecules, excitons):
     """
     :param molecules: List of the defined molecules
     :param excitons: Information about the desired excitation
-    :return: Excited system
+    :return: Excited system, list with the index of the excited molecules
     It could be defined in the file where all processes and excitations will be defined (??)
     """
+    centre_list = []
 
     if excitons['positions'] == 'random':
         for i in range(excitons['number']):
-            molecules[np.random.randint(0, len(molecules))].state = 1
-
+            centre = np.random.randint(0, len(molecules))
+            molecules[centre].state = 1
+            centre_list.append(centre)
     else:
         for position in excitons['positions']:
             molecules[position].state = 1
+            centre_list.append(position)
 
-    return molecules
+    return centre_list
 
 
 def get_capacity(num_dimensions, dimensions):

@@ -4,7 +4,7 @@ class Molecule:
                  transition_dipole,
                  singlet_excitation_energy,
                  molecule_type,
-                 characteristic_length,
+                 characteristic_length=0.0000001,
                  state=0):
         """
         :param coordinates: position of the molecule in nm

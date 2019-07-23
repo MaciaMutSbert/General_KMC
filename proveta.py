@@ -23,9 +23,9 @@ excitons = {'number': 1, 'positions': 1653}
 
 
 conditions = {'temperature': 273.15, 'refractive_index': 2, 'orientational_factor_1': 2,
-                  'neighbourhood_radius': 0.46,
-                  'a_e_spectra_deviation': 0.3, 'delta': 1.65, 'molecule_type': 1,
-                  'singlet_energy': 2.5, 'transition_dipole': 1, 'characteristic_length': 10 ** -8}
+                'neighbourhood_radius': 0.46,
+                'a_e_spectra_deviation': 0.3, 'delta': 1.65, 'molecule_type': 1,
+                'singlet_energy': 2.5, 'transition_dipole': 1, 'characteristic_length': 10 ** -8}
 
 # Lists for further analysis
 initial_positions = []
@@ -42,7 +42,8 @@ decay_memory = []
 state_memory = []
 
 for j in range(100):
-    system = get_homogeneous_system(conditions, dimensions=dimensions, lattice_parameter=lattice_parameter)
+    system = get_homogeneous_system(conditions, dimensions=dimensions, lattice_parameter=lattice_parameter,
+                                    excitons=excitons)
 
     total_time = 0
     path_list = []
@@ -50,29 +51,30 @@ for j in range(100):
     finished = False
     it = 0
     path = None
-    center_indexes = []
     while finished is False:
-        get_centers(system, path, center_indexes)
-        path, time = update_system(system, center_indexes, rate_memory, molecular_memory, decay_memory, state_memory)
-        print(path)
+        get_centers(system, path)
+        path, time = update_system(system, rate_memory, molecular_memory, decay_memory, state_memory)
+
         total_time += time
         path_list.append(path)
+
         it += 1
         finished = check_finish(path_list)
 
     final_positions.append(final_position(path_list, system))
-    print('Iteratció' + str(j))
     exciton_lengths.append(moved_length(initial_position(path_list, system), final_position(path_list, system)))
     diffusion_length.append(np.average(np.array(exciton_lengths)))
 
     time_list.append(total_time)
     life_time.append(np.average(np.array(time_list)))
 
+
 final_x_list, final_y_list = x_y_splitter(final_positions)
 
-df_deviation = np.float(np.std(np.array(diffusion_length))) / 10
+df_deviation = np.float(np.std(np.array(diffusion_length)))
 
-lt_deviation = np.float(np.std(np.array(life_time))) / 10
+lt_deviation = np.float(np.std(np.array(life_time)))
+
 
 iterations = np.arange(0, 100, 1)
 

@@ -90,3 +90,5 @@ def get_decay_rates(system, centre, decay_memory, state_memory):
 
 
 
+#def forster_coupling(center, neighbour_index, system):
+
