@@ -4,13 +4,11 @@ from kmc_implementation.kmc_file import kmc_algorithm
 from processes.processes import get_transfer_rates, update_step, get_decay_rates
 
 
-def update_system(system,  rate_memory, molecular_memory, decay_memory, state_memory):
+def update_system(system,  memory):
     """
     :param system: Dictionary with all the information of the system
-    :param rate_memory:
-    :param molecular_memory:
-    :param decay_memory:
-    :param state_memory:
+    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
+    parameters is used as key.
     Dictionary system already has the indexes of the excited molecules
     1. Looks for the neighbourhood of every centre.
     2. Chooses a process for every exciton. This paths includes: dict(centre, process, new molecule)
@@ -26,8 +24,7 @@ def update_system(system,  rate_memory, molecular_memory, decay_memory, state_me
     for center in center_indexes:
         neighbours_index = neighbourhood(center, molecules, radius=system['conditions']['neighbourhood_radius'])
 
-        path_list, rate_list = get_rates_process(center, neighbours_index, system, rate_memory,
-                                                 molecular_memory, decay_memory, state_memory)
+        path_list, rate_list = get_rates_process(center, neighbours_index, system, memory)
         rate_collector += rate_list
         process_collector += path_list
 
@@ -85,15 +82,13 @@ def neighbourhood(center, molecules, radius=0.11):
     return neighbours
 
 
-def get_rates_process(centre, neighbour_index, system, rate_memory, molecular_memory, decay_memory, state_memory):
+def get_rates_process(centre, neighbour_index, system, memory):
     """
     :param centre: Index of the studied excited molecule
     :param neighbour_index: Indexes of the neighbours (candidates to accept the exciton)
     :param system: Dictionary with the information of the system.
-    :param rate_memory:
-    :param molecular_memory:
-    :param decay_memory:
-    :param state_memory:
+    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
+    parameters is used as key.
     Computes the transfer and decay rates and builds two dictionaries:
             One with the decay process as key and its rate as argument
             One with the transferred molecule index as key and {'process': rate} as argument
@@ -105,10 +100,10 @@ def get_rates_process(centre, neighbour_index, system, rate_memory, molecular_me
     transfer_rates = {}
 
     for i in neighbour_index:
-        i_rates = get_transfer_rates(centre, i, system, rate_memory, molecular_memory)
+        i_rates = get_transfer_rates(centre, i, system, memory)
         transfer_rates[str(i)] = i_rates
 
-    decay_rates = get_decay_rates(system, centre, decay_memory, state_memory)
+    decay_rates = get_decay_rates(system, centre, memory)
     process_list, rate_list = process_rate_splitter(transfer_rates, decay_rates, centre)
 
     return process_list, rate_list

@@ -3,7 +3,6 @@ class Molecule:
     def __init__(self, coordinates,
                  transition_dipole,
                  singlet_excitation_energy,
-                 molecule_type,
                  characteristic_length=0.0000001,
                  state=0):
         """
@@ -14,7 +13,6 @@ class Molecule:
         """
         self.coordinates = coordinates
         self.state = state
-        self.type = molecule_type
         self.characteristic_length = characteristic_length
         self.transition_dipole = transition_dipole      # atomic units
         self.singlet_excitation_energy = singlet_excitation_energy              # eV

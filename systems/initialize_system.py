@@ -77,8 +77,7 @@ def get_disordered_system(conditions,               # External conditions of the
         e_s = conditions['singlet_energy']
         u = conditions['transition_dipole']
         type = conditions['molecule_type']
-        molecules.append(Molecule(coordinates=coordinates, transition_dipole=u, singlet_excitation_energy=e_s,
-                                  molecule_type=type))
+        molecules.append(Molecule(coordinates=coordinates, transition_dipole=u, singlet_excitation_energy=e_s))
         molecule_count += 1
 
         if molecule_count == capacity:
@@ -144,7 +143,7 @@ def get_1d_ordered_system(conditions,
         length = conditions['characteristic_length']
 
         molecules.append(Molecule(coordinates=[x], transition_dipole=u, singlet_excitation_energy=e_s,
-                                  molecule_type=type, characteristic_length=length))
+                                  characteristic_length=length))
 
     centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -182,7 +181,7 @@ def get_2d_ordered_system(conditions,
             length = conditions['characteristic_length']
 
             molecules.append(Molecule(coordinates=[x, y], transition_dipole=u, singlet_excitation_energy=e_s,
-                                      molecule_type=type, characteristic_length=length))
+                                      characteristic_length=length))
 
     centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -223,7 +222,7 @@ def get_3d_ordered_system(conditions,
                 length = conditions['characteristic_length']
 
                 molecules.append(Molecule(coordinates=[x, y, z], transition_dipole=u, singlet_excitation_energy=e_s,
-                                          molecule_type=type, characteristic_length=length))
+                                          characteristic_length=length))
 
     centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -292,6 +291,7 @@ def get_capacity(num_dimensions, dimensions):
 def check_lattice(lattice_parameter, conditions):
     """
     :param lattice_parameter: Lattice parameter
+    :param conditions:
     :return: Boolean. Checks if the lattice parameter chosen is smaller than the molecular characteristic length.
     """
     characteristic_length = conditions['characteristic_length']

@@ -3,58 +3,27 @@ from scipy.spatial import distance
 from numpy import pi
 
 
-def get_transfer_rates(center, neighbour_index, system, rate_memory, molecular_memory):
+def get_transfer_rates(center, neighbour_index, system, memory):
     """
     :param center: Index of the studies excited molecule
     :param neighbour_index: Index of a nearby molecule (possible acceptor of the exciton)
     :param system: Dictionary with the list of molecules and additional physical information
-    :param rate_memory:
-    :param molecular_memory:
+    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
+    parameters is used as key.
     :return: Dictionary with the possible transfer processes between the two involved molecules
     as keys and its rates as arguments.
     """
     molecules = system['molecules']
     transfer_rates = {}
-    molecular_info = []
 
-    if molecules[center].type == 1:
-        if molecules[neighbour_index].type == 1:
-            molecular_info.append(molecules[center].type)
-            molecular_info.append(molecules[neighbour_index].type)
+    fcwd = compute_fcwd_gaussian(system, memory)
 
-            k = system['conditions']['orientational_factor_1']
-            n = system['conditions']['refractive_index']
-            alfa = 1.15  # short distances correction
-            sigma = system['conditions']['a_e_spectra_deviation'] / 27.211  # atomic units
-            delta = system['conditions']['delta'] / 27.211
+    if molecules[center].state == 1:
+        if molecules[center].state == 0:
 
-            if molecules[center].state == 1:
-                if molecules[neighbour_index].state == 0:
-                    process = 'Singlet_transfer'
-                    u = system['conditions']['transition_dipole']
-                    center_position = np.array(molecules[center].coordinates)
-                    neighbour_position = np.array(molecules[neighbour_index].coordinates)
-                    inter_distance = distance.euclidean(center_position, neighbour_position)/0.053    # atomic units
-
-                    molecular_info.append(molecules[center].state)
-                    molecular_info.append(molecules[neighbour_index].state)
-                    molecular_info.append(u)
-                    molecular_info.append(inter_distance)
-
-                    if molecular_info in molecular_memory:
-                        index = molecular_memory.index(molecular_info)
-                        rate = rate_memory[index]
-                        transfer_rates[process] = rate
-
-                    else:
-                        factor_1 = k**2 * pi**(3/2) * u**4 * np.exp(-(delta**2) / (2*sigma)**2)
-                        factor_2 = n**4 * (alfa*u + inter_distance)**6 * sigma
-
-                        rate = factor_1 / factor_2      # atomic units
-                        transfer_rates[process] = rate / (2.4189*10**-8)      # in ns⁻¹
-
-                        molecular_memory.append(molecular_info)
-                        rate_memory.append(transfer_rates[process])
+            process = 'Singlet_transfer'
+            forster = compute_forster_coupling(center, neighbour_index, system, memory)
+            transfer_rates[process] = fcwd * forster**2
 
     return transfer_rates
 
@@ -75,20 +44,81 @@ def update_step(chosen_process, time, system):
         system['molecules'][chosen_process['donor']].state = 0
 
 
-def get_decay_rates(system, centre, decay_memory, state_memory):
+def get_decay_rates(system, centre, memory):
+    """
+    :param system: Dictionary with all the information of the system
+    :param centre: index of the excited molecule
+    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
+    parameters is used as key.
+    :return: A dictionary with the possible decay rates
+    """
 
     molecule = system['molecules'][centre]
 
-    if molecule.state in state_memory:
-        index = state_memory.index(molecule.state)
-        return decay_memory[index]
+    molecular_state = molecule.state
+
+    particular_info = str(hash(molecular_state))
+
+    if particular_info in memory:
+        decay_rates = memory[particular_info]
 
     else:
-        decay_memory.append(molecule.decay_rate())
-        state_memory.append(molecule.state)
-        return molecule.decay_rate()
+        decay_rates = molecule.decay_rate()
+        memory[particular_info] = decay_rates
+
+    return decay_rates
 
 
+def compute_fcwd_gaussian(system, memory):
+    """
+    :param system: dictionary with all the physical information of the system
+    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
+    parameters is used as key.
+    :return: Franck-Condon-weighted density of states in gaussian aproximation
+    """
+    delta = system['conditions']['a_e_centre_shift'] / 27.211       # atomic units
+    sigma = system['conditions']['a_e_deviation'] / 27.211          # atomic units
 
-#def forster_coupling(center, neighbour_index, system):
+    info = str(hash((delta, sigma)))
 
+    if info in memory:
+        fcwd = memory[info]
+
+    else:
+        fcwd = np.sqrt(pi) / (2 * sigma) * np.exp(- delta**2 / (2*sigma)**2)
+        memory[info] = fcwd
+
+    return fcwd
+
+
+def compute_forster_coupling(center, neighbour_index, system, memory):
+    """
+    :param center: Index of the excited molecule
+    :param neighbour_index: Index of a possible acceptor
+    :param system: Dictionary with all the physical information
+    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
+    parameters is used as key.
+    :return: Forster coupling between both molecules. We do not implement
+    any correction for short distances.
+    """
+    molecules = system['molecules']
+
+    u_a = molecules[center].transition_dipole
+    u_b = molecules[neighbour_index].transition_dipole
+    k = 2     # we shall define a function with the right expression for k when it is not constant
+
+    r_a = np.array(molecules[center].coordinates)
+    r_b = np.array(molecules[center].coordinates)
+    inter_distance = distance.euclidean(r_a, r_b)
+
+    particular_info = str(hash((u_a, u_b, inter_distance)))
+
+    if particular_info in memory:
+        forster_coupling = memory[particular_info]
+
+    else:
+        n = system['conditions']['refractive_index']
+        forster_coupling = k * np.dot(u_a, u_b) / (n**2 * inter_distance**3)
+        memory[particular_info] = forster_coupling
+
+    return forster_coupling

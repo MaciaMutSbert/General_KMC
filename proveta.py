@@ -22,10 +22,9 @@ num_dimensions = 2
 excitons = {'number': 1, 'positions': 1653}
 
 
-conditions = {'temperature': 273.15, 'refractive_index': 2, 'orientational_factor_1': 2,
-                'neighbourhood_radius': 0.46,
-                'a_e_spectra_deviation': 0.3, 'delta': 1.65, 'molecule_type': 1,
-                'singlet_energy': 2.5, 'transition_dipole': 1, 'characteristic_length': 10 ** -8}
+conditions = {'temperature': 273.15, 'refractive_index': 2, 'neighbourhood_radius': 0.46,
+              'a_e_spectra_deviation': 0.3, 'a_e_centre_shift': 1.65,
+              'singlet_energy': 2.5, 'transition_dipole': 1, 'characteristic_length': 10 ** -8}
 
 # Lists for further analysis
 initial_positions = []
@@ -36,10 +35,7 @@ diffusion_length = []
 exciton_lengths = []
 
 # Memory of the system
-molecular_memory = []
-rate_memory = []
-decay_memory = []
-state_memory = []
+memory = {}
 
 for j in range(100):
     system = get_homogeneous_system(conditions, dimensions=dimensions, lattice_parameter=lattice_parameter,
@@ -53,7 +49,7 @@ for j in range(100):
     path = None
     while finished is False:
         get_centers(system, path)
-        path, time = update_system(system, rate_memory, molecular_memory, decay_memory, state_memory)
+        path, time = update_system(system, memory)
 
         total_time += time
         path_list.append(path)
