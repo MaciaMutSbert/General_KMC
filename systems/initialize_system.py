@@ -76,7 +76,6 @@ def get_disordered_system(conditions,               # External conditions of the
 
         e_s = conditions['singlet_energy']
         u = conditions['transition_dipole']
-        type = conditions['molecule_type']
         molecules.append(Molecule(coordinates=coordinates, transition_dipole=u, singlet_excitation_energy=e_s))
         molecule_count += 1
 
@@ -139,11 +138,8 @@ def get_1d_ordered_system(conditions,
     for x in np.arange(-x_max, x_max, lattice_parameter):
         e_s = conditions['singlet_energy']
         u = conditions['transition_dipole']
-        type = conditions['molecule_type']
-        length = conditions['characteristic_length']
 
-        molecules.append(Molecule(coordinates=[x], transition_dipole=u, singlet_excitation_energy=e_s,
-                                  characteristic_length=length))
+        molecules.append(Molecule(coordinates=[x], transition_dipole=u, singlet_excitation_energy=e_s))
 
     centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -177,11 +173,8 @@ def get_2d_ordered_system(conditions,
         for y in np.arange(-y_max, y_max, lattice_parameter):
             e_s = conditions['singlet_energy']
             u = conditions['transition_dipole']
-            type = conditions['molecule_type']
-            length = conditions['characteristic_length']
 
-            molecules.append(Molecule(coordinates=[x, y], transition_dipole=u, singlet_excitation_energy=e_s,
-                                      characteristic_length=length))
+            molecules.append(Molecule(coordinates=[x, y], transition_dipole=u, singlet_excitation_energy=e_s))
 
     centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter
@@ -218,11 +211,8 @@ def get_3d_ordered_system(conditions,
             for z in np.arange(-z_max, z_max, step):
                 e_s = conditions['singlet_energy']
                 u = conditions['transition_dipole']
-                type = conditions['molecule_type']
-                length = conditions['characteristic_length']
 
-                molecules.append(Molecule(coordinates=[x, y, z], transition_dipole=u, singlet_excitation_energy=e_s,
-                                          characteristic_length=length))
+                molecules.append(Molecule(coordinates=[x, y, z], transition_dipole=u, singlet_excitation_energy=e_s))
 
     centre_indexes = excited_system(molecules, excitons)
     conditions['lattice_parameter'] = lattice_parameter

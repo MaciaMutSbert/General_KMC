@@ -1,5 +1,5 @@
 from systems.initialize_system import get_homogeneous_system
-from update_functions.update_file import update_system, check_finish, get_centers
+from update_functions.update_file import update_system, check_finish, get_centres
 from result_analysis import initial_position, final_position, x_y_splitter, moved_length
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,31 +16,36 @@ Absorption and emission spectra deviation  (considered as gaussian)       (uncla
 """
 
 
-lattice_parameter = 0.45           # nm
-dimensions = [26.1, 26.1]          # nm
+lattice_parameter = 1.2           # nm
+dimensions = [42, 42]          # nm
 num_dimensions = 2
-excitons = {'number': 1, 'positions': 1653}
+excitons = {'number': 1, 'positions': [612]}
 
 
-conditions = {'temperature': 273.15, 'refractive_index': 2, 'neighbourhood_radius': 0.46,
-              'a_e_spectra_deviation': 0.3, 'a_e_centre_shift': 1.65,
-              'singlet_energy': 2.5, 'transition_dipole': 1, 'characteristic_length': 10 ** -8}
+conditions = {'temperature': 273.15, 'refractive_index': 1, 'neighbourhood_radius': 1.3,
+              'a_e_spectra_deviation': 0.3, 'a_e_spectra_centre_shift': 1.2, 'alfa': 0,
+              'singlet_energy': 2.5, 'transition_dipole': 1, 'characteristic_length': 10**(-8)}
 
 # Lists for further analysis
-initial_positions = []
 final_positions = []
-time_list = []
-life_time = []
 diffusion_length = []
 exciton_lengths = []
+time_list = []
+life_time = []
 
 # Memory of the system
 memory = {}
 
-for j in range(100):
+for j in range(1000):
     system = get_homogeneous_system(conditions, dimensions=dimensions, lattice_parameter=lattice_parameter,
                                     excitons=excitons)
 
+    """
+    system is a dictionary with three keys:
+        molecules: List of objects class Molecule
+        conditions: dictionary with the physical conditions of the system such as temperature, refractive index...
+        centre_indexes: list with the indexes of the excited molecules.
+    """
     total_time = 0
     path_list = []
 
@@ -48,7 +53,7 @@ for j in range(100):
     it = 0
     path = None
     while finished is False:
-        get_centers(system, path)
+        get_centres(system, path)
         path, time = update_system(system, memory)
 
         total_time += time
@@ -60,6 +65,7 @@ for j in range(100):
     final_positions.append(final_position(path_list, system))
     exciton_lengths.append(moved_length(initial_position(path_list, system), final_position(path_list, system)))
     diffusion_length.append(np.average(np.array(exciton_lengths)))
+    print(j)
 
     time_list.append(total_time)
     life_time.append(np.average(np.array(time_list)))
@@ -72,7 +78,7 @@ df_deviation = np.float(np.std(np.array(diffusion_length)))
 lt_deviation = np.float(np.std(np.array(life_time)))
 
 
-iterations = np.arange(0, 100, 1)
+iterations = np.arange(0, 1000, 1)
 
 plt.plot(iterations, diffusion_length, 'ro')
 plt.xlabel('Number of iterations')

@@ -17,7 +17,7 @@ def update_system(system,  memory):
     :return:
     """
     molecules = system['molecules']
-    center_indexes = system['centers']
+    center_indexes = system['centres']
 
     rate_collector = []
     process_collector = []
@@ -42,7 +42,7 @@ def check_finish(path_list):
         return False
 
 
-def get_centers(system, path):
+def get_centres(system, path):
     """
     :param system: Dictionary with the information of the system. Only the list of the excited molecules
     indexes is used.
@@ -58,8 +58,8 @@ def get_centers(system, path):
         """
 
     if path is not None:
-        system['centers'].remove(path['donor'])
-        system['centers'].append(path['acceptor'])
+        system['centres'].remove(path['donor'])
+        system['centres'].append(path['acceptor'])
 
 
 #############################################################################################
@@ -105,7 +105,6 @@ def get_rates_process(centre, neighbour_index, system, memory):
 
     decay_rates = get_decay_rates(system, centre, memory)
     process_list, rate_list = process_rate_splitter(transfer_rates, decay_rates, centre)
-
     return process_list, rate_list
 
 
