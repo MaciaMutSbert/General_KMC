@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial import distance
 from systems.molecules import Molecule
-
+from systems.excitation import excited_system
 
 """
 def get_system(morphology, excitons):
@@ -178,7 +178,8 @@ def get_1d_ordered_system(conditions,
 
         pointing = pointing * symmetry[0]
 
-    centre_indexes = excited_system(molecules, excitons)
+    tolerance = lattice_parameter / 2
+    centre_indexes = excited_system(molecules, excitons, tolerance)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
@@ -215,7 +216,6 @@ def get_2d_ordered_system(conditions,
     x_max = dimensions[0]/2
     y_max = dimensions[1]/2
     # We want the center of the distribution at (0,0)
-
     symmetry = get_symmetry(orientation)
     x_count = 0
     for x in np.arange(-x_max, x_max, lattice_parameter):
@@ -312,28 +312,6 @@ def distance_checking(coordinates, molecules):
             return True
 
     return False
-
-
-def excited_system(molecules, excitons):
-    """
-    :param molecules: List of the defined molecules
-    :param excitons: Information about the desired excitation
-    :return: Excited system, list with the index of the excited molecules
-    It could be defined in the file where all processes and excitations will be defined (??)
-    """
-    centre_list = []
-
-    if excitons['positions'] == 'random':
-        for i in range(excitons['number']):
-            centre = np.random.randint(0, len(molecules))
-            molecules[centre].state = 1
-            centre_list.append(centre)
-    else:
-        for position in excitons['positions']:
-            molecules[position].state = 1
-            centre_list.append(position)
-
-    return centre_list
 
 
 def get_capacity(num_dimensions, dimensions):

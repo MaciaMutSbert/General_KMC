@@ -65,6 +65,11 @@ class Molecule:
         """
         return self.orientation
 
+
+    """
+    VEURE AL DIPC QUINES FUNCIONS MÉS TENIM
+    """
+
     def desexcitation_energies(self):
         """
         D'ENTRADA NO SERÀ NECESSÀRIA.
