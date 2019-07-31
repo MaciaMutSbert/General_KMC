@@ -93,6 +93,7 @@ def get_disordered_system(conditions,  # External conditions of the system such 
         molecules.append(molecule)
         molecule_count += 1
 
+
         if molecule_count == capacity:
             break
 
