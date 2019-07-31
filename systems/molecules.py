@@ -2,11 +2,57 @@ import numpy as np
 from conversion_functions import from_ev_to_au, from_ns_to_au
 
 
+"""
+COMENTARI INICIAL: Els estats (fonamental i excitats) s'indicaran per mitjà d'etiquetes tipus string. Els estats possibles 
+i les seves respectives referències hauran de venir indicades a l'inici del programa, e.g, quan s'inicialitzi la 
+molècula genèrica. Aquestes referències s'usaran per caracteritzar la variable estat i per simplicitat i eficiència
+s'usaran com a claus dels diccionaris que contenguin informació sobre els excitons. A saber: state_energies, 
+relaxation_energies, exciton_energies, (REFERENTS A RATES...).
+
+INICIALITZACIÓ DE LA MOLÈCULA GENÈRICA:
+    -state_energies: diccionari amb les energies d'excitació de cada estat de la molècula:
+                :key: energia de l'estat excitat
+                :argument:  energia de l'estat
+    -state: referència de quinn estat exctitat es troba la molècula
+    -relaxation_energies: diccionari amb les energies de relaxació de cada estat. Per ara en prenem una fitxa i què depèn
+    sols de cada estat.
+                :key: energia de l'estat excitat
+                :argument:  energia de relaxació de l'estat
+    -transition_moment: moment de transició dipolar de la molècula. Donat com un vector (llista de 3 elements) en el 
+    sistema de referència de la molècula.
+    
+Per defecte venen donats:
+    -characteristic_length: defineix les dimensions finites de la molècula. Aquesta s'aproxima com una línia, quadrat o 
+    cub i aquest paràmetre en defineix el costat. Alternativament podriem fer una aproximació esfèrica i que en sigui 
+    el radi.
+    -coordinates. D'entrada la suposam en l'origen. 
+    -orientation. D'entrada la suposam orientada segons [1, 0, 0]. Aquest vector ve donat en un SR extern que 
+    anomenarem global.
+    Aquests dos darrers paràmetres no són estrictament necessaris per estudiar la naturalesa del tipus de molècula.
+    La classe inclou 2 mètodes per cada un d'aquests 2 darrers paràmetres. Un per inicialitzar-los (defineix de manera
+    la posició/orientació com un 3-array) i un per cridar-los alhora d'operar (per assegurar que no s'alteren en el procés).
+    Noms:
+    initialize_coordinates(coordinates)                  initialize_orientation(orientation)
+    molecular_coordinates()                              molecular_orientation()
+
+Mètodes de la molècula:
+Apart dels 4 ja comentats la classe molècula inclou:
+    - get_relaxation_state_energy. Mètode que dóna l'energia de relaxació de l'estat en què es troba la molècula
+    ### MÈTODE PER CANVIAR L'ESTAT ?? ###
+    - decay_rates: mètode que retorna un diccionari amb els possibles rates de decaïment {'decay process': rate}
+    - get_transition_moment(reference_orientation). Necessita com argument un vector de referència. L'orientació de la
+        molècula en la qual el moment de transició en el SR de la molècula i en el SR global coindideixen. 
+        Aleshores, donada aquesta referència i l'orientació de la molècula, aquest mètode fa un canvi de base i retorna
+        el moment de transició dipolar en el SR global.
+"""
+
+
 class Molecule:
 
     def __init__(self,
-                 states_energies,
+                 state_energies,
                  state,
+                 relaxation_energies,
                  transition_moment,
                  characteristic_length=10**(-8),
                  coordinates=[0, 0, 0],
@@ -16,8 +62,10 @@ class Molecule:
         :param state: sting of the name of the state
         The name of the state should coincide with some key of the dictionary in order to identify the state with
         its energy.
+        :param relaxation_energies: dictionary {'state': relaxation energy of the state}
         Names of 'state' would be: g_s (ground state), s_1 (first singlet), t_1 (first triplet), etc.
         Energies should be given with eV.
+
 
         :param transition_moment: Dipole transition moment vector (3d). The vector is given in respect to the RS
         of the molecule. So for all molecules of a same type if will be equal.
@@ -32,8 +80,9 @@ class Molecule:
         :param orientation: 3d unit vector. Gives the orientation of the molecule in the global reference system.
         """
 
-        self.state_energies = states_energies
+        self.state_energies = state_energies
         self.state = state
+        self.relaxation_energies = relaxation_energies
         self.transition_moment = transition_moment
         self.characteristic_length = characteristic_length
         self.coordinates = coordinates
@@ -65,7 +114,8 @@ class Molecule:
         """
         return self.orientation
 
-
+    def get_relaxation_state_energy(self):
+        return self.relaxation_energies[self.state]
     """
     VEURE AL DIPC QUINES FUNCIONS MÉS TENIM
     """
@@ -129,3 +179,4 @@ class Molecule:
 
         # basis transform (matrix product)
         return np.dot(rotation_matrix, self.transition_moment)
+

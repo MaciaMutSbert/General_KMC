@@ -16,14 +16,14 @@ def get_system(morphology, excitons):
 
 def get_homogeneous_system(conditions,
                            generic_molecule,
-                           num_molecules=0,  # Only if order = Disordered
+                           order='ordered',
                            dimensionality=2,
                            dimensions=[10, 10, 0],
-                           lattice_parameter=0.1,  # Only if order = Ordered
+                           num_molecules=0,             # Only if order = Disordered
+                           lattice_parameter=0.1,       # Only if order = Ordered
                            orientation='parallel',
                            reference_orientation=[1, 0, 0],
-                           excitons={'s_1': ['centre']},
-                           order='Ordered'):
+                           excitons={'s_1': ['centre']}):
     """
     PER COMENTARIS GUARDAR ESCRITS DIPC
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
@@ -38,14 +38,16 @@ def get_homogeneous_system(conditions,
     and a list with the indexes of the excited molecules.
     """
 
-    if order == 'Ordered':
-        return get_ordered_system(conditions, dimensionality, dimensions, lattice_parameter, excitons)
+    if order == 'ordered':
+        return get_ordered_system(conditions, generic_molecule, dimensionality, dimensions, lattice_parameter,
+                                  orientation, reference_orientation, excitons)
 
-    elif order == 'Disordered':
-        return get_disordered_system(conditions, dimensionality, dimensions, num_molecules, excitons)
+    elif order == 'disordered':
+        return get_disordered_system(conditions, generic_molecule, dimensionality, dimensions, num_molecules,
+                                     orientation, reference_orientation, excitons)
 
     else:
-        print('A valid Order parameter is needed')
+        print("A valid 'order' parameter is needed")
 
 
 def get_disordered_system(conditions,  # External conditions of the system such as temperature
