@@ -15,14 +15,19 @@ def get_system(morphology, excitons):
 
 
 def get_homogeneous_system(conditions,
+                           generic_molecule,
                            num_molecules=0,  # Only if order = Disordered
                            dimensionality=2,
                            dimensions=[10, 10, 0],
                            lattice_parameter=0.1,  # Only if order = Ordered
+                           orientation='parallel',
+                           reference_orientation=[1, 0, 0],
                            excitons={'number': 1, 'positions': [85]},
                            order='Ordered'):
     """
+    PER COMENTARIS GUARDAR ESCRITS DIPC
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
+    :param generic_molecule: veure escrit DIPC
     :param num_molecules: Number of molecules in the system. Only needed for a disordered system.
     :param dimensionality: Dimensionality of the system (1, 2, 3). Default = 2
     :param dimensions: Dimensions of the system. A list with len = num_dimensions
@@ -44,9 +49,12 @@ def get_homogeneous_system(conditions,
 
 
 def get_disordered_system(conditions,  # External conditions of the system such as temperature
+                          generic_molecule,
                           dimensionality=2,
                           dimensions=[10, 10, 0],
                           number_molecules=1000,
+                          orientation='parallel',
+                          reference_orientation=[1,0.0],
                           excitons={'number': 1, 'positions': [500]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
@@ -58,7 +66,11 @@ def get_disordered_system(conditions,  # External conditions of the system such 
     """
     capacity = get_capacity(dimensionality, dimensions)
     if number_molecules > capacity:
-        print('Only %1d molecules could be fitted' % capacity)
+        print('Only %3d molecules could be fitted' % capacity)
+
+    if orientation is 'antiparallel':
+        print('Not antiparallel orientation considered for an amorphous material')
+        return
 
     molecules = []
     molecule_count = 0
@@ -74,9 +86,11 @@ def get_disordered_system(conditions,  # External conditions of the system such 
 
             too_close = distance_checking(coordinates, molecules)
 
-        e_s = conditions['singlet_energy']
-        u = conditions['transition_dipole']
-        molecules.append(Molecule(coordinates=coordinates, transition_dipole=u, singlet_excitation_energy=e_s))
+        orientation_vector = get_orientation(orientation, reference_orientation, dimensionality, pointing=1)
+        molecule = generic_molecule.copy()
+        molecule.initialize_coordinates(coordinates)
+        molecule.initialize_orientation(orientation_vector)
+        molecules.append(molecule)
         molecule_count += 1
 
         if molecule_count == capacity:
@@ -90,9 +104,12 @@ def get_disordered_system(conditions,  # External conditions of the system such 
 
 
 def get_ordered_system(conditions,
+                       generic_molecule,
                        dimensionality=2,
                        dimensions=[10, 10, 0],
                        lattice_parameter=0.1,
+                       orientation='parallel',
+                       reference_orientation=[1, 0, 0],
                        excitons={'number': 1, 'positions': [85]}):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
@@ -104,13 +121,16 @@ def get_ordered_system(conditions,
     """
 
     if dimensionality == 1:
-        return get_1d_ordered_system(conditions, dimensions, lattice_parameter, excitons)
+        return get_1d_ordered_system(conditions, generic_molecule, dimensionality, dimensions, lattice_parameter,
+                                     orientation, reference_orientation, excitons)
 
     elif dimensionality == 2:
-        return get_2d_ordered_system(conditions, dimensions, lattice_parameter, excitons)
+        return get_2d_ordered_system(conditions, generic_molecule, dimensionality, dimensions, lattice_parameter,
+                                     orientation, reference_orientation, excitons)
 
     elif dimensionality == 3:
-        return get_3d_ordered_system(conditions, dimensions, lattice_parameter, excitons)
+        return get_3d_ordered_system(conditions, generic_molecule, dimensionality, dimensions, lattice_parameter,
+                                     orientation, reference_orientation, excitons)
 
     else:
         print('A number of dimensions must be provided')
@@ -344,6 +364,18 @@ def check_lattice(lattice_parameter, conditions):
         return True
 
 
+"""
+ANTIPARAL·LELISME. COM L'IMPLEMENTAM?   
+Hem inclòs en la inicialització dels sistemes ordenats la possibilitat de què les molècules estiguin ordenades
+antiparal·lelament. L'entenem com un antiparal·lelisme entre veïns primers. O sigui, donada una molècula amb orientació
+'+', els 2, 4 o 6 veïns primers de la xarxa tendran orientació '-'.
+Val a dir que per un material amorf no es contempla l'antiparal·lelisme. Si es donàssim com a paràmetres:
+    order = 'disordered'
+    orientation = 'antiparallel'
+Sortiria un avís per pantalla indicant la no viabilitat d'aquesta distribució i no s'inicialitzaria cap sistema.
+"""
+
+
 def get_symmetry(orientation):
     if orientation is 'parallel':
         return [1, 2]
@@ -360,7 +392,7 @@ def get_orientation(orientation, reference_orientation, dimensionality, pointing
         if dimensionality == 3:
             phi = 2*np.pi() * np.random.rand()
             theta = np.pi * np.random.rand()
-            return [np.sin(thehta)*np.cos(phi), np.sin(thetha)*np.sin(phi), np.cos(theta)]
+            return [np.sin(theta)*np.cos(phi), np.sin(theta)*np.sin(phi), np.cos(theta)]
 
         else:
             phi = 2*np.pi() * np.random.rand()
@@ -368,3 +400,4 @@ def get_orientation(orientation, reference_orientation, dimensionality, pointing
 
     else:
         return reference_orientation * pointing
+
