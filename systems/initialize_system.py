@@ -97,7 +97,8 @@ def get_disordered_system(conditions,  # External conditions of the system such 
         if molecule_count == capacity:
             break
 
-    centre_indexes = excited_system(molecules, excitons)
+    tolerance = (dimensions[0]+dimensions[1]+dimensions[2]) / (3*30)
+    centre_indexes = excited_system(molecules, excitons, tolerance)
     conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
 
@@ -178,8 +179,7 @@ def get_1d_ordered_system(conditions,
 
         pointing = pointing * symmetry[0]
 
-    tolerance = lattice_parameter / 2
-    centre_indexes = excited_system(molecules, excitons, tolerance)
+    centre_indexes = excited_system(molecules, excitons, lattice_parameter / 2)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
@@ -232,7 +232,7 @@ def get_2d_ordered_system(conditions,
             pointing = pointing * symmetry[0]
         x_count = x_count + symmetry[1]
 
-    centre_indexes = excited_system(molecules, excitons)
+    centre_indexes = excited_system(molecules, excitons, lattice_parameter / 2)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
@@ -287,8 +287,7 @@ def get_3d_ordered_system(conditions,
             y_count = y_count + symmetry[1]
         x_count = x_count + symmetry[1]
 
-
-    centre_indexes = excited_system(molecules, excitons)
+    centre_indexes = excited_system(molecules, excitons, lattice_parameter / 2)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}

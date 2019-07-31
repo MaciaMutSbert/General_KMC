@@ -97,7 +97,8 @@ def pick_centre(centre_list, molecules, tolerance):
     The function looks for a molecule in a cercle of radius = tolerance and it is considered the centre.
     It the centre is already taken or there is not any molecule in the centre of the distribution,
     as it migth happen in an amorphous material, the function picks another index randomly.
-    It is taken as the lattice_parameter / 2 in ordered systems and (COM S'AGAFA) in disordered systems.
+    It is taken as the lattice_parameter / 2 in ordered systems and as the 30th part of the average length of
+     the system in disordered systems.
     :return: the index of the excited molecule
     """
     index = None
