@@ -22,7 +22,7 @@ def get_homogeneous_system(conditions,
                            lattice_parameter=0.1,  # Only if order = Ordered
                            orientation='parallel',
                            reference_orientation=[1, 0, 0],
-                           excitons={'number': 1, 'positions': [85]},
+                           excitons={'s_1': ['centre']},
                            order='Ordered'):
     """
     PER COMENTARIS GUARDAR ESCRITS DIPC
@@ -55,7 +55,7 @@ def get_disordered_system(conditions,  # External conditions of the system such 
                           number_molecules=1000,
                           orientation='parallel',
                           reference_orientation=[1,0.0],
-                          excitons={'number': 1, 'positions': [500]}):
+                          excitons={'s_1': ['centre']},):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param dimensionality: Dimensionality of the system (1, 2, 3). Default = 2
@@ -112,7 +112,7 @@ def get_ordered_system(conditions,
                        lattice_parameter=0.1,
                        orientation='parallel',
                        reference_orientation=[1, 0, 0],
-                       excitons={'number': 1, 'positions': [85]}):
+                       excitons={'s_1': ['centre']}, ):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param dimensionality: Dimensionality of the system (1, 2, 3). Default = 2
@@ -145,7 +145,7 @@ def get_1d_ordered_system(conditions,
                           lattice_parameter=0.1,
                           orientation='parallel',
                           reference_orientation=[1, 0, 0],
-                          excitons={'number': 1, 'positions': [50]}):
+                          excitons={'s_1': ['centre']},):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param generic_molecule: #veure escrit a DIPC
@@ -194,7 +194,7 @@ def get_2d_ordered_system(conditions,
                           lattice_parameter=0.1,
                           orientation = 'parallel',
                           reference_orientation = [1, 0 ,0],
-                          excitons={'number': 1, 'positions': [85]}):
+                          excitons={'s_1': ['centre']},):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param generic_molecule: #veure escrit a DIPC
@@ -247,7 +247,7 @@ def get_3d_ordered_system(conditions,
                           lattice_parameter=0.1,
                           orientation='parallel',
                           reference_orientation=[1, 0, 0],
-                          excitons={'number': 1, 'positions': [85]}):
+                          excitons={'s_1': ['centre']},):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
     :param dimensions: Dimensions of the system. A list with len = num_dimensions. By deafult [10, 10, 10]
