@@ -39,27 +39,27 @@ class Molecule:
         self.coordinates = coordinates
         self.orientation = orientation
 
-    def molecular_coordinates(self, coordinate_list):
+    def initialize_coordinates(self, coordinate_list):
         """
         :param coordinate_list: List [x, y, z] with the coordinates of the molecule. Units: nm
         Changes self.coordinates to this new position. Format: numpy array.
         """
         self.coordinates = np.array(coordinate_list)
 
-    def get_coordinates(self):
+    def molecular_coordinates(self):
         """
         :return: Array with the molecular coordinates.
         """
         return self.coordinates
 
-    def molecular_orientation(self, orientation):
+    def initialize_orientation(self, orientation):
         """
         :param orientation: list with the coordinates of the orientation vector
         Changes self.orientation to this new orientation. Format: numpy array
         """
         self.orientation = np.array(orientation)
 
-    def get_orientation(self):
+    def molecular_orientation(self):
         """
         :return: Array with the molecular orientation
         """
