@@ -1,5 +1,5 @@
 import numpy as np
-from scipy import distance
+from scipy.spatial import distance
 from conversion_functions import from_nm_to_au
 
 
@@ -40,7 +40,7 @@ def compute_forster_coupling(molecule1, molecule2, conditions):
     r = intermolecular_distance(molecule1, molecule2)       # a. u.
     n = conditions['refractive_index']
 
-    info = str(hash((u_D, u_A, r, n)))
+    info = str(hash((u_D, u_A, r, n, 'forster')))
     if info in coupling_memory:
         forster_coupling = coupling_memory[info]
 
@@ -71,7 +71,6 @@ def intermolecular_distance(molecule1, molecule2):
     :param molecule2: acceptor
     :return: the euclidean distance between the donor and the acceptor
     """
-
     position_D = molecule1.molecular_coordinates()
     position_A = molecule2.molecular_coordinates()
     r = distance.euclidean(position_D, position_A)
@@ -85,11 +84,9 @@ def orientational_factor(u_D, u_A, r):
     :param r:  intermolecular_distance
     :return: the orientational factor between both molecules
     """
-
     nd = unity(u_D)
     na = unity(u_A)
     e = unity(r)
-
     return np.dot(nd, na) - 3*np.dot(e, nd)*np.dot(e, na)
 
 

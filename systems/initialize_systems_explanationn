@@ -8,6 +8,10 @@ molècula genèrica. Aquestes referències s'usaran per caracteritzar la variabl
 s'usaran com a claus dels diccionaris que contenguin informació sobre els excitons. A saber: state_energies,
 relaxation_energies, exciton_energies, (REFERENTS A RATES...).
 
+ESTATS POSSIBLES:
+    ESTAT FONAMENTAL: 'g_s'
+    SINGLET 1: 's_1
+
 
 
 FITXER: initialize_systems.py

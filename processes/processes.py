@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.spatial import distance
 from numpy import pi
 from processes.coupling_functions import couplings
 from conversion_functions import from_ns_to_au, from_ev_to_au
@@ -105,7 +104,7 @@ def marcus_overlap_formula(donor, acceptor, conditions):
     gibbs_energy = donor.excitation_energy[excited_state] - acceptor.excitation_energy[excited_state]
     relax = donor.get_relaxation_energy()
 
-    info = str(hash((T, gibbs_energy, relax)))
+    info = str(hash((T, gibbs_energy, relax, 'marcus')))
 
     if info in overlap_memory:
         overlap = overlap_memory[info]
