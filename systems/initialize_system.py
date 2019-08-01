@@ -27,7 +27,8 @@ def get_homogeneous_system(conditions,
     """
     PER COMENTARIS GUARDAR ESCRITS DIPC
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
-    :param generic_molecule: veure escrit DIPC
+    :param generic_molecule: generic instance of class Molecule with the nature parameters already defined.
+    Only position and orientation have to be defined
     :param num_molecules: Number of molecules in the system. Only needed for a disordered system.
     :param dimensionality: Dimensionality of the system (1, 2, 3). Default = 2
     :param dimensions: Dimensions of the system. A list with len = num_dimensions
@@ -66,7 +67,7 @@ def get_disordered_system(conditions,  # External conditions of the system such 
     :param excitons: Number of excitons in the system. Default  1 in the 5000th molecule of the list
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
-    capacity = get_capacity(dimensionality, dimensions)
+    capacity = get_capacity(dimensionality, dimensions, generic_molecule)
     if number_molecules > capacity:
         print('Only %3d molecules could be fitted' % capacity)
 
@@ -315,14 +316,13 @@ def distance_checking(coordinates, molecules):
     return False
 
 
-def get_capacity(num_dimensions, dimensions):
+def get_capacity(num_dimensions, dimensions, generic_molecule):
     """
     :param num_dimensions: Dimensionality of the system (1, 2, 3)
     :param dimensions: Size of the system
     :return: Integer. Maximus number of molecules that could fit in the system.
     """
-    molecule = Molecule(0, 0)
-    elemental_site = molecule.characteristic_length ** num_dimensions
+    elemental_site = generic_molecule.characteristic_length ** num_dimensions
 
     total_volume = 1
     for dimension in dimensions:
@@ -380,4 +380,3 @@ def get_orientation(orientation, reference_orientation, dimensionality, pointing
 
     else:
         return reference_orientation * pointing
-

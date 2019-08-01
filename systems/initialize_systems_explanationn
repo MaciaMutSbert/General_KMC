@@ -133,7 +133,7 @@ Per defecte venen donats:
 Mètodes de la molècula:
 Apart dels 4 ja comentats la classe molècula inclou:
     - get_relaxation_state_energy. Mètode que dóna l'energia de relaxació de l'estat en què es troba la molècula
-    ### MÈTODE PER CANVIAR L'ESTAT ?? ###
+    - change_state(new_state): Canvia l'estat de la molècula pel nou donat.
     - decay_rates: mètode que retorna un diccionari amb els possibles rates de decaïment {'decay process': rate}
     - get_transition_moment(reference_orientation). Necessita com argument un vector de referència. L'orientació de la
         molècula en la qual el moment de transició en el SR de la molècula i en el SR global coindideixen.
