@@ -162,7 +162,7 @@ def get_1d_ordered_system(conditions,
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    if check_lattice(lattice_parameter, conditions) is False:
+    if check_lattice(lattice_parameter, generic_molecule) is False:
         print('Lattice parameter smaller than molecular characteristic length')
         return
 
@@ -211,7 +211,7 @@ def get_2d_ordered_system(conditions,
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    if check_lattice(lattice_parameter, conditions) is False:
+    if check_lattice(lattice_parameter, generic_molecule) is False:
         print('Lattice parameter smaller than molecular characteristic length')
         return
 
@@ -259,7 +259,7 @@ def get_3d_ordered_system(conditions,
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    if check_lattice(lattice_parameter, conditions) is False:
+    if check_lattice(lattice_parameter, generic_molecule) is False:
         print('Lattice parameter smaller than molecular characteristic length')
         return
 
@@ -320,6 +320,7 @@ def get_capacity(num_dimensions, dimensions, generic_molecule):
     """
     :param num_dimensions: Dimensionality of the system (1, 2, 3)
     :param dimensions: Size of the system
+    :param generic_molecule: instance of class molecule with all its natural parameters defined
     :return: Integer. Maximus number of molecules that could fit in the system.
     """
     elemental_site = generic_molecule.characteristic_length ** num_dimensions
@@ -331,14 +332,13 @@ def get_capacity(num_dimensions, dimensions, generic_molecule):
     return int(total_volume/elemental_site)
 
 
-def check_lattice(lattice_parameter, conditions):
+def check_lattice(lattice_parameter, generic_molecule):
     """
     :param lattice_parameter: Lattice parameter
-    :param conditions:
+    :param generic_molecule: instance of class molecule with all its natural parameters defined
     :return: Boolean. Checks if the lattice parameter chosen is smaller than the molecular characteristic length.
     """
-    characteristic_length = conditions['characteristic_length']
-    if lattice_parameter < characteristic_length:
+    if lattice_parameter <  generic_molecule.characteristic_length:
         return False
     else:
         return True
