@@ -37,6 +37,7 @@ Per defecte venen donats:
 
 Mètodes de la molècula:
 Apart dels 4 ja comentats la classe molècula inclou:
+    - electronic_state. Mètode que retorna l'estat electrònic de la molecula
     - get_relaxation_state_energy. Mètode que dóna l'energia de relaxació de l'estat en què es troba la molècula
     - change_state(new_state): Canvia l'estat de la molècula pel nou donat.
     - decay_rates: mètode que retorna un diccionari amb els possibles rates de decaïment {'decay process': rate}
@@ -51,9 +52,9 @@ class Molecule:
 
     def __init__(self,
                  state_energies,
-                 state,
                  relaxation_energies,
                  transition_moment,
+                 state = 'g_s',
                  characteristic_length=10**(-8),
                  coordinates=[0, 0, 0],
                  orientation=[1, 0, 0]):
@@ -117,7 +118,11 @@ class Molecule:
     def get_relaxation_state_energy(self):
         return self.relaxation_energies[self.state]
 
-    def change_state(self, new_state):
+    def electronic_state(self):
+        ":return: the electronic state of the molecule"
+        return self.state
+
+    def set_state(self, new_state):
         "No return method. Only changes the molecular state when the exciton is transferred."
         self.state = new_state
 
@@ -154,11 +159,11 @@ class Molecule:
             c = 137         # light speed in atomic units
 
             rate = 4 * desexcitation_energy**3 * u**2 /(3 * c**3)
-            decay_rates[decay_process] = from_ns_to_au(rate, 'inverse')
+            decay_rates[decay_process] = from_ns_to_au(rate, 'direct')
 
         return decay_rates
 
-    def get_transition_moment(self, reference_orientation):
+    def get_transition_moment(self):
         """
         This method computes a basis transformation in order to get the transition dipole moment in a global
         reference coordinate system. This system is described by the reference_orientation vector.
@@ -169,7 +174,7 @@ class Molecule:
         reference system. UNIT  3D VECTOR
         :return: The t.d.m in the global reference system
         """
-
+        reference_orientation = [1, 0, 0]
         # compute the director cosinus of the rotation (inner product)
         cos_director = np.dot(reference_orientation, self.orientation)
 

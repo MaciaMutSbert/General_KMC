@@ -57,7 +57,7 @@ def get_disordered_system(conditions,  # External conditions of the system such 
                           dimensions=[10, 10, 0],
                           number_molecules=1000,
                           orientation='parallel',
-                          reference_orientation=[1,0.0],
+                          reference_orientation=[1,0,0],
                           excitons={'s_1': ['centre']},):
     """
     :param conditions: A dictionary with the pysical conditions of the problem such as temperature.
@@ -163,7 +163,7 @@ def get_1d_ordered_system(conditions,
     """
 
     if check_lattice(lattice_parameter, generic_molecule) is False:
-        print('Lattice parameter smaller than molecular characteristic length')
+        print('Lattice parameter is smaller than molecular characteristic length')
         return
 
     molecules = []
@@ -212,7 +212,7 @@ def get_2d_ordered_system(conditions,
     """
 
     if check_lattice(lattice_parameter, generic_molecule) is False:
-        print('Lattice parameter smaller than molecular characteristic length')
+        print('Lattice parameter is smaller than molecular characteristic length')
         return
 
     molecules = []
@@ -260,7 +260,7 @@ def get_3d_ordered_system(conditions,
     """
 
     if check_lattice(lattice_parameter, generic_molecule) is False:
-        print('Lattice parameter smaller than molecular characteristic length')
+        print('Lattice parameter is smaller than molecular characteristic length')
         return
 
     molecules = []
@@ -308,9 +308,7 @@ def distance_checking(coordinates, molecules):
     coordinates = np.array(coordinates)
 
     for molecule in molecules:
-        molecular_coordinates = np.array(molecule.coordinates)
-
-        if distance.euclidean(coordinates, molecular_coordinates) < molecule.molecular_volume:
+        if distance.euclidean(coordinates, molecule.molecular_coordinates()) < molecule.characteristic_length:
             return True
 
     return False
@@ -338,7 +336,7 @@ def check_lattice(lattice_parameter, generic_molecule):
     :param generic_molecule: instance of class molecule with all its natural parameters defined
     :return: Boolean. Checks if the lattice parameter chosen is smaller than the molecular characteristic length.
     """
-    if lattice_parameter <  generic_molecule.characteristic_length:
+    if lattice_parameter < generic_molecule.characteristic_length:
         return False
     else:
         return True

@@ -50,7 +50,7 @@ def excited_system(molecules, excitons, tolerance):
         for position in excitons[state]:
             index = get_excited_index(position, centre_list, molecules, tolerance)
 
-            molecules[index].change_state(state)     # check the correct method
+            molecules[index].set_state(state)     # check the correct method
             centre_list.append(index)
 
     return centre_list
@@ -135,7 +135,7 @@ def pick_centre(centre_list, molecules, tolerance):
     """
     index = None
     for i, molecule in enumerate(molecules):
-        position = np.abs(molecule.molecular_coordinates())
+        position = np.linalg.norm(molecule.molecular_coordinates())
         if position <= tolerance:
             index = i
 

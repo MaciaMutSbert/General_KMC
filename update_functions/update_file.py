@@ -2,9 +2,9 @@ import numpy as np
 from scipy.spatial import distance
 from kmc_implementation.kmc_file import kmc_algorithm
 from processes.processes import get_transfer_rates, update_step, get_decay_rates
+memory ={}
 
-
-def update_system(system,  memory):
+def update_system(system):
     """
     :param system: Dictionary with all the information of the system
     :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
@@ -14,7 +14,7 @@ def update_system(system,  memory):
     2. Chooses a process for every exciton. This paths includes: dict(centre, process, new molecule)
     3. Considering all the calculated rates computes the time interval for each process.
     4. Updates the system according to the chosen path and the time passed.
-    :return:
+    :return: the choosen process and the advanced time
     """
     molecules = system['molecules']
     center_indexes = system['centres']
@@ -24,12 +24,13 @@ def update_system(system,  memory):
     for center in center_indexes:
         neighbours_index = neighbourhood(center, molecules, radius=system['conditions']['neighbourhood_radius'])
 
-        path_list, rate_list = get_rates_process(center, neighbours_index, system, memory)
+        path_list, rate_list = get_rates_process(center, neighbours_index, system)
         rate_collector += rate_list
         process_collector += path_list
 
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
-    update_step(chosen_process, time, system)
+    update_step(chosen_process, system)
+
     return chosen_process, time
 
 
@@ -82,10 +83,10 @@ def neighbourhood(center, molecules, radius=0.11):
     return neighbours
 
 
-def get_rates_process(centre, neighbour_index, system, memory):
+def get_rates_process(centre, neighbour_index, system):
     """
-    :param centre: Index of the studied excited molecule
-    :param neighbour_index: Indexes of the neighbours (candidates to accept the exciton)
+    :param centre: Index of the studied excited molecule. Donor
+    :param neighbour_index: Indexes of the neighbours (candidates to acceptors)
     :param system: Dictionary with the information of the system.
     :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
     parameters is used as key.
@@ -100,12 +101,11 @@ def get_rates_process(centre, neighbour_index, system, memory):
     transfer_rates = {}
 
     for i in neighbour_index:
-        i_rates = get_transfer_rates(centre, i, system, memory)
+        i_rates = get_transfer_rates(centre, i, system)
         transfer_rates[str(i)] = i_rates
 
-    decay_rates = get_decay_rates(system, centre, memory)
-    process_list, rate_list = process_rate_splitter(transfer_rates, decay_rates, centre)
-    return process_list, rate_list
+    decay_rates = get_decay_rates(system, centre)
+    return process_rate_splitter(transfer_rates, decay_rates, centre)
 
 
 def process_rate_splitter(transfer_rates, decay_rates, centre_index):

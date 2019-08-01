@@ -33,8 +33,7 @@ exciton_lengths = []
 time_list = []
 life_time = []
 
-# Memory of the system
-memory = {}
+
 
 for j in range(1000):
     system = get_homogeneous_system(conditions, dimensions=dimensions, lattice_parameter=lattice_parameter,
@@ -49,18 +48,19 @@ for j in range(1000):
     total_time = 0
     path_list = []
 
-    finished = False
-    it = 0
     path = None
-    while finished is False:
+    """
+    Veure com definim el màxim d'iteracions.
+    """
+    for it in range(max):
         get_centres(system, path)
-        path, time = update_system(system, memory)
+        path, time = update_system(system)
 
         total_time += time
         path_list.append(path)
 
-        it += 1
-        finished = check_finish(path_list)
+        if check_finish(path_list) is True:
+            break
 
     final_positions.append(final_position(path_list, system))
     exciton_lengths.append(moved_length(initial_position(path_list, system), final_position(path_list, system)))

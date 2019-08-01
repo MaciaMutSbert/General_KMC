@@ -1,78 +1,118 @@
 import numpy as np
 from scipy.spatial import distance
 from numpy import pi
+from processes.coupling_functions import couplings
+from conversion_functions import from_ns_to_au, from_ev_to_au
+
+decay_memory = {}
+overlap_memory = {}
+
+###########################################################################
+#           FUNCIÓ 1: rates de transfrència
+###########################################################################
 
 
-def get_transfer_rates(centre, neighbour_index, system, memory):
+def get_transfer_rates(centre, neighbour_index, system):
     """
     :param centre: Index of the studies excited molecule
     :param neighbour_index: Index of a nearby molecule (possible acceptor of the exciton)
     :param system: Dictionary with the list of molecules and additional physical information
-    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
-    parameters is used as key.
     :return: Dictionary with the possible transfer processes between the two involved molecules
     as keys and its rates as arguments.
     """
-    molecules = system['molecules']
+    conditions = system['conditions']
+    donor = system['molecules'][centre]
+    acceptor = system['molecules'][neighbour_index]
+
     transfer_rates = {}
 
-    fcwd = compute_fcwd_gaussian(system, memory)
+    spectral_overlap = marcus_overlap_formula(donor, acceptor, conditions)
 
-    if molecules[centre].state == 1:
-        if molecules[neighbour_index].state == 0:
+    key = '{}_{}'.format(donor.electronic_state(), acceptor.electronic_state())
+    electronic_coupling = couplings[key](donor, acceptor, conditions)
 
-            process = 'Singlet_transfer'
-            forster = compute_forster_coupling(centre, neighbour_index, system, memory)
-            transfer_rates[process] = 2*pi * fcwd * forster**2 / (2.4189 * 10**(-8))
-
+    rate = (2*pi) * spectral_overlap * electronic_coupling**2
+    transfer_rates[key] = from_ns_to_au(rate, 'direct')
     return transfer_rates
 
-
-def update_step(chosen_process, time, system):
-    """
-    :param chosen_process: dictionary like dict(center, process, neighbour)
-    :param time: Duration of the process
-    :param system: dictionary with the molecule list and the additional information of the system
-    Modifies system.
-    """
-
-    if chosen_process['process'] is 'Singlet_transfer':
-        system['molecules'][chosen_process['donor']].state = 0
-        system['molecules'][chosen_process['acceptor']].state = 1
-
-    if chosen_process['process'] is 'Singlet_radiative_decay':
-        system['molecules'][chosen_process['donor']].state = 0
+###########################################################################
+#           FUNCIÓ 2: rates de decaïment
+###########################################################################
 
 
-def get_decay_rates(system, centre, memory):
+def get_decay_rates(system, centre):
     """
     :param system: Dictionary with all the information of the system
     :param centre: index of the excited molecule
-    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
-    parameters is used as key.
     :return: A dictionary with the possible decay rates
     """
+    donor = system['molecules'][centre]
+    info = str(hash(donor.state))
 
-    molecule = system['molecules'][centre]
-
-    molecular_state = molecule.state
-
-    particular_info = str(hash(molecular_state))
-
-    if particular_info in memory:
-        decay_rates = memory[particular_info]
+    if info in decay_memory:
+        decay_rates = decay_memory[info]
 
     else:
-        decay_rates = molecule.decay_rate()
-        memory[particular_info] = decay_rates
+        decay_rates = donor.decay_rate()
+        decay_memory[info] = decay_rates
 
     return decay_rates
 
 
-def compute_fcwd_gaussian(system, memory):
+###########################################################################
+#           FUNCIÓ 3: actualització del sistema
+###########################################################################
+
+
+def update_step(chosen_process, system):
+    """
+    :param chosen_process: dictionary like dict(center, process, neighbour)
+    :param system: dictionary with the molecule list and the additional information of the system
+    Modifies system.
+    """
+
+    if chosen_process['process'] is 's_1_s_0':
+        system['molecules'][chosen_process['donor']].change_state('g_s')
+        system['molecules'][chosen_process['acceptor']].change_state('s_1')
+
+    if chosen_process['process'] is 'Singlet_radiative_decay':
+        system['molecules'][chosen_process['donor']].change_state('g_s')
+
+
+###########################################################################
+#           FUNCIONS AUXILIARS: solapament espectral
+###########################################################################
+def marcus_overlap_formula(donor, acceptor, conditions):
+    """
+    :param donor:
+    :param acceptor:
+    :param conditions:
+    :return: The spectral overlap between the donor and the acceptor according to Marcus formula.
+    """
+    kb = 8.617333 * 10**(-5)            # Boltzmann constant in eV * K^(-1)
+    T = conditions['temperature']       # K
+
+    excited_state = donor.electronic_state()
+    gibbs_energy = donor.excitation_energy[excited_state] - acceptor.excitation_energy[excited_state]
+    relax = donor.get_relaxation_energy()
+
+    info = str(hash((T, gibbs_energy, relax)))
+
+    if info in overlap_memory:
+        overlap = overlap_memory[info]
+
+    else:
+        overlap = 1 / (2* pi * np.sqrt(pi*kb*T*relax)) * np.exp(-(gibbs_energy+relax)**2 / (4*kb*T*relax))
+        overlap_memory[info] = overlap
+
+    return from_ev_to_au(overlap, 'inverse')
+    # Since we have a quantity in 1/eV, we use the converse function from_ev_to_au in inverse mode
+    # to have a 1/au quantity.
+
+
+def compute_fcwd_gaussian(system):
     """
     :param system: dictionary with all the physical information of the system
-    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
     parameters is used as key.
     :return: Franck-Condon-weighted density of states in gaussian aproximation
     """
@@ -81,45 +121,15 @@ def compute_fcwd_gaussian(system, memory):
 
     info = str(hash((delta, sigma)))
 
-    if info in memory:
-        fcwd = memory[info]
+    if info in overlap_memory:
+        fcwd = overlap_memory[info]
 
     else:
         fcwd = np.exp(- delta**2 / (2*sigma)**2) / (2 * np.sqrt(pi) * sigma)
-        memory[info] = fcwd
+        overlap_memory[info] = fcwd
 
     return fcwd
 
 
-def compute_forster_coupling(center, neighbour_index, system, memory):
-    """
-    :param center: Index of the excited molecule
-    :param neighbour_index: Index of a possible acceptor
-    :param system: Dictionary with all the physical information
-    :param memory: dictionary with the calculated rates as arguments, the hash of the characteristic
-    parameters is used as key.
-    :return: Forster coupling between both molecules. We do not implement
-    any correction for short distances.
-    """
-    molecules = system['molecules']
-
-    u_a = molecules[center].transition_dipole
-    u_b = molecules[neighbour_index].transition_dipole
-    k = 2     # we shall define a function with the right expression for k when it is not constant
-
-    r_a = np.array(molecules[center].coordinates)
-    r_b = np.array(molecules[neighbour_index].coordinates)
-    inter_distance = distance.euclidean(r_a, r_b)           # nm
-
-    particular_info = str(hash((u_a, u_b, inter_distance)))
-
-    if particular_info in memory:
-        forster_coupling = memory[particular_info]
-
-    else:
-        n = system['conditions']['refractive_index']
-        alfa = system['conditions']['alfa']
-        forster_coupling = k * np.dot(u_a, u_b) / (n**2 * (alfa*u_a + inter_distance/0.053)**3)
-        memory[particular_info] = forster_coupling
-
-    return forster_coupling
+if __name__ == '__main__':
+    print('test')
