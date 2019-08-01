@@ -29,7 +29,7 @@ def update_system(system):
         process_collector += path_list
 
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
-    update_step(chosen_process, system)
+    update_step(chosen_process, molecules)
 
     return chosen_process, time
 

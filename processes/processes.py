@@ -28,12 +28,21 @@ def get_transfer_rates(centre, neighbour_index, system):
 
     spectral_overlap = marcus_overlap_formula(donor, acceptor, conditions)
 
+    """
+    Les referències dels possibles processos de transfarència seran les que s'usaran com a claus dels diccionaris:
+    transfer_rates i couplings. Així com les que s'usaran per identificar com s'ha d'actualitzar el sistema. És per això
+    que s'ha de seguir un conveni. La clau es construirà com: 'state1_state2' i farà referència a una excitació en state1
+    que es propaga a una molècula en state2. E.g, si tenim la propagació d'un singlet_1 a una molècula en l'estat 
+    fonamental la clau del procés serà: 's_1_g_s'.
+    """
+
     key = '{}_{}'.format(donor.electronic_state(), acceptor.electronic_state())
     electronic_coupling = couplings[key](donor, acceptor, conditions)
 
     rate = (2*pi) * spectral_overlap * electronic_coupling**2
     transfer_rates[key] = from_ns_to_au(rate, 'direct')
     return transfer_rates
+
 
 ###########################################################################
 #           FUNCIÓ 2: rates de decaïment
@@ -64,19 +73,19 @@ def get_decay_rates(system, centre):
 ###########################################################################
 
 
-def update_step(chosen_process, system):
+def update_step(chosen_process, molecules):
     """
     :param chosen_process: dictionary like dict(center, process, neighbour)
     :param system: dictionary with the molecule list and the additional information of the system
     Modifies system.
     """
 
-    if chosen_process['process'] is 's_1_s_0':
-        system['molecules'][chosen_process['donor']].change_state('g_s')
-        system['molecules'][chosen_process['acceptor']].change_state('s_1')
+    if chosen_process['process'] is 's_1_g_s':
+        molecules[chosen_process['donor']].change_state('g_s')
+        molecules[chosen_process['acceptor']].change_state('s_1')
 
     if chosen_process['process'] is 'Singlet_radiative_decay':
-        system['molecules'][chosen_process['donor']].change_state('g_s')
+        molecules[chosen_process['donor']].change_state('g_s')
 
 
 ###########################################################################
