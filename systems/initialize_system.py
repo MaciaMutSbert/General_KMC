@@ -169,7 +169,7 @@ def get_1d_ordered_system(conditions,
     molecules = []
     x_max = dimensions[0]/2
     pointing = 1
-    symmetry = get_symmetry(orientation)
+    symmetry = get_symmetry[orientation]
     # We want the distribution center at 0
     for x in np.arange(-x_max, x_max, lattice_parameter):
         coordinates = [x, 0, 0]
@@ -219,7 +219,7 @@ def get_2d_ordered_system(conditions,
     x_max = dimensions[0]/2
     y_max = dimensions[1]/2
     # We want the center of the distribution at (0,0)
-    symmetry = get_symmetry(orientation)
+    symmetry = get_symmetry[orientation]
     x_count = 0
     for x in np.arange(-x_max, x_max, lattice_parameter):
         pointing = (-1)**x_count
@@ -271,7 +271,7 @@ def get_3d_ordered_system(conditions,
     # We want the center of the distribution at (0,0,0)
 
     x_count = 0
-    symmetry = get_symmetry(orientation)
+    symmetry = get_symmetry[orientation]
     for x in np.arange(-x_max, x_max, step):
         x_pointing = (-1)**x_count
         y_count = 0
@@ -353,19 +353,11 @@ Val a dir que per un material amorf no es contempla l'antiparal·lelisme. Si es 
 Sortiria un avís per pantalla indicant la no viabilitat d'aquesta distribució i no s'inicialitzaria cap sistema.
 """
 
-
-def get_symmetry(orientation):
-    if orientation is 'parallel':
-        return [1, 2]
-
-    if orientation is 'antiparallel':
-        return [-1, 1]
-
-    else:
-        return [0, 0]
+get_symmetry = {'parallel': [1, 2], 'antiparallel': [-1, 1], 'random': [0,0]}
 
 
 def get_orientation(orientation, reference_orientation, dimensionality, pointing):
+
     if orientation is 'random':
         if dimensionality == 3:
             phi = 2*np.pi() * np.random.rand()

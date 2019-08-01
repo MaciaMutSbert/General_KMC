@@ -29,6 +29,9 @@ Arguments necessaris per inicialitzar qualsevol sistema:
 -dimensionality: Enter. Número de dimensions del sistema, tendrà interès per altres funcions.
 -dimensions: Lista de 3 elements. Dimensions del sistema, sempre donades en 3D i agafant 0 les coordenades oportunes
     si volem un sistema de menor dimensionalitat
+
+    - L'INPUT real per les dimensions serà una llista amb el número de molècules per cada costat.
+
 -num_molecules: Enter. Número de molècules que ha de generar el sistema. Només és necessari per un sistema desordenat.
     Per un sistema ordenat el número vendria donat pel número de sites possibles.
 -lattice_parameter: Real. Caracteritza el sistema ordenat amb el seu paràmetre de xarxa. D'aquest dependrà el número de
@@ -49,7 +52,7 @@ Diccionari anomenat system amb (per ara) 3 entrades:
             el paràmetre de xarxa.
         'centre_indexes': llista dels índexs de les molècules excitades (sigui quin sigui l'estat).s
 
-
+################################################
 
 Funció: get_homogeneous_system().
     Reb tots els paràmetres esmentats anteriorment i redirigeix el programa cap a una altre funció segons si el volem
@@ -62,8 +65,22 @@ Funció: get_disordered_system().
     A part d'amb una posició aleatòria, la funció inicialitza les molècules amb l'orientació demanada ('random' / 'parallel').
     No contempla que pugui haver-hi una orientació antiparal·lela.
 
+Funció: get_ordered_system().
+    Reb tots els paràmetres MENYS ordre i el número de molècules. Genera una llista amb molècules ordenades en una xarxa.
+    Segons la dimensionalitat agafa una funció o una altre tot i que el procediment és anàleg per cada una.
+    És necessari que estiguin separades ja que a mesura que s'afegeixen dimensions es necessiten més bucles per generar
+    les coordenades i més paràmetres per poder definir bé l'antiparal·lelisme.
 
-ANTIPARAL·LELISME. COM S'IMPLEMENTA?
+    subfuncions segons la dimensionalitat
+        get_1d_ordered_system()
+        get_2d_ordered_system()
+        get_3d_ordered_system()
+
+
+FALTEN FUNCIONS AUXILIARS DE L'ARXIU
+
+##############################################################################################################################
+                                    ANTIPARAL·LELISME. COM S'IMPLEMENTA?
 Hem inclòs en la inicialització dels sistemes ordenats la possibilitat de què les molècules estiguin ordenades
 antiparal·lelament. L'entenem com un antiparal·lelisme entre veïns primers. O sigui, donada una molècula amb orientació
 '+', els 2, 4 o 6 veïns primers de la xarxa tendran orientació '-'.
@@ -102,9 +119,17 @@ En un sistema 2D. Tenim 2 loops for, un dins l'altre.
         'antiparallel': x_count = x_count + 1 i pointing =* (-1)    (anirà alternant sempre)
     Fent mix de les dues situacions trobariem situacions d'antiparal·lelisme segons un eix triat.
 
+
+Definim un diccionari que té per entrade les orientacions possibles i per arguments els conjunts de valors que donaran
+el paral·lelisme o antiparal·lelisme segons la lògica expressada a sobre.
+    - 'parallel': [1, 2]
+    - 'antiparallel': [-1, 1]
+    - 'random': [0, 0] (és indiferent, el paràmetre pointing no s'usa quan orientation = 'random').
+
+
+FALTA FUNCIÓ get_orientation().
+
 ##############################################################################################################################
-
-
 FITXER: excitation.py
 
 Plantejam una sèrie de funcions que a partir d'un diccionari que contengui la informació sobre els excitons, modificaran
@@ -142,9 +167,6 @@ pick_furthest(centre_list, molecules). Recórre tota la llista de molècules i a
 
 
 ##############################################################################################################################
-
-
-
 FITXER: molecules.py
 
 INICIALITZACIÓ DE LA MOLÈCULA GENÈRICA:
