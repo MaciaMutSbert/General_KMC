@@ -63,7 +63,7 @@ def get_centres(system, path):
 
 
 #############################################################################################
-def neighbourhood(center, molecules, radius=0.11):
+def neighbourhood(center, molecules, radius=1.05):
     """
     :param center: Index of an excited Molecule object
     :param molecules: List of objects Molecule

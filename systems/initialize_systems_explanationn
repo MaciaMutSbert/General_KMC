@@ -27,20 +27,23 @@ Arguments necessaris per inicialitzar qualsevol sistema:
 -order: paràmetre string. Té dues possibilitats: 'ordered' o 'disordered'. Indica si tenim un material ordenat (cristal·lí)
     o desordenat (amorf).
 
--dimensionality: Enter. Número de dimensions del sistema, tendrà interès per altres funcions.
--dimensions: Lista de 3 elements. Dimensions del sistema, sempre donades en 3D i agafant 0 les coordenades oportunes
-    si volem un sistema de menor dimensionalitat
-
-    - L'INPUT real per les dimensions serà una llista amb el número de molècules per cada costat.
+-dimensions: Lista. Dimensions del sistema donades com numero de molècules per costat. La longitud
+        és igual a la dimensionalitat del sistema. Les dimensions físiques es calculen dins cada funció.
+        Sistema desordenat. Se suposa que la distància mitjana entre molècules és de 1A. Per tant, les dimensions
+        físiques venen donades per: num_molecules_costat * 0.1 nm
+        Sistema ordenat. Les dimensions físiques venen donades pel número de molècules per costat pel paràmetre
+        de xarxa.
 
 -num_molecules: Enter. Número de molècules que ha de generar el sistema. Només és necessari per un sistema desordenat.
     Per un sistema ordenat el número vendria donat pel número de sites possibles.
 -lattice_parameter: Real. Caracteritza el sistema ordenat amb el seu paràmetre de xarxa. D'aquest dependrà el número de
     molècules del sistema ordenat.
+
 -orientation: Paràmetre string. Indica com volem orientades les molècules unes respecte d'altres. Es contemplen 3 opcions:
     'parallel', 'antiparallel' i 'random'. Tot i que pel sistema desordenat no tenim ben definit l'antiparal·lelisme.
 -reference_orientation: només serà usat si l'orientació no és aleatòria. Dirà a quina direcció han de ser (anti)paral·leles
     les molècules que generem.
+
 -excitons: diccionari amb l'informació dels excitons a generar. Les claus són les referències dels possibles estats
     excitats i els arguments una llista amb les posicions de les excitacions (Veure amb més detall a l'apartat
     'excitacion')
@@ -55,19 +58,19 @@ Diccionari anomenat system amb (per ara) 3 entrades:
 
 ################################################
 
-Funció: get_homogeneous_system().
-    Reb tots els paràmetres esmentats anteriorment i redirigeix el programa cap a una altre funció segons si el volem
-    un sistema ordenat o desordenat.
+Es construeix un diccionari de funcions amb 2 entrades: 'ordered' o 'disordered'
 
-Funció: get_disordered_system().
-    Reb tots els paràmetres MENYS ordre i lattice_parameter. Genera un sistema amb les molècules distribuïdes aleatòriament.
+Clau 'disordered':  get_disordered_system().
+    Reb tots els paràmetres MENYS lattice_parameter. Genera un sistema amb les molècules distribuïdes aleatòriament.
     Alhora de generar el sistema té en compte que el fet de que les molècues siguin finites fa que la capacitat sigui
     limitada i que no poden superposar-se.
     A part d'amb una posició aleatòria, la funció inicialitza les molècules amb l'orientació demanada ('random' / 'parallel').
     No contempla que pugui haver-hi una orientació antiparal·lela.
 
-Funció: get_ordered_system().
-    Reb tots els paràmetres MENYS ordre i el número de molècules. Genera una llista amb molècules ordenades en una xarxa.
+Clau 'ordered': ens porta a un segon diccionari de funcions get_ordered_system. Aquest té per clau la dimensionalitat
+del sistema i usa una funció per cada dimensionalitat.
+
+    Reb tots els paràmetres MENYS el número de molècules. Genera una llista amb molècules ordenades en una xarxa.
     Segons la dimensionalitat agafa una funció o una altre tot i que el procediment és anàleg per cada una.
     És necessari que estiguin separades ja que a mesura que s'afegeixen dimensions es necessiten més bucles per generar
     les coordenades i més paràmetres per poder definir bé l'antiparal·lelisme.

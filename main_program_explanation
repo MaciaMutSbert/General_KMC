@@ -25,8 +25,9 @@ Morphology parameters:
         With these two parameters the physical dimensions of the system will be computed as:
         dimensions * lattice_parameter. This operation is done in the initialize_system function.
         The dimensionality of the system will be taken as the length of the list dimensions
-    num_molecules: integer. Only needed for 'disordered' systems. In this case the physical dimensions
-        of the system will be calculated with the characteristic length of the molecule since there is not a lattice.
+    num_molecules: integer. Only needed for 'disordered' systems. The physical dimensions are computed considering
+        that the intermolecular medium distance is 1A.
+
     orientation: string parameter. Valid commands 'random', 'parallel', 'antiparallel'. Referred to the
         orientation of the molecules in relation to each other.
     reference_orientation: unit vector. Necessary only for 'parallel' or 'antiparallel' orientation.
