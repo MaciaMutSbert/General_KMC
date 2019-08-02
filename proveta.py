@@ -3,35 +3,86 @@ from update_functions.update_file import update_system, check_finish, get_centre
 from result_analysis import initial_position, final_position, x_y_splitter, moved_length
 import matplotlib.pyplot as plt
 import numpy as np
-
+from systems.molecules import Molecule
 
 """
-In conditions the physical conditions of the system and molecule are defined.
-Global condition: temperature
-Material parameters: refractive index (n), orientational factor, k
-Molecule parameters:    singlet (excitation) energy, must be given in eV
-                        transition dipole, must be given in atomic units
-                        characteristic_length, in nm
-Absorption and emission spectra deviation  (considered as gaussian)       (unclassified parameter)
+ORGANITZAR-HO EN FUNCIONS ESPECÍFIQUES
 """
 
 
-lattice_parameter = 1.2           # nm
-dimensions = [42, 42]          # nm
-num_dimensions = 2
-excitons = {'number': 1, 'positions': [612]}
+"Physical conditions"
+conditions = {'temperature': input('Temperature in K:'),
+              'refractive_index': input('Refractive index of the material:'),
+              'neighbour_radius': input('Maximum distance considered for the interaction:')}
 
 
-conditions = {'temperature': 273.15, 'refractive_index': 1, 'neighbourhood_radius': 1.3,
-              'a_e_spectra_deviation': 0.3, 'a_e_spectra_centre_shift': 1.2, 'alfa': 0,
-              'singlet_energy': 2.5, 'transition_dipole': 1, 'characteristic_length': 10**(-8)}
+"Generic molecule initialization"
+print("""\n Possible states: 
+         \t 'g_s': ground state 
+         \t 's_1': first singlet state 
+         \t 't_1': first triplet state 
+         \n All energies must be given in eV.""")
+
+state_energies = {'g_s': float(input('Ground state energy (eV): ')),
+                  's_1': float(input('First singlet state energy (eV): ')),
+                  't_1': float(input('First triplet state energy (eV): '))}
+print('\n')
+relaxation_energies = {'g_s': float(input('Ground state relaxation energy (eV): ')),
+                       's_1': float(input('First singlet state relaxation energy (eV): ')),
+                       't_1': float(input('First triplet state relaxation energy (eV): '))}
+
+print("\n Dipole transition moment vector (a.u)")
+transition_moment = np.array([float(input('x_component:')),
+                              float(input('y_component: ')),
+                              float(input('z_component: '))])
+
+generic_molecule = Molecule(state_energies, relaxation_energies, transition_moment)
+print('\n')
+
+"Morphology parameters"
+order = input("'ordered' / 'disordered': ")
+print(order)
+print(type(order))
+print("\n Number of molecules per side: ")
+dimensions = [int(input('Molecules in x: ')),
+              int(input('Molecules in y: ')),
+              int(input('Molecules in z: '))]
+for dimension in dimensions:
+    if dimension == 0:
+        dimensions.remove(dimension)
+print(dimensions)
+
+if order is 'ordered':
+    lattice_parameter = float(input("Lattice parameter (nm), only needed for 'ordered': "))
+    num_molecules = None
+if order is 'disordered':
+    num_molecules = int(input("Number of molecules (only for 'disordered'): "))
+    lattice_parameter = None
+
+orientation = input("'random'/'parallel'/'antiparallel': ")
+reference_orientation = np.array([1, 0, 0])
+print('\n')
+
+"Excitons"
+print("""Possible positions: random, first, last, centre and furthest \n""")
+excitons = {}
+num_s1 = int(input('Number of s_1 excitons:'))
+s_1_positions = []
+for i in range(num_s1):
+    s_1_positions.append(input('s_1 position:'))
+excitons['s_1'] = s_1_positions
+
+num_t1 = int(input('Number of t_1 excitons'))
+t_1_positions = []
+for i in range(num_t1):
+    t_1_positions.append(input('t_1 position: '))
+excitons['t_1'] = t_1_positions
+print(excitons)
+
+
+
 
 # Lists for further analysis
-final_positions = []
-diffusion_length = []
-exciton_lengths = []
-time_list = []
-life_time = []
 
 
 
@@ -92,4 +143,3 @@ plt.show()
 
 print('Average distance: %.5f +- %.5f' % (diffusion_length[-1], df_deviation))
 print('Average time %.5f +- %.5f' % (life_time[-1], lt_deviation))
-

@@ -102,7 +102,7 @@ de la temperatura (conditions['temperature']) l'energia de relaxació de l'estat
 diferència d'energia (lliure de Gibbs) entre l'estat en què es troba l'excitó i l'estat al què es transferirà.
 
 D'igual manera que amb els rates de decaïment introduïm un diccionari overlap_memory que emmagatzerà els càlculs que
-s'hagin fet. La clau serà el hash de (temperatura, energia de relaxació, diferència d'energia lliure, 'Marcus'). De tal manera
+s'hagin fet. La clau serà el hash de (temperatura, energia de relaxació, diferència d'energia lliure, 'marcus'). De tal manera
 que per una situació amb els mateixos paràmetres s'usi el resultat ja calculat.
 
 
@@ -127,7 +127,7 @@ DICCIONARI
 compute_forster_coupling(donor, acceptor, conditions):
 
 La funció retorna l'acoplament electrònic calculat segons l'aproximació dipol-dipol de Förster.
-Si el hash de la tupla (moment del donor, moment de l'acceptor, distància, 'Förster') és clau del diccionari
+Si el hash de la tupla (moment del donor, moment de l'acceptor, distància, 'förster') és clau del diccionari
 coupling_memory, aleshores ja ha estat calculat i reaprofitam el valor. Per cas contrari el calcula i crea una nova
 entrada del diccionari de memòria.
 

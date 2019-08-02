@@ -27,26 +27,26 @@ Acoplaments considerats:
 coupling_memory = {}
 
 
-def compute_forster_coupling(molecule1, molecule2, conditions):
+def compute_forster_coupling(donor, acceptor, conditions):
     """
-    :param molecule1: excited moleculen. Donor
-    :param molecule2: neighbouring molecule. Possible acceptor
+    :param donor: excited moleculen. Donor
+    :param acceptor: neighbouring molecule. Possible acceptor
     :param conditions: dictionary with physical conditions
     :return: Förster coupling between both molecules. We don't implement any correction for short distances.
     """
 
-    u_D = molecule1.get_transition_moment()
-    u_A = molecule2.get_transition_moment()
-    r = intermolecular_distance(molecule1, molecule2)       # a. u.
+    u_d = donor.get_transition_moment()
+    u_a = acceptor.get_transition_moment()
+    r = intermolecular_distance(donor, acceptor)       # a. u.
     n = conditions['refractive_index']
 
-    info = str(hash((u_D, u_A, r, n, 'forster')))
+    info = str(hash((u_d, u_a, r, n, 'förster')))
     if info in coupling_memory:
         forster_coupling = coupling_memory[info]
 
     else:
-        k = orientational_factor(u_D, u_A, r)
-        forster_coupling = k**2 * np.dot(u_D, u_A) / (n**2 * r**3)
+        k = orientational_factor(u_d, u_a, r)
+        forster_coupling = k**2 * np.dot(u_d, u_a) / (n**2 * r**3)
         coupling_memory[info] = forster_coupling
 
     return forster_coupling
@@ -57,7 +57,6 @@ def compute_forster_coupling(molecule1, molecule2, conditions):
 ##########################################################################################
 
 couplings = {'s_1_g_s': compute_forster_coupling}
-
 
 
 ###############################################################################################
@@ -71,21 +70,21 @@ def intermolecular_distance(molecule1, molecule2):
     :param molecule2: acceptor
     :return: the euclidean distance between the donor and the acceptor
     """
-    position_D = molecule1.molecular_coordinates()
-    position_A = molecule2.molecular_coordinates()
-    r = distance.euclidean(position_D, position_A)
+    position_d = molecule1.molecular_coordinates()
+    position_a = molecule2.molecular_coordinates()
+    r = distance.euclidean(position_d, position_a)
     return from_nm_to_au(r, 'direct')
 
 
-def orientational_factor(u_D, u_A, r):
+def orientational_factor(u_d, u_a, r):
     """
-    :param u_D: dipole transition moment of the donor
-    :param u_A: dipole transition moment of the acceptor
+    :param u_d: dipole transition moment of the donor
+    :param u_a: dipole transition moment of the acceptor
     :param r:  intermolecular_distance
     :return: the orientational factor between both molecules
     """
-    nd = unity(u_D)
-    na = unity(u_A)
+    nd = unity(u_d)
+    na = unity(u_a)
     e = unity(r)
     return np.dot(nd, na) - 3*np.dot(e, nd)*np.dot(e, na)
 

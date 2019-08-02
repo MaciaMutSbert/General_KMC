@@ -13,7 +13,6 @@ INICIALITZACIÓ DE LA MOLÈCULA GENÈRICA:
     -state_energies: diccionari amb les energies d'excitació de cada estat de la molècula:
                 :key: energia de l'estat excitat
                 :argument:  energia de l'estat
-    -state: referència de quinn estat exctitat es troba la molècula
     -relaxation_energies: diccionari amb les energies de relaxació de cada estat. Per ara en prenem una fitxa i què depèn
     sols de cada estat.
                 :key: energia de l'estat excitat
@@ -54,7 +53,7 @@ class Molecule:
                  state_energies,
                  relaxation_energies,
                  transition_moment,
-                 state = 'g_s',
+                 state='g_s',
                  characteristic_length=10**(-8),
                  coordinates=[0, 0, 0],
                  orientation=[1, 0, 0]):

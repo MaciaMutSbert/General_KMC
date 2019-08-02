@@ -23,6 +23,7 @@ Arguments necessaris per inicialitzar qualsevol sistema:
 - generic_molecule: instància de la classe Molecule. Aquesta recull la naturalesa de la molècula i s'inicialitza amb
     una posició i orientació per defecte. (Veure amb més detall en l'apartat 'molecules')
     (Afegir on i com inicialitzar-la)
+
 -order: paràmetre string. Té dues possibilitats: 'ordered' o 'disordered'. Indica si tenim un material ordenat (cristal·lí)
     o desordenat (amorf).
 
