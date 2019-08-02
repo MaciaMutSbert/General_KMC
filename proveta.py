@@ -48,8 +48,8 @@ excitons = {'s_1': ['centre']}
 
 # Lists for further analysis
 
-
-for j in range(1):
+decayment_iterations = []
+for j in range(10):
     key = str(len(dimensions))
     system = get_homogeneous_system['ordered'][key](conditions, generic_molecule, dimensions, lattice_parameter,
                                                     orientation, reference_orientation, excitons)
@@ -66,15 +66,23 @@ for j in range(1):
     """
     Veure com definim el màxim d'iteracions.
     """
-    for it in range(1):
+    max = 20000
+    for it in range(max):
         path, time = update_system(system)
         total_time += time
         path_list.append(path)
 
-        print(path)
-
         if check_finish(path_list) is True:
             break
+
+    if it == max-1:
+        print('%5d iterations without decayment' %max)
+    else:
+        print('%5d iterations needed for decayment' %it)
+    decayment_iterations.append(it)
+
+average = np.average(np.array(decayment_iterations))
+print(average)
 
 
 """
