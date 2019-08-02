@@ -72,24 +72,32 @@ def get_decay_rates(system, centre):
 ###########################################################################
 
 
-def update_step(chosen_process, molecules):
+def update_step(chosen_process, molecules, centre_indexes):
     """
     :param chosen_process: dictionary like dict(center, process, neighbour)
-    :param system: dictionary with the molecule list and the additional information of the system
-    Modifies system.
+    :param molecules: list of instances of molecule
+    :param centre_indexes: list of the indexes of the excited molecules
+    Modifies the state of the donor and the acceptor. Removes the donor from the centre_indexes list
+    and includes the acceptor. If its a decay only changes and removes tha acceptor
     """
 
     if chosen_process['process'] is 's_1_g_s':
         molecules[chosen_process['donor']].change_state('g_s')
         molecules[chosen_process['acceptor']].change_state('s_1')
 
+        centre_indexes.remove(chosen_process['donor'])
+        centre_indexes.append(chosen_process['acceptor'])
+
     if chosen_process['process'] is 'Singlet_radiative_decay':
         molecules[chosen_process['donor']].change_state('g_s')
+        centre_indexes.remove(chosen_process['donor'])
 
 
 ###########################################################################
 #           FUNCIONS AUXILIARS: solapament espectral
 ###########################################################################
+
+
 def marcus_overlap_formula(donor, acceptor, conditions):
     """
     :param donor:

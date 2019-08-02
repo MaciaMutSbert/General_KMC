@@ -28,7 +28,7 @@ random. Pentura s'hi guanyaria eficiència.
 
 pick_centre(centre_list, molecules, tolerance). Recórre tota la llista de molècules i agafa la que estigui situada en una
 esfera de radi tolerance centrada en 0. Si tenim un sistema ordenat amb un paràmetre de xarxa donat, la tolerància n'és
-la meitat. Per un sistema amorf la definim com la 30èssima part de la mitjana dels 3 costats.
+la meitat. Per un sistema amorf la definim com 2 cops la distància intermolecular mitjana (2A)
 Si no tenim cap molècula en aquest entorn (podria donar-se en un sistema amorf) o aquesta ja està excitada pren un
 índex aleatòriament, tot printant un avís de que no tenim cap molècula al centre.
 
@@ -41,6 +41,7 @@ def excited_system(molecules, excitons, tolerance):
     """
     :param molecules: List of the defined molecules
     :param excitons: Information about the desired excitation
+    :param tolerance:
     :return: list with the index of the excited molecules
     The function modifies the list of molecules with the excitons.
     """
@@ -129,8 +130,8 @@ def pick_centre(centre_list, molecules, tolerance):
     The function looks for a molecule in a cercle of radius = tolerance and it is considered the centre.
     It the centre is already taken or there is not any molecule in the centre of the distribution,
     as it migth happen in an amorphous material, the function picks another index randomly.
-    It is taken as the lattice_parameter / 2 in ordered systems and as the 30th part of the average length of
-     the system in disordered systems.
+    It is taken as the lattice_parameter / 2 in ordered systems and as the intermolecular distance times 2
+    in disordered systems.
     :return: the index of the excited molecule
     """
     index = None
@@ -158,7 +159,7 @@ def pick_furthest(centre_list, molecules):
     furthest_position = 0
     index = None
     for i, molecule in enumerate(molecules):
-        position = np.abs(molecule.molecular_coordinates())
+        position = np.linalg.norm(molecule.molecular_coordinates())
 
         if position > furthest_position:
             furthest_position = position

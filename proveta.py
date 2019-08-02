@@ -17,7 +17,7 @@ Possible states:
     'g_s': ground state 
     's_1': first singlet state 
     't_1': first triplet state 
-All energies must be given in eV.
+All energies must be given in eV. By default initialized at g_s.
 """
 
 state_energies = {'g_s': 0, 's_1': 2.5, 't_1': 'Not considered'}       # eV
@@ -45,29 +45,28 @@ The dictionary takes the state as key and a list with the position of every exci
 """
 excitons = {'s_1': ['centre'], 't_1': []}
 
+
 # Lists for further analysis
 
 
-
-for j in range(1000):
-    system = get_homogeneous_system(conditions, dimensions=dimensions, lattice_parameter=lattice_parameter,
-                                    excitons=excitons)
-
+for j in range(10):
+    ordered_systems = get_homogeneous_system['ordered']
+    key = str(len(dimensions))
+    system = ordered_systems[key](conditions, generic_molecule, dimensions, lattice_parameter,
+                                  orientation, reference_orientation, excitons)
     """
     system is a dictionary with three keys:
         molecules: List of objects class Molecule
         conditions: dictionary with the physical conditions of the system such as temperature, refractive index...
         centre_indexes: list with the indexes of the excited molecules.
     """
+
     total_time = 0
     path_list = []
-
-    path = None
     """
     Veure com definim el màxim d'iteracions.
     """
     for it in range(max):
-        get_centres(system, path)
         path, time = update_system(system)
 
         total_time += time
@@ -76,7 +75,10 @@ for j in range(1000):
         if check_finish(path_list) is True:
             break
 
-    final_positions.append(final_position(path_list, system))
+
+
+"""
+ final_positions.append(final_position(path_list, system))
     exciton_lengths.append(moved_length(initial_position(path_list, system), final_position(path_list, system)))
     diffusion_length.append(np.average(np.array(exciton_lengths)))
     print(j)
@@ -106,3 +108,4 @@ plt.show()
 
 print('Average distance: %.5f +- %.5f' % (diffusion_length[-1], df_deviation))
 print('Average time %.5f +- %.5f' % (life_time[-1], lt_deviation))
+"""

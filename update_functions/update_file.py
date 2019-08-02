@@ -28,7 +28,7 @@ def update_system(system):
         process_collector += path_list
 
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
-    update_step(chosen_process, molecules)
+    update_step(chosen_process, molecules, center_indexes)        # updates both lists according to the chosen process
 
     return chosen_process, time
 
@@ -40,26 +40,6 @@ def check_finish(path_list):
 
     else:
         return False
-
-
-def get_centres(system, path):
-    """
-    :param system: Dictionary with the information of the system. Only the list of the excited molecules
-    indexes is used.
-    :param path: dict(donor, process, acceptor) the acceptor is the new center
-    Changes the list of centers when the exciton is transferred from a 'donor' to an 'acceptor'.
-    """
-
-    """
-        molecules = system['molecules']
-        for i, molecule in enumerate(molecules):
-            if molecule.state != 0:
-                center_indexes.append(i)
-        """
-
-    if path is not None:
-        system['centres'].remove(path['donor'])
-        system['centres'].append(path['acceptor'])
 
 
 #############################################################################################

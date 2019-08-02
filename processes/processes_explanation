@@ -82,14 +82,14 @@ Aleshores el procediment serà:
 
 
 ############################################################
-update_step(chosen_proces, system):
+update_step(chosen_proces, molecules, centre_indexes):
 
 A partir del chosen_procés que és un diccionari tipus {'donor': index del donant, 'process': etiqueta del procés,
-'acceptor': índex de l'acceptor} i de la llista molecules, canvia els estats del donador i l'acceptor segons el
-procés triat.
+'acceptor': índex de l'acceptor} actualitza les llistes molecules i centre indexes.
 
-Per un procés de transfarència, l'acceptor passa a l'estat excitat corresponent i el donant decau.
-Per un de decaïment el donador i l'acceptor són iguals i es passa l'estat del donant al fonamental.
+Per un procés de transfarència es desexcita i es treu de la llista de centres el donant mentre que s'hi afegeix i
+s'excita l'acceptor.
+Per un procés de decaïment sols s'actua sobre el donant
 
 
 ###################################################################################################################

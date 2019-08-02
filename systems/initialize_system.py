@@ -15,6 +15,9 @@ def get_disordered_system(conditions,  # External conditions of the system such 
     :param generic_molecule: generic instance of class Molecule with the intern information defined.
         In the function a position and orientation for the molecule are given
     :param dimensions: Number of molecules per side. A list with len = num_dimensions.
+    :param orientation: String parameter. Indicates whether the orientation of the molecules is parallel,
+    random or antiparallel (each molecule finds its 1sts neighbours antiparallely orientated)
+    :param reference_orientation: 3 length string (vector), indicates the privileged orientation.
     :param number_molecules: Number of molecules in the system.
     :param excitons: Dictionary with the information of the excitons (type and a position for each).
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
@@ -51,7 +54,7 @@ def get_disordered_system(conditions,  # External conditions of the system such 
         if molecule_count == capacity:
             break
 
-    tolerance = (dimensions[0]+dimensions[1]+dimensions[2]) / (3*30)
+    tolerance = intermolecular_distance * 2
     centre_indexes = excited_system(molecules, excitons, tolerance)
     conditions['dimensions'] = dimensions
     system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
