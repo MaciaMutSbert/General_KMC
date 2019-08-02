@@ -151,10 +151,10 @@ class Molecule:
         if self.state == 's_1':
             "We consider only the radiative decay to singlet 0 state"
             decay_process = 'Singlet_radiative_decay'
-            desexcitation_energy = self.state_energies[self.state] - self.state_energies['s_0']
+            desexcitation_energy = self.state_energies[self.state] - self.state_energies['g_s']
             desexcitation_energy = from_ev_to_au(desexcitation_energy, 'direct')            # energy in atomic units
             u = np.linalg.norm(self.transition_moment)                                      # transition moment norm.
-
+            print()
             c = 137         # light speed in atomic units
 
             rate = 4 * desexcitation_energy**3 * u**2 /(3 * c**3)
@@ -179,9 +179,11 @@ class Molecule:
 
         # construct the rotation matrix
         sin_director = np.sqrt(1-cos_director**2)
-        rotation_matrix = np.array([[cos_director, -sin_director],
-                                    [sin_director, cos_director]])
+        rotation_matrix = np.array([[cos_director, -sin_director, 0],
+                                    [sin_director, cos_director, 0],
+                                    [0,                 0,       0]])
 
         # basis transform (matrix product)
         return np.dot(rotation_matrix, self.transition_moment)
+
 

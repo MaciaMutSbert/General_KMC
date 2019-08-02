@@ -26,7 +26,6 @@ def get_transfer_rates(centre, neighbour_index, system):
     transfer_rates = {}
 
     spectral_overlap = marcus_overlap_formula(donor, acceptor, conditions)
-
     """
     Les referències dels possibles processos de transfarència seran les que s'usaran com a claus dels diccionaris:
     transfer_rates i couplings. Així com les que s'usaran per identificar com s'ha d'actualitzar el sistema. És per això
@@ -40,6 +39,7 @@ def get_transfer_rates(centre, neighbour_index, system):
 
     rate = (2*pi) * spectral_overlap * electronic_coupling**2
     transfer_rates[key] = from_ns_to_au(rate, 'direct')
+
     return transfer_rates
 
 
@@ -61,7 +61,7 @@ def get_decay_rates(system, centre):
         decay_rates = decay_memory[info]
 
     else:
-        decay_rates = donor.decay_rate()
+        decay_rates = donor.decay_rates()
         decay_memory[info] = decay_rates
 
     return decay_rates
@@ -80,16 +80,14 @@ def update_step(chosen_process, molecules, centre_indexes):
     Modifies the state of the donor and the acceptor. Removes the donor from the centre_indexes list
     and includes the acceptor. If its a decay only changes and removes tha acceptor
     """
-
-    if chosen_process['process'] is 's_1_g_s':
-        molecules[chosen_process['donor']].change_state('g_s')
-        molecules[chosen_process['acceptor']].change_state('s_1')
-
+    if chosen_process['process'] == 's_1_g_s':
+        molecules[chosen_process['donor']].set_state('g_s')
+        molecules[chosen_process['acceptor']].set_state('s_1')
         centre_indexes.remove(chosen_process['donor'])
         centre_indexes.append(chosen_process['acceptor'])
 
-    if chosen_process['process'] is 'Singlet_radiative_decay':
-        molecules[chosen_process['donor']].change_state('g_s')
+    if chosen_process['process'] == 'Singlet_radiative_decay':
+        molecules[chosen_process['donor']].set_state('g_s')
         centre_indexes.remove(chosen_process['donor'])
 
 
@@ -109,8 +107,8 @@ def marcus_overlap_formula(donor, acceptor, conditions):
     T = conditions['temperature']       # K
 
     excited_state = donor.electronic_state()
-    gibbs_energy = donor.excitation_energy[excited_state] - acceptor.excitation_energy[excited_state]
-    relax = donor.get_relaxation_energy()
+    gibbs_energy = donor.state_energies[excited_state] - acceptor.state_energies[excited_state]
+    relax = donor.get_relaxation_state_energy()
 
     info = str(hash((T, gibbs_energy, relax, 'marcus')))
 
@@ -118,7 +116,7 @@ def marcus_overlap_formula(donor, acceptor, conditions):
         overlap = overlap_memory[info]
 
     else:
-        overlap = 1 / (2* pi * np.sqrt(pi*kb*T*relax)) * np.exp(-(gibbs_energy+relax)**2 / (4*kb*T*relax))
+        overlap = 1 / (2 * np.sqrt(pi*kb*T*relax)) * np.exp(-(gibbs_energy+relax)**2 / (4*kb*T*relax))
         overlap_memory[info] = overlap
 
     return from_ev_to_au(overlap, 'inverse')
@@ -147,5 +145,4 @@ def compute_fcwd_gaussian(system):
     return fcwd
 
 
-if __name__ == '__main__':
-    print('test')
+

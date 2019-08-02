@@ -9,7 +9,7 @@ from systems.molecules import Molecule
 "Physical conditions"
 conditions = {'temperature': 273.15,    # Kelvin
               'refractive_index': 1,    # adimensional
-              'neighbour_radius': 1.1}  # nm. Maximum interaction distance
+              'neighbourhood_radius': 1.1}  # nm. Maximum interaction distance
 
 """
 Generic molecule initialization
@@ -22,9 +22,9 @@ All energies must be given in eV. By default initialized at g_s.
 
 state_energies = {'g_s': 0, 's_1': 2.5}       # eV
 
-relaxation_energies = {'g_s': 0, 's_1': 'Look for a proper value'}     # eV
+relaxation_energies = {'g_s': 0, 's_1': 0.33}     # eV
 
-transition_moment = np.array([6, 0, 0])     # a.u.  Tetracene value
+transition_moment = np.array([1, 0, 0])     # a.u.  Tetracene value
 
 generic_molecule = Molecule(state_energies, relaxation_energies, transition_moment)
 
@@ -49,10 +49,11 @@ excitons = {'s_1': ['centre']}
 # Lists for further analysis
 
 
-for j in range(10):
+for j in range(1):
     key = str(len(dimensions))
     system = get_homogeneous_system['ordered'][key](conditions, generic_molecule, dimensions, lattice_parameter,
                                                     orientation, reference_orientation, excitons)
+
     """
     system is a dictionary with three keys:
         molecules: List of objects class Molecule
@@ -65,15 +66,15 @@ for j in range(10):
     """
     Veure com definim el màxim d'iteracions.
     """
-    for it in range(max):
+    for it in range(1):
         path, time = update_system(system)
-
         total_time += time
         path_list.append(path)
 
+        print(path)
+
         if check_finish(path_list) is True:
             break
-
 
 
 """

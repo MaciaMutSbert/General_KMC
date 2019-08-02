@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import distance
 from systems.excitation import excited_system
+import copy
 
 
 def get_disordered_system(conditions,  # External conditions of the system such as temperature
@@ -45,7 +46,7 @@ def get_disordered_system(conditions,  # External conditions of the system such 
             too_close = distance_checking(coordinates, molecules)
 
         orientation_vector = get_orientation(orientation, reference_orientation, len(dimensions), pointing=1)
-        molecule = generic_molecule.copy()
+        molecule = copy.deepcopy(generic_molecule)
         molecule.initialize_coordinates(coordinates)
         molecule.initialize_orientation(orientation_vector)
         molecules.append(molecule)
@@ -96,7 +97,7 @@ def get_1d_ordered_system(conditions,
         coordinates = [x, 0, 0]
         orientation_vector = get_orientation(orientation, reference_orientation, len(dimensions), pointing)
 
-        molecule = generic_molecule.copy()
+        molecule = copy.deepcopy(generic_molecule)
         molecule.initialize_coordinates(coordinates)
         molecule.initialize_orientation(orientation_vector)
         molecules.append(molecule)
@@ -148,9 +149,9 @@ def get_2d_ordered_system(conditions,
             coordinates = [x, y, 0]
             orientation_vector = get_orientation(orientation, reference_orientation, len(dimensions), pointing)
 
-            molecule = generic_molecule.copy()
+            molecule = copy.deepcopy(generic_molecule)
             molecule.initialize_coordinates(coordinates)
-            molecule.innitialize_orientation(orientation_vector)
+            molecule.initialize_orientation(orientation_vector)
             molecules.append(molecule)
 
             pointing = pointing * symmetry[0]
@@ -204,9 +205,9 @@ def get_3d_ordered_system(conditions,
                 coordinates = [x, y, z]
                 orientation_vector = get_orientation(orientation, reference_orientation, len(dimensions), pointing)
 
-                molecule = generic_molecule.copy()
+                molecule = copy.deepcopy(generic_molecule)
                 molecule.initialize_coordinates(coordinates)
-                molecule.innitialize_orientation(orientation_vector)
+                molecule.initialize_orientation(orientation_vector)
                 molecules.append(molecule)
 
                 pointing = pointing*symmetry[0]

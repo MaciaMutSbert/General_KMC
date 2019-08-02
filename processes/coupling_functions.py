@@ -37,16 +37,18 @@ def compute_forster_coupling(donor, acceptor, conditions):
 
     u_d = donor.get_transition_moment()
     u_a = acceptor.get_transition_moment()
-    r = intermolecular_distance(donor, acceptor)       # a. u.
+    momentum_projection = np.dot(u_d, u_a)                  # a. u.
+    r_vector = intermolecular_vector(donor, acceptor)       # a. u.
+    r = np.linalg.norm(r_vector)                            # a. u.
     n = conditions['refractive_index']
 
-    info = str(hash((u_d, u_a, r, n, 'förster')))
+    info = str(hash((momentum_projection, r, n, 'förster')))
     if info in coupling_memory:
         forster_coupling = coupling_memory[info]
 
     else:
-        k = orientational_factor(u_d, u_a, r)
-        forster_coupling = k**2 * np.dot(u_d, u_a) / (n**2 * r**3)
+        k = orientational_factor(u_d, u_a, r_vector)
+        forster_coupling = k**2 * momentum_projection / (n**2 * r**3)
         coupling_memory[info] = forster_coupling
 
     return forster_coupling
@@ -64,7 +66,7 @@ couplings = {'s_1_g_s': compute_forster_coupling}
 ###############################################################################################
 
 
-def intermolecular_distance(molecule1, molecule2):
+def intermolecular_vector(molecule1, molecule2):
     """
     :param molecule1: donor
     :param molecule2: acceptor
@@ -72,7 +74,7 @@ def intermolecular_distance(molecule1, molecule2):
     """
     position_d = molecule1.molecular_coordinates()
     position_a = molecule2.molecular_coordinates()
-    r = distance.euclidean(position_d, position_a)
+    r = position_d - position_a
     return from_nm_to_au(r, 'direct')
 
 

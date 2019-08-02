@@ -15,20 +15,19 @@ def update_system(system):
     :return: the chosen process and the advanced time
     """
     molecules = system['molecules']
-    center_indexes = system['centres']
+    centre_indexes = system['centres']
 
     rate_collector = []
     process_collector = []
-    for center in center_indexes:
-
-        neighbour_indexes = neighbourhood(center, molecules, radius=system['conditions']['neighbourhood_radius'])
-        path_list, rate_list = get_rates_and_processes(center, neighbour_indexes, system)
+    for centre in centre_indexes:
+        neighbour_indexes = neighbourhood(centre, molecules, radius=system['conditions']['neighbourhood_radius'])
+        path_list, rate_list = get_rates_and_processes(centre, neighbour_indexes, system)
 
         rate_collector += rate_list
         process_collector += path_list
 
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
-    update_step(chosen_process, molecules, center_indexes)        # updates both lists according to the chosen process
+    update_step(chosen_process, molecules, centre_indexes)        # updates both lists according to the chosen process
 
     return chosen_process, time
 
@@ -52,7 +51,6 @@ def neighbourhood(center, molecules, radius=1.05):
     If there is not any neighbours in the defined neighbourhood an alert is printed.
     """
     center_position = np.array(molecules[center].coordinates)
-
     neighbours = []
     for i, molecule in enumerate(molecules):
         coordinates = np.array(molecule.coordinates)
