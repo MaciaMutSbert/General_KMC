@@ -22,7 +22,7 @@ def update_system(system):
     for center in center_indexes:
 
         neighbour_indexes = neighbourhood(center, molecules, radius=system['conditions']['neighbourhood_radius'])
-        path_list, rate_list = get_rates_process(center, neighbour_indexes, system)
+        path_list, rate_list = get_rates_and_processes(center, neighbour_indexes, system)
 
         rate_collector += rate_list
         process_collector += path_list
@@ -61,12 +61,12 @@ def neighbourhood(center, molecules, radius=1.05):
             neighbours.append(i)
 
     if len(neighbours) == 0:
-        print('No neighbours found')
+        print('No neighbours found. Check neighbourhood radius')
 
     return neighbours
 
 
-def get_rates_process(centre, neighbour_indexes, system):
+def get_rates_and_processes(centre, neighbour_indexes, system):
     """
     :param centre: Index of the studied excited molecule. Donor
     :param neighbour_indexes: Indexes of the neighbours (candidates to acceptors)

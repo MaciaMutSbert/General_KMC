@@ -1,5 +1,5 @@
 from systems.initialize_system import get_homogeneous_system
-from update_functions.update_file import update_system, check_finish, get_centres
+from update_functions.update_file import update_system, check_finish
 from result_analysis import initial_position, final_position, x_y_splitter, moved_length
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,9 +20,9 @@ Possible states:
 All energies must be given in eV. By default initialized at g_s.
 """
 
-state_energies = {'g_s': 0, 's_1': 2.5, 't_1': 'Not considered'}       # eV
+state_energies = {'g_s': 0, 's_1': 2.5}       # eV
 
-relaxation_energies = {'g_s': 0, 's_1': 'Look for a proper value', 't_1': 'Not considered'}     # eV
+relaxation_energies = {'g_s': 0, 's_1': 'Look for a proper value'}     # eV
 
 transition_moment = np.array([6, 0, 0])     # a.u.  Tetracene value
 
@@ -43,17 +43,16 @@ Excitons.
 Possible positions commands: 'random', 'first', 'last', 'centre', 'furthest'.
 The dictionary takes the state as key and a list with the position of every exciton.
 """
-excitons = {'s_1': ['centre'], 't_1': []}
+excitons = {'s_1': ['centre']}
 
 
 # Lists for further analysis
 
 
 for j in range(10):
-    ordered_systems = get_homogeneous_system['ordered']
     key = str(len(dimensions))
-    system = ordered_systems[key](conditions, generic_molecule, dimensions, lattice_parameter,
-                                  orientation, reference_orientation, excitons)
+    system = get_homogeneous_system['ordered'][key](conditions, generic_molecule, dimensions, lattice_parameter,
+                                                    orientation, reference_orientation, excitons)
     """
     system is a dictionary with three keys:
         molecules: List of objects class Molecule
