@@ -5,82 +5,45 @@ import matplotlib.pyplot as plt
 import numpy as np
 from systems.molecules import Molecule
 
-"""
-ORGANITZAR-HO EN FUNCIONS ESPECÍFIQUES
-"""
-
 
 "Physical conditions"
-conditions = {'temperature': input('Temperature in K:'),
-              'refractive_index': input('Refractive index of the material:'),
-              'neighbour_radius': input('Maximum distance considered for the interaction:')}
+conditions = {'temperature': 273.15,    # Kelvin
+              'refractive_index': 1,    # adimensional
+              'neighbour_radius': 1.1}  # nm. Maximum interaction distance
 
+"""
+Generic molecule initialization
+Possible states: 
+    'g_s': ground state 
+    's_1': first singlet state 
+    't_1': first triplet state 
+All energies must be given in eV.
+"""
 
-"Generic molecule initialization"
-print("""\n Possible states: 
-         \t 'g_s': ground state 
-         \t 's_1': first singlet state 
-         \t 't_1': first triplet state 
-         \n All energies must be given in eV.""")
+state_energies = {'g_s': 0, 's_1': 2.5, 't_1': 'Not considered'}       # eV
 
-state_energies = {'g_s': float(input('Ground state energy (eV): ')),
-                  's_1': float(input('First singlet state energy (eV): ')),
-                  't_1': float(input('First triplet state energy (eV): '))}
-print('\n')
-relaxation_energies = {'g_s': float(input('Ground state relaxation energy (eV): ')),
-                       's_1': float(input('First singlet state relaxation energy (eV): ')),
-                       't_1': float(input('First triplet state relaxation energy (eV): '))}
+relaxation_energies = {'g_s': 0, 's_1': 'Look for a proper value', 't_1': 'Not considered'}     # eV
 
-print("\n Dipole transition moment vector (a.u)")
-transition_moment = np.array([float(input('x_component:')),
-                              float(input('y_component: ')),
-                              float(input('z_component: '))])
+transition_moment = np.array([6, 0, 0])     # a.u.  Tetracene value
 
 generic_molecule = Molecule(state_energies, relaxation_energies, transition_moment)
-print('\n')
+
 
 "Morphology parameters"
-order = input("'ordered' / 'disordered': ")
-print(order)
-print(type(order))
-print("\n Number of molecules per side: ")
-dimensions = [int(input('Molecules in x: ')),
-              int(input('Molecules in y: ')),
-              int(input('Molecules in z: '))]
-for dimension in dimensions:
-    if dimension == 0:
-        dimensions.remove(dimension)
-print(dimensions)
+order = 'ordered'               # can take 'ordered' or 'disordered'
+dimensions = [10, 10]           # molecules per side. dimensionality = len(dimensions)
+lattice_parameter = 1           # nm. Molecular site in an ordered system. Not used for disordered systems
+num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
 
-if order is 'ordered':
-    lattice_parameter = float(input("Lattice parameter (nm), only needed for 'ordered': "))
-    num_molecules = None
-if order is 'disordered':
-    num_molecules = int(input("Number of molecules (only for 'disordered'): "))
-    lattice_parameter = None
+orientation = 'parallel'        # orientation between molecules
+reference_orientation = np.array([1, 0, 0])         # necessary only when (anti)parallelism is required
 
-orientation = input("'random'/'parallel'/'antiparallel': ")
-reference_orientation = np.array([1, 0, 0])
-print('\n')
-
-"Excitons"
-print("""Possible positions: random, first, last, centre and furthest \n""")
-excitons = {}
-num_s1 = int(input('Number of s_1 excitons:'))
-s_1_positions = []
-for i in range(num_s1):
-    s_1_positions.append(input('s_1 position:'))
-excitons['s_1'] = s_1_positions
-
-num_t1 = int(input('Number of t_1 excitons'))
-t_1_positions = []
-for i in range(num_t1):
-    t_1_positions.append(input('t_1 position: '))
-excitons['t_1'] = t_1_positions
-print(excitons)
-
-
-
+"""
+Excitons.
+Possible positions commands: 'random', 'first', 'last', 'centre', 'furthest'.
+The dictionary takes the state as key and a list with the position of every exciton.
+"""
+excitons = {'s_1': ['centre'], 't_1': []}
 
 # Lists for further analysis
 
