@@ -25,7 +25,6 @@ def update_system(system):
 
         rate_collector += rate_list
         process_collector += path_list
-
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
     update_step(chosen_process, molecules, centre_indexes)        # updates both lists according to the chosen process
 
@@ -42,15 +41,15 @@ def check_finish(path_list):
 
 
 #############################################################################################
-def neighbourhood(center, molecules, radius=1.05):
+def neighbourhood(centre, molecules, radius=1.05):
     """
-    :param center: Index of an excited Molecule object
+    :param centre: Index of an excited Molecule object
     :param molecules: List of objects Molecule
     :param radius: Effective distance where interaction may be considerable. Default 0.11
     :return: List of indexes of molecules in a neighbourhood of center
     If there is not any neighbours in the defined neighbourhood an alert is printed.
     """
-    center_position = np.array(molecules[center].coordinates)
+    center_position = np.array(molecules[centre].coordinates)
     neighbours = []
     for i, molecule in enumerate(molecules):
         coordinates = np.array(molecule.coordinates)
