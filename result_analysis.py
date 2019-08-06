@@ -2,6 +2,20 @@ import numpy as np
 from scipy.spatial import distance
 
 
+def get_trajectory(path_collector, time_advance, system_):
+    molecules = system_['molecules']
+    positions = []
+    states = []
+
+    positions.append(molecules[path_collector[0]['donor']].molecular_coordinates())
+
+    for path in path_collector:
+        positions.append(molecules[path['acceptor']].molecular_coordinates())
+        states.append(molecules[path['acceptor']].state)
+
+    return {'positions': positions, 'time_advance': time_advance, 'state': states}
+
+
 def moved_length(initial_position, final_position):
     return distance.euclidean(np.array(initial_position), np.array(final_position))
 

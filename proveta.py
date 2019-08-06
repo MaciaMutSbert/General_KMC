@@ -1,8 +1,9 @@
 from systems.initialize_system import get_homogeneous_system
 from update_functions.update_file import update_system, check_finish
-from result_analysis import initial_position, final_position, x_y_splitter, moved_length
+from result_analysis import get_trajectory
 import matplotlib.pyplot as plt
 import numpy as np
+import json
 from systems.molecules import Molecule
 
 
@@ -20,9 +21,9 @@ Possible states:
 All energies must be given in eV. By default initialized at g_s.
 """
 
-state_energies = {'g_s': 0, 's_1': 2.5}       # eV
+state_energies = {'g_s': 0, 's_1': 2.5}       # eV Tetracene
 
-relaxation_energies = {'g_s': 0, 's_1': 0.33}     # eV
+relaxation_energies = {'g_s': 0, 's_1': 0.33}     # eV Tetracene
 
 transition_moment = np.array([1, 0, 0])     # a.u.  Tetracene value
 
@@ -33,7 +34,7 @@ generic_molecule = Molecule(state_energies, relaxation_energies, transition_mome
 order = 'ordered'               # can take 'ordered' or 'disordered'
 dimensions = [10, 10]           # molecules per side. dimensionality = len(dimensions)
 lattice_parameter = 1           # nm. Molecular site in an ordered system. Not used for disordered systems
-num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
+# num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
 
 orientation = 'parallel'        # orientation between molecules
 reference_orientation = np.array([1, 0, 0])         # necessary only when (anti)parallelism is required
@@ -46,7 +47,20 @@ The dictionary takes the state as key and a list with the position of every exci
 excitons = {'s_1': ['centre']}
 
 
-# Lists for further analysis
+# We list all the outputs in system_information and write it in the output_file
+
+system_information = [conditions, state_energies, relaxation_energies, transition_moment, order, dimensions,
+                      lattice_parameter, orientation, reference_orientation, excitons]
+
+with open("results_file.json", 'w') as write_file:
+    json.dump(system_information, write_file)
+###########################################################################################################
+
+
+trajectories = []                   # list with the trajectories of all excitons
+
+
+
 
 
 for j in range(1):
@@ -61,51 +75,20 @@ for j in range(1):
         centre_indexes: list with the indexes of the excited molecules.
     """
 
-    total_time = 0
+    total_time = [0.0]
     path_list = []
     """
     Veure com definim el màxim d'iteracions.
     """
     for it in range(1):
         path, time = update_system(system)
-        total_time += time
+        total_time.append(total_time[-1]+time)
         path_list.append(path)
-
-        print(path)
 
         if check_finish(path_list) is True:
             break
 
+    trajectories.append(get_trajectory(path_list, total_time, system))
 
-"""
- final_positions.append(final_position(path_list, system))
-    exciton_lengths.append(moved_length(initial_position(path_list, system), final_position(path_list, system)))
-    diffusion_length.append(np.average(np.array(exciton_lengths)))
-    print(j)
-
-    time_list.append(total_time)
-    life_time.append(np.average(np.array(time_list)))
-
-
-final_x_list, final_y_list = x_y_splitter(final_positions)
-
-df_deviation = np.float(np.std(np.array(diffusion_length)))
-
-lt_deviation = np.float(np.std(np.array(life_time)))
-
-
-iterations = np.arange(0, 1000, 1)
-
-plt.plot(iterations, diffusion_length, 'ro')
-plt.xlabel('Number of iterations')
-plt.ylabel('Diffusion length')
-plt.show()
-
-plt.plot(iterations, life_time, 'ro')
-plt.xlabel('Number of iterations')
-plt.ylabel('Life_time')
-plt.show()
-
-print('Average distance: %.5f +- %.5f' % (diffusion_length[-1], df_deviation))
-print('Average time %.5f +- %.5f' % (life_time[-1], lt_deviation))
-"""
+with open("results_file.json", 'w') as write_file:
+    json.dump(trajectories, write_file)
