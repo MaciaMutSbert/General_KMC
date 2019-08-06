@@ -14,7 +14,7 @@ def final_position(path_list, system):
     """
     final_index = path_list[-1]['acceptor']
 
-    return system['molecules'][final_index].coordinates
+    return system['molecules'][final_index].molecular_coordinates()
 
 
 def initial_position(path_list, system):
@@ -25,7 +25,7 @@ def initial_position(path_list, system):
     """
     initial_index = path_list[0]['donor']
 
-    return system['molecules'][initial_index].coordinates
+    return system['molecules'][initial_index].molecular_coordinates()
 
 
 def exciton_shift(initial_positions, final_positions):
