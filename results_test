@@ -1,0 +1,9 @@
+ld_teo_1 = 24.725           # nm
+ld_teo_2 = 34.966           # nm
+ld_teo_3 = 17.48            # nm
+
+Average distance: 18.82767 +- 0.85241
+Average distance (computed with the residence time): 43.78136 +- 0.18679
+Average time 60.34890 +- 2.05617
+
+(3000 iteracions)
