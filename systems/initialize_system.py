@@ -82,7 +82,7 @@ def get_1d_ordered_system(conditions,
     :param excitons: Dictionary with the information of the excitons (type and a position for each).
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
-    physical_dimensions = dimensions * lattice_parameter    # nm
+    physical_dimensions = np.array(dimensions) * lattice_parameter    # nm
 
     if check_lattice(lattice_parameter, generic_molecule) is False:
         print('Lattice parameter is smaller than molecular characteristic length')
@@ -131,7 +131,7 @@ def get_2d_ordered_system(conditions,
     :param excitons: Dictionary with the information of the excitons (type and a position for each).
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
-    physical_dimensions = dimensions * lattice_parameter    # nm
+    physical_dimensions = np.array(dimensions) * lattice_parameter    # nm
 
     if check_lattice(lattice_parameter, generic_molecule) is False:
         print('Lattice parameter is smaller than molecular characteristic length')
@@ -181,7 +181,7 @@ def get_3d_ordered_system(conditions,
     :param excitons: Dictionary with the information of the excitons (type and a position for each).
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
-    physical_dimensions = dimensions * lattice_parameter    # nm
+    physical_dimensions = np.array(dimensions) * lattice_parameter    # nm
 
     if check_lattice(lattice_parameter, generic_molecule) is False:
         print('Lattice parameter is smaller than molecular characteristic length')
