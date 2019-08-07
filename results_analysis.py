@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from analysis_functions import get_root_mean_square, initial_final_distance, duration, stadistics
+from analysis_functions import stadistical_diffusivity, diffusion_parameters
 
 
 with open('results_file.json', 'r') as read_file:
@@ -8,30 +8,24 @@ with open('results_file.json', 'r') as read_file:
 
 trajectories = data['trajectories']
 
-"""
-Per cada trajectòria hem de calcular el root_mean_square, la distància entre el punt inicial i el final (pel
-que fa a longituds de difussió). A més de calcular el temps de vida de l'excitó.
-"""
-rms_collector = []
-exciton_shift_collector = []
-exciton_lifetime_collector = []
+dimensionality = len(data['system_information']['dimensions'])
+steps = data['system_information']['steps']
 
-for trajectory in trajectories:
-    rms_collector.append(get_root_mean_square(trajectory))
-    exciton_shift_collector.append(initial_final_distance(trajectory))
-    exciton_lifetime_collector.append(duration(trajectory))
+diffusion_constant_list = stadistical_diffusivity(trajectories, steps, dimensionality)
 
-rms_average, rms_deviation = stadistics(rms_collector)
+diffusion_constant = np.average(diffusion_constant_list)
 
-exciton_shift_average,  exciton_shift_deviation = stadistics(exciton_shift_collector)
+theoretical_lifetime = 60           # ns
+theoretical_diffusion_constant = 3.25277
+theoretical_diffusion_length = np.sqrt(2*dimensionality*theoretical_diffusion_constant*theoretical_lifetime)
 
-exciton_lifetime_average, exciton_lifetime_deviation = stadistics(exciton_lifetime_collector)
+diffusion_length = np.sqrt(2*dimensionality*diffusion_constant*theoretical_lifetime)
 
-output = {'rms': {'average': rms_average, 'deviation': rms_deviation},
-          'exciton_shift': {'average': exciton_shift_average, 'deviation': exciton_shift_deviation},
-          'exciton_lifetime': {'average': exciton_lifetime_average, 'deviation': exciton_lifetime_deviation}}
+print('Diffusion constant (average) %.5f' % diffusion_constant)
+print('Experimental diffusion length %.5f' % diffusion_length)
 
-with open('analysis_results.json', 'w') as write_file:
-    json.dump(output, write_file)
+print('--------------------------')
+print('Theoretical diffusion constant %.5f' % theoretical_diffusion_constant)
+print('Theoretical diffusion length %.5f' % theoretical_diffusion_length)
 
 

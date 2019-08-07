@@ -21,7 +21,7 @@ Possible states:
 All energies must be given in eV. By default initialized at g_s.
 """
 
-state_energies = {'g_s': 0, 's_1': 2.5}          # eV Tetracene
+state_energies = {'g_s': 0, 's_1': 0}          # eV Tetracene
 
 relaxation_energies = {'g_s': 0, 's_1': 0.7}     # eV Tetracene
 
@@ -32,7 +32,7 @@ generic_molecule = Molecule(state_energies, relaxation_energies, transition_mome
 
 "Morphology parameters"
 order = 'ordered'                 # can take 'ordered' or 'disordered'
-dimensions = [100]                 # molecules per side. dimensionality = len(dimensions)
+dimensions = [1000]                 # molecules per side. dimensionality = len(dimensions)
 lattice_parameter = 1.0           # nm. Molecular site in an ordered system. Not used for disordered systems
 # num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
 
@@ -48,7 +48,9 @@ excitons = {'s_1': ['centre']}
 
 
 trajectories = []                   # list with the trajectories of all excitons
-for j in range(500):
+num_trajectories = 1000
+num_steps = 100
+for j in range(num_trajectories):
     key = str(len(dimensions))
     system = get_homogeneous_system['ordered'][key](conditions, generic_molecule, dimensions, lattice_parameter,
                                                     orientation, reference_orientation, excitons)
@@ -66,7 +68,7 @@ for j in range(500):
     Veure com definim el màxim d'iteracions.
     """
     finished = False
-    while finished is False:
+    for i in range(num_steps):
         path, time = update_system(system)
         total_time.append(total_time[-1]+time)
         path_list.append(path)
@@ -85,7 +87,7 @@ system_information = {'conditions': conditions, 'state_energies': state_energies
                       'relaxation_energies': relaxation_energies, 'transition_moment': list(transition_moment),
                       'order': order, 'dimensions': dimensions, 'lattice_parameter':  lattice_parameter,
                       'orientation':  orientation,  'reference_orientation': list(reference_orientation),
-                      'excitons': excitons}
+                      'excitons': excitons, 'steps': num_steps}
 
 output = {'system_information': system_information, 'trajectories': trajectories}
 
