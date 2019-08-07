@@ -7,11 +7,11 @@ def get_trajectory(path_collector, time_advance, system_):
     positions = []
     states = []
 
-    positions.append(molecules[path_collector[0]['donor']].molecular_coordinates())
+    positions.append(list(molecules[path_collector[0]['donor']].molecular_coordinates()))
 
     for path in path_collector:
-        positions.append(molecules[path['acceptor']].molecular_coordinates())
-        states.append(molecules[path['acceptor']].state)
+        positions.append(list(molecules[path['acceptor']].molecular_coordinates()))
+        states.append(path['process'])
 
     return {'positions': positions, 'time_advance': time_advance, 'state': states}
 

@@ -23,21 +23,21 @@ All energies must be given in eV. By default initialized at g_s.
 
 state_energies = {'g_s': 0, 's_1': 2.5}       # eV Tetracene
 
-relaxation_energies = {'g_s': 0, 's_1': 0.33}     # eV Tetracene
+relaxation_energies = {'g_s': 0, 's_1': 0.7}     # eV Tetracene
 
-transition_moment = np.array([1, 0, 0])     # a.u.  Tetracene value
+transition_moment = np.array([1.0, 0, 0])     # a.u.  Tetracene value
 
 generic_molecule = Molecule(state_energies, relaxation_energies, transition_moment)
 
 
 "Morphology parameters"
 order = 'ordered'               # can take 'ordered' or 'disordered'
-dimensions = [10, 10]           # molecules per side. dimensionality = len(dimensions)
-lattice_parameter = 1           # nm. Molecular site in an ordered system. Not used for disordered systems
+dimensions = [10.0]           # molecules per side. dimensionality = len(dimensions)
+lattice_parameter = 1.0           # nm. Molecular site in an ordered system. Not used for disordered systems
 # num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
 
 orientation = 'parallel'        # orientation between molecules
-reference_orientation = np.array([1, 0, 0])         # necessary only when (anti)parallelism is required
+reference_orientation = np.array([1.0, 0, 0])         # necessary only when (anti)parallelism is required
 
 """
 Excitons.
@@ -47,10 +47,13 @@ The dictionary takes the state as key and a list with the position of every exci
 excitons = {'s_1': ['centre']}
 
 
-# We list all the outputs in system_information and write it in the output_file
+# We list all the outputs in a dictionary system_information and write it in the output_file
 
-system_information = [conditions, state_energies, relaxation_energies, transition_moment, order, dimensions,
-                      lattice_parameter, orientation, reference_orientation, excitons]
+system_information = {'conditions': conditions, 'state_energies': state_energies,
+                      'relaxation_energies': relaxation_energies, 'transition_moment': list(transition_moment),
+                      'order': order, 'dimensions': dimensions, 'lattice_parameter':  lattice_parameter,
+                      'orientation':  orientation,  'reference_orientation': list(reference_orientation),
+                      'excitons': excitons}
 
 with open("results_file.json", 'w') as write_file:
     json.dump(system_information, write_file)
@@ -58,11 +61,6 @@ with open("results_file.json", 'w') as write_file:
 
 
 trajectories = []                   # list with the trajectories of all excitons
-
-
-
-
-
 for j in range(1):
     key = str(len(dimensions))
     system = get_homogeneous_system['ordered'][key](conditions, generic_molecule, dimensions, lattice_parameter,
@@ -80,15 +78,31 @@ for j in range(1):
     """
     Veure com definim el màxim d'iteracions.
     """
-    for it in range(1):
+    finished = False
+    while finished is False:
         path, time = update_system(system)
         total_time.append(total_time[-1]+time)
         path_list.append(path)
+        print('donor state')
+        print(system['molecules'][path['donor']].electronic_state())
+        print('acceptor state')
+        print(system['molecules'][path['acceptor']].electronic_state())
 
         if check_finish(path_list) is True:
             break
 
     trajectories.append(get_trajectory(path_list, total_time, system))
 
+
+###########################################################################################################
+# We list all the outputs in a dictionary system_information and write it in the output_file
+
+system_information = {'conditions': conditions, 'state_energies': state_energies,
+                      'relaxation_energies': relaxation_energies, 'transition_moment': list(transition_moment),
+                      'order': order, 'dimensions': dimensions, 'lattice_parameter':  lattice_parameter,
+                      'orientation':  orientation,  'reference_orientation': list(reference_orientation),
+                      'excitons': excitons}
+
 with open("results_file.json", 'w') as write_file:
-    json.dump(trajectories, write_file)
+    json.dump(system_information, write_file, indent='\t')
+    json.dump(trajectories, write_file, indent='\t')
