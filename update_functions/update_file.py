@@ -20,7 +20,7 @@ def update_system(system):
     rate_collector = []
     process_collector = []
     for centre in centre_indexes:
-        neighbour_indexes = neighbourhood(centre, molecules, radius=system['conditions']['neighbourhood_radius'])
+        neighbour_indexes = neighbourhood(centre, system, radius=system['conditions']['neighbourhood_radius'])
         path_list, rate_list = get_rates_and_processes(centre, neighbour_indexes, system)
 
         rate_collector += rate_list
@@ -41,39 +41,52 @@ def check_finish(path_list):
 
 
 #############################################################################################
-def neighbourhood(centre, molecules, radius=1.05):
+def neighbourhood(centre, system, radius=1.05):
     """
     :param centre: Index of an excited Molecule object
-    :param molecules: List of objects Molecule
+    :param system: dictionary with all the information of the system
     :param radius: Effective distance where interaction may be considerable. Default 0.11
     :return: List of indexes of molecules in a neighbourhood of center
     If there is not any neighbours in the defined neighbourhood an alert is printed.
     """
+    molecules = system['molecules']
     center_position = np.array(molecules[centre].molecular_coordinates())
-    neighbours = [centre-140, centre-1, centre+1, centre+140]
 
-    if center_position[0] == -70.0:
-        neighbours.remove(centre-140)
-    elif center_position[1] == -70.0:
-        neighbours.remove(centre-1)
-    elif center_position[0] == 69.0:
-        neighbours.remove(centre+140)
-    elif center_position[1] == 69.0:
-        neighbours.remove(centre+1)
+    if system['type'] == '1d_ordered':
+        neighbours = [centre-1, centre+1]
+        if centre == 0:
+            neighbours.remove(centre-1)
+        elif centre == len(molecules)-1:
+            neighbours.remove(centre+1)
 
-    """
+    if system['type'] == '2d_ordered':
+        dimensions = system['conditions']['dimensions']
+        lat_param = system['conditions']['lattice_parameter']
+
+        neighbours = [centre-dimensions[1], centre-1, centre+1, centre+dimensions[1]]
+
+        if center_position[0] == -dimensions[0]*lat_param / 2:
+            neighbours.remove(centre-dimensions[1])
+        elif center_position[1] == -dimensions[1]*lat_param / 2:
+            neighbours.remove(centre-1)
+        elif center_position[0] == dimensions[0] * lat_param / 2 - lat_param:
+            neighbours.remove(centre + dimensions[1])
+        elif center_position[1] == dimensions[1] * lat_param / 2 - lat_param:
+            neighbours.remove(centre+1)
+
+    else:
+        neighbours = []
         for i, molecule in enumerate(molecules):
-        coordinates = np.array(molecule.coordinates)
+            coordinates = np.array(molecule.coordinates)
 
-        if 0 < distance.euclidean(center_position, coordinates) < radius:
-            neighbours.append(i)
+            if 0 < distance.euclidean(center_position, coordinates) < radius:
+                neighbours.append(i)
 
-        if len(neighbours) == 4:
-            break
+            if len(neighbours) == 4:
+                break
 
     if len(neighbours) == 0:
         print('No neighbours found. Check neighbourhood radius')
-    """
 
     return neighbours
 

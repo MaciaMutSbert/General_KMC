@@ -73,6 +73,7 @@ for j in range(num_trajectories):
         path, time = update_system(system)
         total_time.append(total_time[-1]+time)
         path_list.append(path)
+        print(i)
         if check_finish(path_list) is True:
             break
 
@@ -87,11 +88,11 @@ system_information = {'conditions': conditions, 'state_energies': state_energies
                       'relaxation_energies': relaxation_energies, 'transition_moment': list(transition_moment),
                       'order': order, 'dimensions': dimensions, 'lattice_parameter':  lattice_parameter,
                       'orientation':  orientation,  'reference_orientation': list(reference_orientation),
-                      'excitons': excitons, 'steps': num_steps}
+                      'excitons': excitons}
 
-output = {'system_information': system_information, 'trajectories': trajectories}
+output = {'system_information': system_information, 'trajectories': trajectories, 'steps': num_steps}
 
-with open("results_file_2d_150steps.json", 'w') as write_file:
+with open("results_file_test_neighbour.json", 'w') as write_file:
     json.dump(output, write_file)
 
 

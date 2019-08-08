@@ -9,7 +9,8 @@ with open('results_file_2d.json', 'r') as read_file:
 trajectories = data['trajectories']
 
 dimensionality = len(data['system_information']['dimensions'])
-steps = data['system_information']['steps']
+steps = data['system_information']['steps']             # passarà a ser una entrada del diccionari data, no de
+                                                        # system information !!!
 
 diffusion_constant_list = stadistical_diffusivity(trajectories, steps, dimensionality)
 

@@ -58,7 +58,7 @@ def get_disordered_system(conditions,  # External conditions of the system such 
     tolerance = intermolecular_distance * 2
     centre_indexes = excited_system(molecules, excitons, tolerance)
     conditions['dimensions'] = dimensions
-    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
+    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes, 'type': 'amorphous'}
 
     return system
 
@@ -107,7 +107,7 @@ def get_1d_ordered_system(conditions,
     centre_indexes = excited_system(molecules, excitons, lattice_parameter / 2)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
-    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
+    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes, 'type': '1d_ordered'}
 
     return system
 
@@ -160,7 +160,7 @@ def get_2d_ordered_system(conditions,
     centre_indexes = excited_system(molecules, excitons, lattice_parameter / 2)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
-    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
+    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes, 'type': '2d_ordered'}
 
     return system
 
@@ -217,7 +217,7 @@ def get_3d_ordered_system(conditions,
     centre_indexes = excited_system(molecules, excitons, lattice_parameter / 2)
     conditions['lattice_parameter'] = lattice_parameter
     conditions['dimensions'] = dimensions
-    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes}
+    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes, 'type': '3d_ordered'}
 
     return system
 

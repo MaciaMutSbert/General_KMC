@@ -118,7 +118,9 @@ class Molecule:
         return self.relaxation_energies[self.state]
 
     def electronic_state(self):
-        ":return: the electronic state of the molecule"
+        """
+        :return: the electronic state of the molecule
+        """
         return self.state
 
     def set_state(self, new_state):

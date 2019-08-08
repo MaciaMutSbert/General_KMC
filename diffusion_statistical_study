@@ -1,3 +1,6 @@
+
+relaxation energy = 0.7 eV (paràmetre que hem anat variant. La resta són els valors del tetracè).
+
 Diffusion constant (average) 3.23872
 Experimental diffusion length 19.71410
 --------------------------
@@ -5,7 +8,7 @@ Theoretical diffusion constant 3.25277
 Theoretical diffusion length 19.75683
 
 
-CAS 2D. Tarda 36,17 s per simulació de trajectòria. Canviat i ara sols 1.
+CAS 2D. Tarda 36,17 s per simulació de trajectòria. Canviat i ara sols 1 s.
 (100 steps)
 
 Diffusion constant (average) 3.38478
