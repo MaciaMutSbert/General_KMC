@@ -49,16 +49,31 @@ def neighbourhood(centre, molecules, radius=1.05):
     :return: List of indexes of molecules in a neighbourhood of center
     If there is not any neighbours in the defined neighbourhood an alert is printed.
     """
-    center_position = np.array(molecules[centre].coordinates)
-    neighbours = []
-    for i, molecule in enumerate(molecules):
+    center_position = np.array(molecules[centre].molecular_coordinates())
+    neighbours = [centre-140, centre-1, centre+1, centre+140]
+
+    if center_position[0] == -70.0:
+        neighbours.remove(centre-140)
+    elif center_position[1] == -70.0:
+        neighbours.remove(centre-1)
+    elif center_position[0] == 69.0:
+        neighbours.remove(centre+140)
+    elif center_position[1] == 69.0:
+        neighbours.remove(centre+1)
+
+    """
+        for i, molecule in enumerate(molecules):
         coordinates = np.array(molecule.coordinates)
 
         if 0 < distance.euclidean(center_position, coordinates) < radius:
             neighbours.append(i)
 
+        if len(neighbours) == 4:
+            break
+
     if len(neighbours) == 0:
         print('No neighbours found. Check neighbourhood radius')
+    """
 
     return neighbours
 

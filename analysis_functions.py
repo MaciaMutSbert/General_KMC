@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.spatial import distance
-from sklearn.linear_model import LinearRegression
 
 
 def get_trajectory(path_collector, time_advance, system_):

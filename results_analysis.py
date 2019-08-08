@@ -3,7 +3,7 @@ import numpy as np
 from analysis_functions import stadistical_diffusivity, diffusion_parameters
 
 
-with open('results_file.json', 'r') as read_file:
+with open('results_file_2d.json', 'r') as read_file:
     data = json.load(read_file)
 
 trajectories = data['trajectories']

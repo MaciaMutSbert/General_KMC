@@ -32,7 +32,7 @@ generic_molecule = Molecule(state_energies, relaxation_energies, transition_mome
 
 "Morphology parameters"
 order = 'ordered'                 # can take 'ordered' or 'disordered'
-dimensions = [1000]                 # molecules per side. dimensionality = len(dimensions)
+dimensions = [140, 140]                 # molecules per side. dimensionality = len(dimensions)
 lattice_parameter = 1.0           # nm. Molecular site in an ordered system. Not used for disordered systems
 # num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
 
@@ -69,14 +69,14 @@ for j in range(num_trajectories):
     """
     finished = False
     for i in range(num_steps):
+        " OJO. A LA FUNCIÓ NEIGHBOURHOOD HI HA UN TRUQUILLO QUE HEM DE CANVIAR EN CANVIAR LA DIMENSIONALITAT"
         path, time = update_system(system)
         total_time.append(total_time[-1]+time)
         path_list.append(path)
-
         if check_finish(path_list) is True:
             break
 
-    print(j)
+    print('j=', j)
     trajectories.append(get_trajectory(path_list, total_time, system))
 
 
@@ -91,7 +91,7 @@ system_information = {'conditions': conditions, 'state_energies': state_energies
 
 output = {'system_information': system_information, 'trajectories': trajectories}
 
-with open("results_file.json", 'w') as write_file:
+with open("results_file_2d_150steps.json", 'w') as write_file:
     json.dump(output, write_file)
 
 
