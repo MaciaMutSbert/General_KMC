@@ -1,32 +1,68 @@
 import json
 import numpy as np
-from analysis_functions import stadistical_diffusivity, diffusion_parameters
+import matplotlib.pyplot as plt
+from analysis_functions import statistical_diffusivity, diffusion_parameters
+from processes.theorethical_functions import theorethical_diffusion_values
 
 
-with open('results_file_2d.json', 'r') as read_file:
+input_file_name = '1d_simulation_trajectories.json'
+
+with open(input_file_name, 'r') as read_file:
     data = json.load(read_file)
 
 trajectories = data['trajectories']
 
 dimensionality = len(data['system_information']['dimensions'])
-steps = data['system_information']['steps']             # passarà a ser una entrada del diccionari data, no de
-                                                        # system information !!!
+trajectory_steps = data['trajectory_steps']
 
-diffusion_constant_list = stadistical_diffusivity(trajectories, steps, dimensionality)
+"Theorical values for the diffusion parameters"
+system_information = data['system_information']
+diffusion_theorical = theorethical_diffusion_values(system_information)
 
-diffusion_constant = np.average(diffusion_constant_list)
+print('Theorical values')
+print(diffusion_theorical)
 
-theoretical_lifetime = 60           # ns
-theoretical_diffusion_constant = 3.25277
-theoretical_diffusion_length = np.sqrt(2*dimensionality*theoretical_diffusion_constant*theoretical_lifetime)
+"Dictionary with a list of diffusion parameters computed for every iteration"
+diffusion_statistical_study = statistical_diffusivity(trajectories, trajectory_steps, dimensionality)
 
-diffusion_length = np.sqrt(2*dimensionality*diffusion_constant*theoretical_lifetime)
+stad_diffusion_constant = np.average(np.array(diffusion_statistical_study['diffusion_constants']))
+stad_diffusion_length = stad_diffusion_constant * diffusion_theorical['life_time']
 
-print('Diffusion constant (average) %.5f' % diffusion_constant)
-print('Experimental diffusion length %.5f' % diffusion_length)
+diffusion_statistical_values = {'diffusion_constant': stad_diffusion_constant,
+                                'diffusion_length': stad_diffusion_length}
 
-print('--------------------------')
-print('Theoretical diffusion constant %.5f' % theoretical_diffusion_constant)
-print('Theoretical diffusion length %.5f' % theoretical_diffusion_length)
+print('\n Statistical values:')
+print(diffusion_statistical_values)
+
+"Dictionary with the life time and diffusion length using only the last point"
+diffusion_experimental_study = diffusion_parameters(trajectories, dimensionality)
+
+print('\n Experimental values')
+print(diffusion_experimental_study)
+
+
+diffusion_results_1d = {'theorical': diffusion_theorical, 'statistical': diffusion_statistical_values,
+                        'experimental': diffusion_experimental_study}
+
+with open('diffusion_results_1d.json', 'w') as write_file:
+    json.dump(diffusion_results_1d, write_file)
+
+
+r_square = diffusion_statistical_study['mean_square_distances']
+lifetime = diffusion_statistical_study['life_times']
+
+
+"Gràfica r**2 vs t (lifetime), ha de ser una recta de pendent D"
+plt.plot(lifetime, r_square, 'ro')
+plt.xlabel('Exciton lifetime (ns)')
+plt.ylabel('Mean square distances (nm^2)')
+plt.title('Diffusion constant, r^2 vs t')
+plt.show()
+
+"Histograma amb les posicions finals"
+plt.hist(diffusion_experimental_study['max_distances'])
+plt.show()
+
+
 
 

@@ -76,6 +76,8 @@ for j in range(num_trajectories):
         print(i)
         if check_finish(path_list) is True:
             break
+        if total_time[-1] == 480:
+            break
 
     print('j=', j)
     trajectories.append(get_trajectory(path_list, total_time, system))

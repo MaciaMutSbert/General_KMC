@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.spatial import distance
+import matplotlib.pyplot as plt
 
 
 def get_trajectory(path_collector, time_advance, system_):
@@ -16,7 +17,7 @@ def get_trajectory(path_collector, time_advance, system_):
     return {'positions': positions, 'time_advance': time_advance, 'state': states}
 
 
-def stadistical_diffusivity(trajectories, hops, dimensionality):
+def statistical_diffusivity(trajectories, trajenctories_steps, dimensionality):
     """
     :param trajectories: list with all the trajectories, each is a dictionary with a list with the positions,
     time to reach each position and the exciton transfer process.
@@ -31,15 +32,20 @@ def stadistical_diffusivity(trajectories, hops, dimensionality):
     mean_square_distance_list = []
     mean_lifetime_list = []
     set_of_points = []
-    for i in range(1, hops):
+
+    steps = 250                 # prenem un número fixe de steps per fer l'estudi estadístic (triat per tenir el resultat òptim).
+    for i in range(1, steps):
         squared_distances = []
         time = []
         for trajectory in trajectories:
-            distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i]))**2
-            time_i = trajectory['time_advance'][i]
+            if i >= len(trajectory['positions']):
+                count = 0
+            else:
+                distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i]))**2
+                time_i = trajectory['time_advance'][i]
 
-            squared_distances.append(distance_i_squared)
-            time.append(time_i)
+                squared_distances.append(distance_i_squared)
+                time.append(time_i)
 
         mean_square_distance_list.append(np.average(np.array(squared_distances)))
         mean_lifetime_list.append(np.average(np.array(time)))
@@ -47,9 +53,9 @@ def stadistical_diffusivity(trajectories, hops, dimensionality):
         set_of_points.append([np.average(squared_distances), np.average(time)])
 
     diffusion_constant_list = np.array(mean_square_distance_list) / (np.array(mean_lifetime_list) *2*dimensionality)
-#    statistical_diffusion_constant = LinearRegression().fit(set_of_points, y)
 
-    return diffusion_constant_list
+    return {'diffusion_constants': diffusion_constant_list, 'mean_square_distances':mean_square_distance_list,
+            'life_times': mean_lifetime_list}
 
 
 def diffusion_parameters(trajectories, dimensionality):
@@ -69,6 +75,11 @@ def diffusion_parameters(trajectories, dimensionality):
 
         squared_distances.append(final_distance_squared)
         lifetimes.append(final_time)
+
+    "Histograma amb les posicions finals"
+    plt.hist(np.sqrt(squared_distances), bins=15)
+    plt.title('Final positions histogram')
+    plt.show()
 
     return {'diffusion_length': np.sqrt(np.average(squared_distances)),
             'exciton_lifetime': np.average(lifetimes),
