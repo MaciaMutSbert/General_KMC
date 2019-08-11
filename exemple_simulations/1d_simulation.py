@@ -6,7 +6,7 @@ import json
 from systems.molecules import Molecule
 
 "Output file name"
-output_file_name = '1d_simulation_trajectories_mu1.2.json'
+output_file_name = '1d_simulation_trajectories_mu1.4.json'
 
 "Physical conditions"
 conditions = {'temperature': 273.15,    # Kelvin
@@ -26,7 +26,7 @@ state_energies = {'g_s': 0, 's_1': 2.5}          # eV Tetracene
 
 relaxation_energies = {'g_s': 0, 's_1': 0.7}
 
-transition_moment = np.array([1.2, 0, 0])        # a.u.  Tetracene value
+transition_moment = np.array([1.4, 0, 0])        # a.u.  Tetracene value
 
 generic_molecule = Molecule(state_energies, relaxation_energies, transition_moment)
 
