@@ -24,9 +24,8 @@ def theorethical_diffusion_values(system_information):
         transition_moment_vector = system_information['transition_moment']
         transition_moment = np.linalg.norm(transition_moment_vector)
 
-        factor_1 = 2 * pi * (transition_moment * k**2 / ((r/0.053)**3 * n**2 ))**2
+        factor_1 = 2 * pi * (transition_moment**2 * k**2 / ((r/0.053)**3 * n**2 ))**2
         factor_2 = np.sqrt(1 / (4 * pi * relax * boltzmann_constant * T)) * np.exp(- relax / (4*boltzmann_constant*T))
-
         factor_2_transformed = from_ev_to_au(factor_2, 'inverse')
 
         rate_au = factor_1 * factor_2_transformed

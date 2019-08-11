@@ -36,6 +36,7 @@ def compute_forster_coupling(donor, acceptor, conditions):
     """
 
     u_d = donor.get_transition_moment()
+    print(u_d)
     u_a = acceptor.get_transition_moment()
     momentum_projection = np.dot(u_d, u_a)                  # a. u.
     r_vector = intermolecular_vector(donor, acceptor)       # a. u.

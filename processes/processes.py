@@ -142,6 +142,7 @@ def compute_fcwd_gaussian(system):
         fcwd = np.exp(- delta**2 / (2*sigma)**2) / (2 * np.sqrt(pi) * sigma)
         overlap_memory[info] = fcwd
 
+    print(fcwd)
     return fcwd
 
 

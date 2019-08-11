@@ -25,7 +25,7 @@ state_energies = {'g_s': 0, 's_1': 0}          # eV Tetracene
 
 relaxation_energies = {'g_s': 0, 's_1': 0.7}     # eV Tetracene
 
-transition_moment = np.array([1.0, 0, 0])        # a.u.  Tetracene value
+transition_moment = np.array([1.2, 0, 0])        # a.u.  Tetracene value
 
 generic_molecule = Molecule(state_energies, relaxation_energies, transition_moment)
 
@@ -48,8 +48,8 @@ excitons = {'s_1': ['centre']}
 
 
 trajectories = []                   # list with the trajectories of all excitons
-num_trajectories = 1000
-num_steps = 100
+num_trajectories = 1
+num_steps = 1
 for j in range(num_trajectories):
     key = str(len(dimensions))
     system = get_homogeneous_system['ordered'][key](conditions, generic_molecule, dimensions, lattice_parameter,
