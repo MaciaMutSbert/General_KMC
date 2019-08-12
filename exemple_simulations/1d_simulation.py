@@ -6,7 +6,7 @@ import json
 from systems.molecules import Molecule
 
 "Output file name"
-output_file_name = '1d_simulation_trajectories_mu1.4.json'
+output_file_name = '1d_simulation_trajectories_random.json'
 
 "Physical conditions"
 conditions = {'temperature': 273.15,    # Kelvin
@@ -26,7 +26,7 @@ state_energies = {'g_s': 0, 's_1': 2.5}          # eV Tetracene
 
 relaxation_energies = {'g_s': 0, 's_1': 0.7}
 
-transition_moment = np.array([1.4, 0, 0])        # a.u.  Tetracene value
+transition_moment = np.array([1.0, 0, 0])        # a.u.  Tetracene value
 
 generic_molecule = Molecule(state_energies, relaxation_energies, transition_moment)
 
@@ -37,7 +37,7 @@ dimensions = [1000]                 # molecules per side. dimensionality = len(d
 lattice_parameter = 1.0           # nm. Molecular site in an ordered system. Not used for disordered systems
 # num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
 
-orientation = 'parallel'                              # orientation between molecules
+orientation = 'random'                              # orientation between molecules
 reference_orientation = np.array([1.0, 0, 0])         # necessary only when (anti)parallelism is required
 
 """
@@ -50,7 +50,7 @@ excitons = {'s_1': ['centre']}
 
 trajectories = []                   # list with the trajectories of all excitons
 trajectories_steps = []
-num_trajectories = 500
+num_trajectories = 2000
 for j in range(num_trajectories):
 
     key = str(len(dimensions))

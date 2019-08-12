@@ -5,7 +5,7 @@ from analysis_functions import statistical_diffusivity, diffusion_parameters
 from processes.theorethical_functions import theorethical_diffusion_values
 
 
-input_file_name = '1d_simulation_trajectories_mu1.4.json'
+input_file_name = '1d_simulation_trajectories_random.json'
 
 with open(input_file_name, 'r') as read_file:
     data = json.load(read_file)
@@ -42,9 +42,9 @@ print(diffusion_experimental_study)
 
 
 diffusion_results_1d = {'theorical': diffusion_theorical, 'statistical': diffusion_statistical_values,
-                        'experimental': diffusion_experimental_study}
+                        'experimental': diffusion_experimental_study, 'comment': 'Valors teòrics no vàlids'}
 
-with open('diffusion_results_1d_mu1-4.json', 'w') as write_file:
+with open('diffusion_results_random.json', 'w') as write_file:
     json.dump(diffusion_results_1d, write_file)
 
 

@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import pi
 from scipy.spatial import distance
 from systems.excitation import excited_system
 import copy
@@ -297,12 +298,12 @@ def get_orientation(orientation, reference_orientation, dimensionality, pointing
 
     if orientation is 'random':
         if dimensionality == 3:
-            phi = 2*np.pi() * np.random.rand()
-            theta = np.pi * np.random.rand()
+            phi = 2 * pi * np.random.rand()
+            theta = pi * np.random.rand()
             return [np.sin(theta)*np.cos(phi), np.sin(theta)*np.sin(phi), np.cos(theta)]
 
         else:
-            phi = 2*np.pi() * np.random.rand()
+            phi = 2 * pi * np.random.rand()
             return [np.cos(phi), np.sin(phi), 0]
 
     else:
