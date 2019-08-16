@@ -1,90 +1,69 @@
-from systems.initialize_system import get_homogeneous_system
+from systems.initialize_system import get_system
 from update_functions.update_file import update_system, check_finish
 from analysis_functions import get_trajectory
-import matplotlib.pyplot as plt
 import numpy as np
 import json
 from systems.molecules import Molecule
 
 
-"Physical conditions"
-conditions = {'temperature': 273.15,    # Kelvin
-              'refractive_index': 1,    # adimensional
-              'neighbourhood_radius': 1.1}  # nm. Maximum interaction distance
+output_file_name = 'example_1d_simulation.json'         # name of the output file where the trajectories will be saved
+                                                        # .json format
 
 """
 Generic molecule initialization
 Possible states: 
     'g_s': ground state 
     's_1': first singlet state 
-    't_1': first triplet state 
 All energies must be given in eV. By default initialized at g_s.
 """
-
-state_energies = {'g_s': 0, 's_1': 0}          # eV Tetracene
-
-relaxation_energies = {'g_s': 0, 's_1': 0.7}     # eV Tetracene
-
-transition_moment = np.array([1.2, 0, 0])        # a.u.  Tetracene value
-
-generic_molecule = Molecule(state_energies, relaxation_energies, transition_moment)
+# definition of the generic molecule
+molecule = Molecule(state_energies={'g_s': 0, 's_1': 2.5},           # excitation energies of each electronic state (eV)
+                    reorganization_energies={'g_s': 0, 's_1': 0.7},  # reorganization energies of the states (eV)
+                    transition_moment=np.array([1.2, 0, 0]))         # transition dipole moment of the molecule (a.u)
 
 
-"Morphology parameters"
-order = 'ordered'                 # can take 'ordered' or 'disordered'
-dimensions = [140, 140]                 # molecules per side. dimensionality = len(dimensions)
-lattice_parameter = 1.0           # nm. Molecular site in an ordered system. Not used for disordered systems
-# num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
-
-orientation = 'parallel'                              # orientation between molecules
-reference_orientation = np.array([1.0, 0, 0])         # necessary only when (anti)parallelism is required
-
-"""
-Excitons.
-Possible positions commands: 'random', 'first', 'last', 'centre', 'furthest'.
-The dictionary takes the state as key and a list with the position of every exciton.
-"""
-excitons = {'s_1': ['centre']}
+# physical conditions of the system (as a dictionary)
+conditions = {'temperature': 273.15,            # temperature of the system (K)
+              'refractive_index': 1,            # refractive index of the material (n)
+              'neighbourhood_radius': 1.1}      # maximum interaction distance (nm)
 
 
-trajectories = []                   # list with the trajectories of all excitons
-num_trajectories = 1
-num_steps = 1
+trajectories = []                               # list with the trajectories of all excitons
+num_trajectories = 1000
+num_steps = 10000
 for j in range(num_trajectories):
-    key = str(len(dimensions))
-    system = get_homogeneous_system['ordered'][key](conditions, generic_molecule, dimensions, lattice_parameter,
-                                                    orientation, reference_orientation, excitons)
+    # s'ha de canviar en la definició
+    system = get_system(conditions=conditions,                           # dictionary with the physical conditions of the simulation
+                        order='ordered',                                 # 'ordered': crystall material, 'disordered': amorphous
+                        molecule=molecule,
+                        lattice={'dimensions': [1000],                   # dictionary lattice. dimensions: supercell of the crystall
+                                 'lattice_parameter': 1.0},              # lattice parameter (nm)
+                        orientation='parallel',                          # orientation of the molecules: 'parallel', 'antiparallel', 'random'
+                        initial_excitation={'s_1': ['centre']})          # intial excitation of the system (excited states and the positions of the excitons in the lattice)
 
-    """
-    system is a dictionary with three keys:
-        molecules: List of objects class Molecule
-        conditions: dictionary with the physical conditions of the system such as temperature, refractive index...
-        centre_indexes: list with the indexes of the excited molecules.
-    """
+#    system is a dictionary with three keys:
+#       molecules: List of objects class Molecule
+#        conditions: dictionary with the physical conditions of the system such as temperature, refractive index...
+#        centre_indexes: list with the indexes of the excited molecules.
 
-    total_time = [0.0]
-    path_list = []
-    """
-    Veure com definim el màxim d'iteracions.
-    """
-    finished = False
+    time = [0.0]
+    path = []
     for i in range(num_steps):
-        " OJO. A LA FUNCIÓ NEIGHBOURHOOD HI HA UN TRUQUILLO QUE HEM DE CANVIAR EN CANVIAR LA DIMENSIONALITAT"
-        path, time = update_system(system)
-        total_time.append(total_time[-1]+time)
-        path_list.append(path)
+        change_step, step_time = update_system(system)
+
+        time.append(time[-1] + step_time)
+        path.append(change_step)
         print(i)
-        if check_finish(path_list) is True:
-            break
-        if total_time[-1] == 480:
+
+        if check_finish(system) is True:                    # S'HA DE CANVIAR
             break
 
     print('j=', j)
-    trajectories.append(get_trajectory(path_list, total_time, system))
+    trajectories.append(get_trajectory(path, time, system))
 
 
 ###########################################################################################################
-# We list all the outputs in a dictionary system_information and write it in the output_file
+# We collect all the outputs in a dictionary system_information and write it in the output_file
 
 system_information = {'conditions': conditions, 'state_energies': state_energies,
                       'relaxation_energies': relaxation_energies, 'transition_moment': list(transition_moment),

@@ -33,7 +33,7 @@ def statistical_diffusivity(trajectories, trajenctories_steps, dimensionality):
     mean_lifetime_list = []
     set_of_points = []
 
-    steps = int(np.average(np.array(trajenctories_steps)))               # prenem un número fixe de steps per fer l'estudi estadístic (triat per tenir el resultat òptim).
+    steps = 250               # prenem un número fixe de steps per fer l'estudi estadístic (triat per tenir el resultat òptim).
     print(steps)
     for i in range(1, steps):
         squared_distances = []

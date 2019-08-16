@@ -51,7 +51,7 @@ class Molecule:
 
     def __init__(self,
                  state_energies,
-                 relaxation_energies,
+                 reorganization_energies,
                  transition_moment,
                  state='g_s',
                  characteristic_length=10**(-8),
@@ -62,7 +62,7 @@ class Molecule:
         :param state: sting of the name of the state
         The name of the state should coincide with some key of the dictionary in order to identify the state with
         its energy.
-        :param relaxation_energies: dictionary {'state': relaxation energy of the state}
+        :param reorganization_energies: dictionary {'state': relaxation energy of the state}
         Names of 'state' would be: g_s (ground state), s_1 (first singlet), t_1 (first triplet), etc.
         Energies should be given with eV.
 
@@ -82,7 +82,7 @@ class Molecule:
 
         self.state_energies = state_energies
         self.state = state
-        self.relaxation_energies = relaxation_energies
+        self.relaxation_energies = reorganization_energies
         self.transition_moment = transition_moment
         self.characteristic_length = characteristic_length
         self.coordinates = coordinates

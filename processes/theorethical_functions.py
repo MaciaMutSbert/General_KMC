@@ -12,7 +12,7 @@ def theorethical_diffusion_values(system_information):
     defined).
     """
 
-    possible_cases = [['ordered', 'antiparallel'], ['2d_ordered', 'parallel'],['3d_ordered', 'parallel'],
+    possible_cases = [['ordered', 'parallel'], ['2d_ordered', 'parallel'],['3d_ordered', 'parallel'],
                       ['ordered', 'antiparallel'], ['2d_ordered', 'antiparallel'],['3d_ordered', 'antiparallel']]
 
     boltzmann_constant = 8.617333 * 10 ** (-5)  # Boltzmann constant in eV * K^(-1)
@@ -25,8 +25,8 @@ def theorethical_diffusion_values(system_information):
     transition_moment = np.linalg.norm(transition_moment_vector)
 
     generic_molecule = Molecule(state_energies=system_information['state_energies'],
-                                    state='s_1', relaxation_energies=system_information['relaxation_energies'],
-                                    transition_moment=transition_moment_vector)
+                                state='s_1', reorganization_energies=system_information['relaxation_energies'],
+                                transition_moment=transition_moment_vector)
     decay_rates = generic_molecule.decay_rates()
     decay_sum = 0
     for decay in decay_rates:
@@ -34,6 +34,7 @@ def theorethical_diffusion_values(system_information):
     life_time = 1 / decay_sum
 
     d = len(system_information['dimensions'])
+
 
     if [system_information['order'], system_information['orientation']] in possible_cases:
 
