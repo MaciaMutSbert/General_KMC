@@ -1,5 +1,5 @@
 from initialize_systems.__init__ import get_homogeneous_system
-from update_functions.update_file import update_system, check_finish
+from core.__init__ import update_system, check_finish
 from analysis_functions import get_trajectory
 import numpy as np
 import json

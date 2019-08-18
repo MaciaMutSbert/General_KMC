@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import pi
-from processes.coupling_functions import couplings
+from core.processes.coupling_functions import couplings
 from conversion_functions import from_ns_to_au, from_ev_to_au
 
 decay_memory = {}
