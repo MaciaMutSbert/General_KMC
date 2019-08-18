@@ -408,20 +408,6 @@ def check_lattice(lattice_parameter, generic_molecule):
 
 ######################################################################################
 
-
-"""
-ANTIPARALLELISM IMPLEMENTATION.
-Antiparallelism possibility has been included for ordered systems. This property is implemented while the generation
-of the molecules. We use assistant parameters given by the dictionary get_symmetry. These parameters are linked with 
-the for loops and change at each iteration. We manage to build a system where  firts neighbours are antiparallel between 
-them. 
-These implementation allows an easy expansion to cases where antiparallelism is given along an axis. Only a new entrance
-to the dictionary get_system with a proper set of values to change pointing would be required.
-
-Antiparallelims is not allowed for disordered systems. In the case antiparallelism and disorder where given as arguments
-the system wouldn't be initialized.
-"""
-
 get_symmetry = {'parallel': [1, 2], 'antiparallel': [-1, 1], 'random': [0,0]}
 # dictionary with the sets of values to build parallelism or antiparallelism
 
