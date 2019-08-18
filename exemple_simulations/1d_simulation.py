@@ -1,9 +1,9 @@
-from systems.initialize_system import get_homogeneous_system
+from initialize_systems.__init__ import get_homogeneous_system
 from update_functions.update_file import update_system, check_finish
 from analysis_functions import get_trajectory
 import numpy as np
 import json
-from systems.molecules import Molecule
+from molecules import Molecule
 
 "Output file name"
 output_file_name = '1d_simulation_trajectories_random.json'
@@ -34,8 +34,8 @@ generic_molecule = Molecule(state_energies, relaxation_energies, transition_mome
 "Morphology parameters"
 order = 'ordered'                 # can take 'ordered' or 'disordered'
 dimensions = [1000]                 # molecules per side. dimensionality = len(dimensions)
-lattice_parameter = 1.0           # nm. Molecular site in an ordered system. Not used for disordered systems
-# num_molecules = 0               # int. Number of molecules in the system. Not used in ordered systems
+lattice_parameter = 1.0           # nm. Molecular site in an ordered system. Not used for disordered initialize_systems
+# num_molecules = 0               # int. Number of molecules in the system. Not used in ordered initialize_systems
 
 orientation = 'random'                              # orientation between molecules
 reference_orientation = np.array([1.0, 0, 0])         # necessary only when (anti)parallelism is required

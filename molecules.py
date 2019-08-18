@@ -53,7 +53,8 @@ class Molecule:
                  state_energies,
                  reorganization_energies,
                  transition_moment,
-                 state='g_s',
+                 dipole_moment_direction=[1, 0, 0],
+                 state='gs',
                  characteristic_length=10**(-8),
                  coordinates=[0, 0, 0],
                  orientation=[1, 0, 0]):
@@ -69,7 +70,11 @@ class Molecule:
 
         :param transition_moment: Dipole transition moment vector (3d). The vector is given in respect to the RS
         of the molecule. So for all molecules of a same type if will be equal.
-        This dipole moment is given in atomic units..
+        This dipole moment is given in atomic units.
+
+        :param dipole_moment_direction: Gives a referene direction This reference direction is the molecular orientation
+        in which the transition dipole moment in the molecular reference system coincides with the itself in the
+        global reference system. Given by default as [1,0,0]
 
         :param characteristic_length: We consider a finite size molecule. The simplified shape of the molecule
         is longitudinal, squared or cubic and is defined with this characteristic length. Units: nm
@@ -83,10 +88,11 @@ class Molecule:
         self.state_energies = state_energies
         self.state = state
         self.relaxation_energies = reorganization_energies
-        self.transition_moment = transition_moment
+        self.transition_moment = np.array(transition_moment)
+        self.dipole_moment_direction = np.array(dipole_moment_direction)
         self.characteristic_length = characteristic_length
-        self.coordinates = coordinates
-        self.orientation = orientation
+        self.coordinates = np.array(coordinates)
+        self.orientation = np.array(orientation)
 
     def initialize_coordinates(self, coordinate_list):
         """
@@ -150,10 +156,10 @@ class Molecule:
         :return: Dictionary with the decay processes as key and the decay rates as arguments.
         """
         decay_rates = {}
-        if self.state == 's_1':
+        if self.state == 's1':
             "We consider only the radiative decay to singlet 0 state"
             decay_process = 'Singlet_radiative_decay'
-            desexcitation_energy = self.state_energies[self.state] - self.state_energies['g_s']
+            desexcitation_energy = self.state_energies[self.state] - self.state_energies['gs']
             desexcitation_energy = from_ev_to_au(desexcitation_energy, 'direct')            # energy in atomic units
             u = np.linalg.norm(self.transition_moment)                                      # transition moment norm.
             print()
@@ -175,9 +181,9 @@ class Molecule:
         reference system. UNIT  3D VECTOR
         :return: The t.d.m in the global reference system
         """
-        reference_orientation = [1, 0, 0]
+
         # compute the director cosinus of the rotation (inner product)
-        cos_director = np.dot(reference_orientation, self.orientation)
+        cos_director = np.dot(self.dipole_moment_direction, self.orientation)
 
         # construct the rotation matrix
         sin_director = np.sqrt(1-cos_director**2)

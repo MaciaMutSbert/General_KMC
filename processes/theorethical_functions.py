@@ -1,7 +1,6 @@
 import numpy as np
 from numpy import pi
-from scipy.spatial import distance
-from systems.molecules import Molecule
+from molecules import Molecule
 from conversion_functions import from_ev_to_au, from_ns_to_au
 
 
