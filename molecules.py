@@ -53,11 +53,11 @@ class Molecule:
                  state_energies,
                  reorganization_energies,
                  transition_moment,
-                 dipole_moment_direction=[1, 0, 0],
+                 dipole_moment_direction=[1, 0, 0],                 # unity vector
                  state='gs',
                  characteristic_length=10**(-8),
                  coordinates=[0, 0, 0],
-                 orientation=[1, 0, 0]):
+                 orientation=[1, 0, 0]):                            # unity vector
         """
         :param states_energies: dictionary {'state': energy}
         :param state: sting of the name of the state
@@ -87,12 +87,12 @@ class Molecule:
 
         self.state_energies = state_energies
         self.state = state
-        self.relaxation_energies = reorganization_energies
+        self.reorganization_energies = reorganization_energies
         self.transition_moment = np.array(transition_moment)
-        self.dipole_moment_direction = np.array(dipole_moment_direction)
+        self.dipole_moment_direction = np.array(dipole_moment_direction)        # unity vector
         self.characteristic_length = characteristic_length
         self.coordinates = np.array(coordinates)
-        self.orientation = np.array(orientation)
+        self.orientation = np.array(orientation)                                # unity vector
 
     def initialize_coordinates(self, coordinate_list):
         """
@@ -120,8 +120,8 @@ class Molecule:
         """
         return self.orientation
 
-    def get_relaxation_state_energy(self):
-        return self.relaxation_energies[self.state]
+    def get_reorganization_state_energy(self):
+        return self.reorganization_energies[self.state]
 
     def electronic_state(self):
         """
@@ -130,12 +130,15 @@ class Molecule:
         return self.state
 
     def set_state(self, new_state):
-        "No return method. Only changes the molecular state when the exciton is transferred."
+        """
+        :param new_state:
+        No return method. Only changes the molecular state when the exciton is transferred.
+        """
         self.state = new_state
 
     def desexcitation_energies(self):
         """
-        D'ENTRADA NO SERÀ NECESSÀRIA.
+        IS NOT USED (19/08/2019).
         Given an electronic state, calculates the possible desexcitation energy. Generates and sorts
         a list with the energies, then calculates the possible desexcitation energies (the energy difference
         between the given state and the less energetic states).
@@ -153,32 +156,38 @@ class Molecule:
 
     def decay_rates(self):
         """
-        :return: Dictionary with the decay processes as key and the decay rates as arguments.
+        :return: A list of two elements: list of the possible decay processes and another with the respective rates
+        for a given electronic state.
+
+        More if(s) entrances shall be added if more electronic states are considered.
         """
-        decay_rates = {}
+        decay_rates = []
+        decay_processes = []
+
         if self.state == 's1':
-            "We consider only the radiative decay to singlet 0 state"
+
+            desexcitation_energy = self.state_energies[self.state] - self.state_energies['gs']      # energy in eV
+            desexcitation_energy = from_ev_to_au(desexcitation_energy, 'direct')                    # energy in a.u.
+
+            u = np.linalg.norm(self.transition_moment)              # transition moment norm.
+            c = 137                                                 # light speed in atomic units
+
+            rate = 4 * desexcitation_energy**3 * u**2 / (3 * c**3)
             decay_process = 'Singlet_radiative_decay'
-            desexcitation_energy = self.state_energies[self.state] - self.state_energies['gs']
-            desexcitation_energy = from_ev_to_au(desexcitation_energy, 'direct')            # energy in atomic units
-            u = np.linalg.norm(self.transition_moment)                                      # transition moment norm.
-            print()
-            c = 137         # light speed in atomic units
+            # for a first singlet state only radiative decay is considered.
 
-            rate = 4 * desexcitation_energy**3 * u**2 /(3 * c**3)
-            decay_rates[decay_process] = from_ns_to_au(rate, 'direct')
+            decay_rates.append(from_ns_to_au(rate, 'direct'))
+            decay_processes.append(decay_process)
 
-        return decay_rates
+        return [decay_processes, decay_rates]
 
     def get_transition_moment(self):
         """
         This method computes a basis transformation in order to get the transition dipole moment in a global
-        reference coordinate system. This system is described by the reference_orientation vector.
+        reference coordinate system. This system is described by the dipole_moment_direction
         When the molecule is orientated in this way the transition_moment in the RS system of the molecule
         and in the global RS coincides. Else, we can say that the molecule is rotated and the rotation angle
         is given by the inner product between the reference_orientation and molecule_orientation vectors
-        :param reference_orientation: Orientation in which the t.d.m coincides in both the molecular and global
-        reference system. UNIT  3D VECTOR
         :return: The t.d.m in the global reference system
         """
 
@@ -187,6 +196,7 @@ class Molecule:
 
         # construct the rotation matrix
         sin_director = np.sqrt(1-cos_director**2)
+
         rotation_matrix = np.array([[cos_director, -sin_director, 0],
                                     [sin_director, cos_director, 0],
                                     [0,                 0,       0]])

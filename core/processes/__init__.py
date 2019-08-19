@@ -3,73 +3,109 @@ from numpy import pi
 from core.processes.coupling_functions import couplings
 from conversion_functions import from_ns_to_au, from_ev_to_au
 
+
+# Memory for the calculated decay rates and spectral overlaps is introduced.
 decay_memory = {}
 overlap_memory = {}
 
-###########################################################################
-#           FUNCIÓ 1: rates de transfrència
-###########################################################################
+
+###########################################################################################################
+#                                   FUNCTION 1: TRANSFER RATES
+###########################################################################################################
 
 
-def get_transfer_rates(centre, neighbour_index, system):
+def get_transfer_rates(centre, neighbour_indexes, system):
     """
     :param centre: Index of the studies excited molecule
-    :param neighbour_index: Index of a nearby molecule (possible acceptor of the exciton)
+    :param neighbour_indexes: neighbour indexes list
     :param system: Dictionary with the list of molecules and additional physical information
     :return: Dictionary with the possible transfer processes between the two involved molecules
     as keys and its rates as arguments.
-    """
-    conditions = system['conditions']
-    donor = system['molecules'][centre]
-    acceptor = system['molecules'][neighbour_index]
-
-    transfer_rates = {}
-
-    spectral_overlap = marcus_overlap_formula(donor, acceptor, conditions)
-    """
-    Les referències dels possibles processos de transfarència seran les que s'usaran com a claus dels diccionaris:
-    transfer_rates i couplings. Així com les que s'usaran per identificar com s'ha d'actualitzar el sistema. És per això
-    que s'ha de seguir un conveni. La clau es construirà com: 'state1_state2' i farà referència a una excitació en state1
-    que es propaga a una molècula en state2. E.g, si tenim la propagació d'un singlet_1 a una molècula en l'estat 
-    fonamental la clau del procés serà: 's_1_g_s'.
+    For each possible acceptor in neighbour_indexes computes the transfer rate using the Fermi's Golden Rule:
+        - For the spectral overlap the Marcus Formula is used for all cases.
+        - For the electronic coupling an external dictionary is defined. It contains the possible couplings between
+            two states (more than one allowed). The keys of this dictionary are like:
+                'state1_state2' + str(additional information)
+            If the key 'state1_state2' is not in the dictionary the electronic coupling shall be taken as 0.
     """
 
-    key = '{}_{}'.format(donor.electronic_state(), acceptor.electronic_state())
-    electronic_coupling = couplings[key](donor, acceptor, conditions)
+    conditions = system['conditions']           # physical conditions of the system
 
-    rate = (2*pi) * spectral_overlap * electronic_coupling**2
-    transfer_rates[key] = from_ns_to_au(rate, 'direct')
+    donor = system['molecules'][centre]         # excited molecule
 
-    return transfer_rates
+    transfer_rates = []                         # list that collects the transfer rates (only the numerical values)
+    transfer_processes = []                     # list that collects the transfer processes dict(donor,process,acceptor)
+
+    for neighbour in neighbour_indexes:
+        acceptor = system['molecules'][neighbour]
+        # acceptor = molecule instance for each neighbour index.
+
+        spectral_overlap = marcus_overlap_formula(donor, acceptor, conditions)
+        # compute the spectral overlap with the Marcus Formula (for all possible couplings)
+
+        prefix_key = '{}_{}'.format(donor.electronic_state(), acceptor.electronic_state())
+        # first key. Only with the information of both implicated states: 'state1_state2'
+
+        possible_couplings = slice_dict(couplings, prefix_key)
+        # new dictionary with all the keys of couplings that start with prefix_key
+
+        if len(possible_couplings) == 0:
+            # when no couplings are found, the rate is taken as 0
+            rate = 0
+            transfer_rates.append(rate)
+
+            process = {'donor': centre, 'process': prefix_key, 'acceptor': neighbour}
+            transfer_processes.append(process)
+
+        else:
+            # for the possible couplings computes the transfer rate by the Fermi's Golden Rule.
+            for key in possible_couplings:
+                e_coupling = possible_couplings[key]
+
+                rate = 2*pi * e_coupling**2 * spectral_overlap          # rate in a.u -- Fermi's Golden Rule
+                transfer_rates.append(from_ns_to_au(rate, 'direct'))    # rate in ns⁻¹
+
+                transfer_processes.append({'donor': centre, 'process': key, 'acceptor': neighbour})
+
+    return transfer_processes, transfer_rates
 
 
-###########################################################################
-#           FUNCIÓ 2: rates de decaïment
-###########################################################################
+###########################################################################################################
+#                               FUNCTION 2: DECAY RATES
+###########################################################################################################
 
 
-def get_decay_rates(system, centre):
+def get_decay_rates(centre, system):
     """
-    :param system: Dictionary with all the information of the system
     :param centre: index of the excited molecule
+    :param system: Dictionary with all the information of the system
     :return: A dictionary with the possible decay rates
+    For computing them the method get_decay_rates of class molecule is call.
     """
     donor = system['molecules'][centre]
+
     info = str(hash(donor.state))
+    # we define a compact string with the characteristic information of the decays: electronic state
 
     if info in decay_memory:
-        decay_rates = decay_memory[info]
+        decay_complete = decay_memory[info]
+        # the decay memory defined is used if the decay have been already computed
+
+    # decay_complete has two lists: decay_processes and decay_rates
 
     else:
-        decay_rates = donor.decay_rates()
-        decay_memory[info] = decay_rates
+        decay_complete = donor.decay_rates()
+        decay_memory[info] = decay_complete
+        # new computed decays are added to the memory
 
-    return decay_rates
+    decay_processes = decay_complete[0]
+    decay_rates = decay_complete[1]
+    return decay_processes, decay_rates
 
 
-###########################################################################
-#           FUNCIÓ 3: actualització del sistema
-###########################################################################
+###########################################################################################################
+#                           FUNCTION 3: UPDATE OF THE SYSTEM AND CENTRE INDEXES
+###########################################################################################################
 
 
 def update_step(chosen_process, molecules, centre_indexes):
@@ -78,22 +114,29 @@ def update_step(chosen_process, molecules, centre_indexes):
     :param molecules: list of instances of molecule
     :param centre_indexes: list of the indexes of the excited molecules
     Modifies the state of the donor and the acceptor. Removes the donor from the centre_indexes list
-    and includes the acceptor. If its a decay only changes and removes tha acceptor
+    and includes the acceptor. If its a decay only changes and removes the donor
+
+    New if(s) entrances shall be defined for more processes.
     """
-    if chosen_process['process'] == 's_1_g_s':
-        molecules[chosen_process['donor']].set_state('g_s')
-        molecules[chosen_process['acceptor']].set_state('s_1')
+
+    if chosen_process['process'] == 's1_gs':
+        molecules[chosen_process['donor']].set_state('gs')          # des excitation of the donor
+        molecules[chosen_process['acceptor']].set_state('s1')       # excitation of the acceptor
+
         centre_indexes.remove(chosen_process['donor'])
         centre_indexes.append(chosen_process['acceptor'])
+        # modification of the excited molecules indexes list
 
     if chosen_process['process'] == 'Singlet_radiative_decay':
-        molecules[chosen_process['donor']].set_state('g_s')
+        molecules[chosen_process['donor']].set_state('gs')          # des excitation of the donor
+
         centre_indexes.remove(chosen_process['donor'])
+        # modification of the excited molecules indexes list
 
 
-###########################################################################
-#           FUNCIONS AUXILIARS: solapament espectral
-###########################################################################
+###########################################################################################################
+#                           ASSISTANT FUNCTIONS: spectral overlaps
+###########################################################################################################
 
 
 def marcus_overlap_formula(donor, acceptor, conditions):
@@ -104,20 +147,28 @@ def marcus_overlap_formula(donor, acceptor, conditions):
     :return: The spectral overlap between the donor and the acceptor according to Marcus formula.
     """
     kb = 8.617333 * 10**(-5)            # Boltzmann constant in eV * K^(-1)
-    T = conditions['temperature']       # K
+    T = conditions['temperature']       # temperature (K)
 
     excited_state = donor.electronic_state()
     gibbs_energy = donor.state_energies[excited_state] - acceptor.state_energies[excited_state]
-    relax = donor.get_relaxation_state_energy()
+    # Gibbs energy: energy difference between the equilibrium points of the excited states
 
-    info = str(hash((T, gibbs_energy, relax, 'marcus')))
+    reorganization = donor.get_reorganization_state_energy()
+    # donor reorganization energy of the excited state
+
+    info = str(hash((T, gibbs_energy, reorganization, 'marcus')))
+    # we define a compact string with the characteristic information of the spectral overlap
 
     if info in overlap_memory:
+        # the memory is used if the overlap has been already computed
         overlap = overlap_memory[info]
 
     else:
-        overlap = 1 / (2 * np.sqrt(pi*kb*T*relax)) * np.exp(-(gibbs_energy+relax)**2 / (4*kb*T*relax))
+        overlap = 1 / (2 * np.sqrt(pi*kb*T*reorganization)) * \
+                  np.exp(-(gibbs_energy+reorganization)**2 / (4*kb*T*reorganization))
+
         overlap_memory[info] = overlap
+        # new values are added to the memory
 
     return from_ev_to_au(overlap, 'inverse')
     # Since we have a quantity in 1/eV, we use the converse function from_ev_to_au in inverse mode
@@ -145,5 +196,24 @@ def compute_fcwd_gaussian(system):
     print(fcwd)
     return fcwd
 
+
+###########################################################################################################
+#          Take all the keys of a dictionary that start with the same string
+###########################################################################################################
+
+
+def slice_dict(original_dict, key_string):
+    """
+    :param original_dict: Original (and larger) dictionary with all entrances
+    :param key_string: key string (desired starting string)
+    :return: A new dictionary with all the entrances of the original that start with key_string
+    """
+    newdict = {}
+
+    for key in original_dict:
+        if key.startswith(key_string):
+            newdict[key] = original_dict[key]
+
+    return newdict
 
 

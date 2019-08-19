@@ -52,7 +52,7 @@ def get_disordered_system(conditions,
         dimensions: maximum physical dimensions of the system
         num_molecules: number of molecules
     :param orientation: String parameter. Indicates whether the orientation of the molecules is parallel,
-    random or antiparallel (each molecule finds its 1sts neighbours antiparallely orientated)
+    random or anti parallel (each molecule finds its 1sts neighbours anti parallely orientated)
     :param initial_excitation: Dictionary with the information of the excitons (type and a position for each).
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
@@ -65,8 +65,8 @@ def get_disordered_system(conditions,
 #   computes the number of molecules per side from the physical dimensions of the system and the molecular
 #   characteristic  length. With this information calculates the capacity (maximum number of molecules) of the system
 
-    if orientation is 'antiparallel':           # antiparallelism is not defined for an amorphous system
-        print('Not antiparallel orientation considered for an amorphous material')
+    if orientation is 'antiparallel':           # anti parallelism is not defined for an amorphous system
+        print('Not anti parallel orientation considered for an amorphous material')
         return
 
     molecules = []                  # list of instances of class molecule
@@ -104,13 +104,15 @@ def get_disordered_system(conditions,
 
     conditions['amorphous'] = amorphous
 
-    # definition of system as a dictionary with two main arguments:
+    # definition of system as a dictionary with three main arguments:
     #       molecules: list with all class molecule instances
-    #       condition: dictionary with the physical conditions, updated with the morphology information of amorphous
+    #       condition: dictionary with the physical conditions
+    #       amorphous: dictionary with the morphology information
     # and two arguments used as efficiency tricks:
     #       centres: list with the indexes of the excited molecules
     #       type type of the system
-    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes, 'type': 'amorphous'}
+    system = {'molecules': molecules, 'conditions': conditions, 'amorphous': amorphous,
+              'centres': centre_indexes, 'type': 'amorphous'}
 
     return system
 
@@ -120,7 +122,7 @@ def get_disordered_system(conditions,
 
 def get_1d_ordered_system(conditions,
                           generic_molecule,
-                          lattice = {'dimensions': [1000],          # molecules / side
+                          lattice={'dimensions': [1000],          # molecules / side
                                      'lattice_parameter': [1.0]},
                           orientation='parallel',
                           initial_excitation={'s1': ['centre']}, ):
@@ -132,12 +134,12 @@ def get_1d_ordered_system(conditions,
             dimensions: number of molecules per side
             lattice parameter: list with the lattice parameter for each dimension
     :param orientation: String parameter. Indicates whether the orientation of the molecules is parallel,
-    random or antiparallel (each molecule finds its 1sts neighbours antiparallely orientated)
+    random or anti parallel (each molecule finds its 1sts neighbours anti parallely orientated)
     :param initial_excitation: Dictionary with the information of the excitons (type and a position for each).
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    dimensions = lattice['dimensions']                      # supercell of the crystal (molecules / side)
+    dimensions = lattice['dimensions']                      # super cell of the crystal (molecules / side)
     lattice_parameter = lattice['lattice_parameter']        # list with the lattice parameter for each direction
 
     physical_dimensions = np.array(dimensions) * np.array(lattice_parameter)        # physical dimensions of the finite crystal (nm)
@@ -150,7 +152,7 @@ def get_1d_ordered_system(conditions,
     molecules = []                          # list of instances of class molecule
 
     pointing = 1                            # pointing and symmetry are assistant parameters used in the generation of
-    symmetry = get_symmetry[orientation]    # the molecular orientation when antiparallel or parallel orientation is given
+    symmetry = get_symmetry[orientation]    # the molecular orientation when anti parallel or parallel orientation is given
 
     x_max = physical_dimensions[0]/2
     for x in np.arange(-x_max, x_max, lattice_parameter[0]):
@@ -167,8 +169,8 @@ def get_1d_ordered_system(conditions,
 
         molecules.append(molecule)
 
-        pointing = pointing * symmetry[0]                           # is over defined in order to get antiparallelism
-        # see Antiparalellims in Docs to a further knowledge of how antiparellism is defined.
+        pointing = pointing * symmetry[0]
+        # see Anti parallelism in Docs to a further knowledge of how anti parallelism is defined.
 
     centre_indexes = excited_system(molecules, initial_excitation, tolerance=np.sum(np.array(lattice_parameter))/2)
     # molecules list is modified with the excitation defined in initial_excitation.
@@ -176,13 +178,15 @@ def get_1d_ordered_system(conditions,
 
     conditions['lattice'] = lattice
 
-    # definition of system as a dictionary with two main arguments:
+    # definition of system as a dictionary with three main arguments:
     #       molecules: list with all class molecule instances
-    #       condition: dictionary with the physical conditions, updated with the morphology information of amorphous
+    #       condition: dictionary with the physical conditions
+    #       lattice: morphology information
     # and two arguments used as efficiency tricks:
     #       centres: list with the indexes of the excited molecules
     #       type type of the system
-    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes, 'type': '1d_ordered'}
+    system = {'molecules': molecules, 'conditions': conditions, 'lattice': lattice,
+              'centres': centre_indexes, 'type': '1d_ordered'}
 
     return system
 
@@ -192,7 +196,7 @@ def get_1d_ordered_system(conditions,
 
 def get_2d_ordered_system(conditions,
                           generic_molecule,
-                          lattice = {'dimensions': [100, 100],               # molecules / side
+                          lattice={'dimensions': [100, 100],               # molecules / side
                                      'lattice_parameter': [1.0, 1.0]},
                           orientation='parallel',
                           initial_excitation={'s1': ['centre']}):
@@ -204,12 +208,12 @@ def get_2d_ordered_system(conditions,
             dimensions: number of molecules per side
             lattice parameter: list with the lattice parameter for each dimension
     :param orientation: String parameter. Indicates whether the orientation of the molecules is parallel,
-    random or antiparallel (each molecule finds its 1sts neighbours antiparallely orientated)
+    random or anti parallel (each molecule finds its 1sts neighbours anti parallely orientated)
     :param initial_excitation: Dictionary with the information of the excitons (type and a position for each).
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    dimensions = lattice['dimensions']                              # supercell of the crystal (molecules / side)
+    dimensions = lattice['dimensions']                              # super cell of the crystal (molecules / side)
     lattice_parameter = lattice['lattice_parameter']                # list with the lattice parameter for each direction
 
     physical_dimensions = np.array(dimensions) * np.array(lattice_parameter)    # physical dimensions of the finite crystal (nm)
@@ -224,7 +228,7 @@ def get_2d_ordered_system(conditions,
     symmetry = get_symmetry[orientation]
     x_count = 0
     # symmetry and x_count are assistant parameters used in the generation of  the molecular orientation when
-    # antiparallel or parallel orientation is given
+    # anti parallel or parallel orientation is given
 
     x_max = physical_dimensions[0]/2
     y_max = physical_dimensions[1]/2
@@ -232,7 +236,7 @@ def get_2d_ordered_system(conditions,
 
     for x in np.arange(-x_max, x_max, lattice_parameter[0]):
 
-        pointing = (-1)**x_count                # assistant parameter for antiparallelism
+        pointing = (-1)**x_count                # assistant parameter for anti parallelism
 
         for y in np.arange(-y_max, y_max, lattice_parameter[1]):
             coordinates = [x, y, 0]
@@ -248,7 +252,7 @@ def get_2d_ordered_system(conditions,
 
             pointing = pointing * symmetry[0]
         x_count = x_count + symmetry[1]
-        # see Antiparalellims in Docs to a further knowledge of how antiparellism is defined.
+        # see Anti parallelism in Docs to a further knowledge of how anti parallelism is defined.
 
     centre_indexes = excited_system(molecules, initial_excitation, tolerance=np.sum(np.array(lattice_parameter))/4)
     # molecules list is modified with the excitation defined in initial_excitation.
@@ -256,13 +260,15 @@ def get_2d_ordered_system(conditions,
 
     conditions['lattice'] = lattice
 
-    # definition of system as a dictionary with two main arguments:
+    # definition of system as a dictionary with three main arguments:
     #       molecules: list with all class molecule instances
-    #       condition: dictionary with the physical conditions, updated with the morphology information of amorphous
+    #       condition: dictionary with the physical conditions
+    #       lattice: morphology information
     # and two arguments used as efficiency tricks:
     #       centres: list with the indexes of the excited molecules
     #       type type of the system
-    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes, 'type': '2d_ordered'}
+    system = {'molecules': molecules, 'conditions': conditions, 'lattice': lattice,
+              'centres': centre_indexes, 'type': '2d_ordered'}
 
     return system
 
@@ -283,11 +289,13 @@ def get_3d_ordered_system(conditions,
     :param lattice: dictionary with the morphology parameters:
             dimensions: number of molecules per side
             lattice parameter: list with the lattice parameter for each dimension
+    :param orientation: String parameter. Indicates whether the orientation of the molecules is parallel,
+    random or anti parallel (each molecule finds its 1sts neighbours anti parallely orientated)
     :param initial_excitation: Dictionary with the information of the excitons (type and a position for each).
     :return: A dictionary with a list of molecules and updated dictionary with the physical conditions.
     """
 
-    dimensions = lattice['dimensions']                              # supercell of the crystal (molecules / side)
+    dimensions = lattice['dimensions']                              # super cell of the crystal (molecules / side)
     lattice_parameter = lattice['lattice_parameter']                # list with the lattice parameter for each direction
 
     physical_dimensions = np.array(dimensions) * np.array(lattice_parameter)    # physical dimensions of the finite crystal (nm)
@@ -302,7 +310,7 @@ def get_3d_ordered_system(conditions,
     x_count = 0
     symmetry = get_symmetry[orientation]
     # symmetry and x_count are assistant parameters used in the generation of  the molecular orientation when
-    # antiparallel or parallel orientation is given
+    # anti parallel or parallel orientation is given
 
     max_coordinate = np.array(physical_dimensions)
     step = lattice_parameter
@@ -333,7 +341,7 @@ def get_3d_ordered_system(conditions,
                 pointing = pointing*symmetry[0]
             y_count = y_count + symmetry[1]
         x_count = x_count + symmetry[1]
-        # see Antiparalellims in Docs to a further knowledge of how antiparellism is defined.
+        # see Anti parallelism in Docs to a further knowledge of how anti parallelism is defined.
 
     centre_indexes = excited_system(molecules, initial_excitation, tolerance=np.sum(np.array(lattice_parameter))/6)
     # molecules list is modified with the excitation defined in initial_excitation.
@@ -341,13 +349,15 @@ def get_3d_ordered_system(conditions,
 
     conditions['lattice'] = lattice_parameter
 
-    # definition of system as a dictionary with two main arguments:
+    # definition of system as a dictionary with three main arguments:
     #       molecules: list with all class molecule instances
-    #       condition: dictionary with the physical conditions, updated with the morphology information of amorphous
+    #       condition: dictionary with the physical conditions
+    #       lattice: morphology information
     # and two arguments used as efficiency tricks:
     #       centres: list with the indexes of the excited molecules
     #       type type of the system
-    system = {'molecules': molecules, 'conditions': conditions, 'centres': centre_indexes, 'type': '3d_ordered'}
+    system = {'molecules': molecules, 'conditions': conditions, 'lattice': lattice,
+              'centres': centre_indexes, 'type': '3d_ordered'}
 
     return system
 

@@ -16,7 +16,7 @@ ja estigui calculat.
 
 Acoplaments considerats:
     Acoplament de Förster entre una molècula en l'estat singlet 1 i una en el singlet 0 (estat fonamental).
-        Etiqueta: s_1_g_s
+        Etiqueta: s1_gs
         Funció: compute_forster_coupling
 """
 
@@ -58,7 +58,7 @@ def compute_forster_coupling(donor, acceptor, conditions):
 #                               DICTIONARY COUPLINGS
 ##########################################################################################
 
-couplings = {'s_1_g_s': compute_forster_coupling}
+couplings = {'s1_gs': compute_forster_coupling}
 
 
 ###############################################################################################

@@ -20,7 +20,15 @@ def neighbourhood(centre, system, radius=1.05):
 
     # some connectivity tricks have been defined for specific cases: 1d, 2d ordered systems (squared systems).
 
-    if system['type'] == '1d_ordered':
+    # Flux control. We ensure that variable type is defined (in general will be an argument of system).
+    if 'type' in system:
+        type = system['type']
+
+    else:
+        type = None
+
+    # Connectivity 1d
+    if type == '1d_ordered':
         neighbours = [centre-1, centre+1]
 
         if centre == 0:                      # removes the previous if the center is in the first position of the list
@@ -28,22 +36,23 @@ def neighbourhood(centre, system, radius=1.05):
         elif centre == len(molecules)-1:     # removes the next if the center is in the last position of the list
             neighbours.remove(centre+1)
 
-    if system['type'] == '2d_ordered':
-        dimensions = system['conditions']['dimensions']
-        lat_param = system['conditions']['lattice_parameter']
+    # Connectivity 2d
+    if type == '2d_ordered':
+        dimensions = system['lattice']['dimensions']
+        lat_param = system['lattice']['lattice_parameter']
 
         neighbours = [centre-dimensions[1], centre-1, centre+1, centre+dimensions[1]]
         # the previous and the next molecule are taken. Besides, the molecules of the adjacent columns need to be taken
         # The number of molecules per column is used to take these last positions
 
         # if the excited molecule is on the border of the system the extra molecules are removed.
-        if center_position[0] == -dimensions[0]*lat_param / 2:                  # **
+        if center_position[0] == -dimensions[0]*lat_param[0] / 2:                  # **
             neighbours.remove(centre-dimensions[1])
-        elif center_position[1] == -dimensions[1]*lat_param / 2:                # **
+        elif center_position[1] == -dimensions[1]*lat_param[1] / 2:                # **
             neighbours.remove(centre-1)
-        elif center_position[0] == dimensions[0] * lat_param / 2 - lat_param:   # **
+        elif center_position[0] == dimensions[0] * lat_param[0] / 2 - lat_param[0]:   # **
             neighbours.remove(centre + dimensions[1])
-        elif center_position[1] == dimensions[1] * lat_param / 2 - lat_param:   # **
+        elif center_position[1] == dimensions[1] * lat_param[1] / 2 - lat_param[1]:   # **
             neighbours.remove(centre+1)
         # **: bordering coordinates for each side
         # the way they are chosen and removed has been tested.
@@ -60,6 +69,7 @@ def neighbourhood(centre, system, radius=1.05):
             if 0 < distance.euclidean(center_position, coordinates) < radius:
                 neighbours.append(i)
 
+    # Printed alert if no neighbours are found.
     if len(neighbours) == 0:
         print('No neighbours found. Check neighbourhood radius')
 

@@ -66,7 +66,7 @@ for j in range(num_trajectories):
         path.append(change_step)
         print(i)
 
-        if check_finish(system) is True:                    # S'HA DE CANVIAR
+        if check_finish(system) is True:
             break
 
         if i == max_steps-1:

@@ -93,6 +93,7 @@ def get_processes_and_rates(centre, neighbour_indexes, system):
 
     return process_list, rate_list
 
+
 """
 Things to be changed:
     process and rates must be splitted when calling get_transfer/decay_rates

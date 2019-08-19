@@ -7,8 +7,8 @@ s'usaran com a claus dels diccionaris que contenguin informació sobre els excit
 relaxation_energies, exciton_energies, (REFERENTS A RATES...).
 
 ESTATS POSSIBLES:
-    ESTAT FONAMENTAL: 'g_s'
-    SINGLET 1: 's_1
+    ESTAT FONAMENTAL: 'gs'
+    SINGLET 1: 's1
 
 
 Aquesta carpeta recull les funcions en què apareixen explicitament els processos de transfarència i decaïment possible
@@ -16,7 +16,7 @@ a fi de què si se'n ha d'afegir o llevar algun només calgui modificar aquests 
 del programa es vegi afectada.
 
 PROCESSOS POSSIBLES:
-    SINGLET_1 TRANSFER: 's_1_g_s'
+    SINGLET_1 TRANSFER: 's1_gs'
     SINGLET_1 RADIATIVE DECAY: 'Singlet_radiative_decay'
 
 
@@ -52,8 +52,8 @@ IMPORTANT. DEFINICIÓ DE LES CLAUS.
     Les referències dels possibles processos de transfarència seran les que s'usaran com a claus dels diccionaris
     transfer_rates i couplings. Així com les que s'usaran per identificar com s'ha d'actualitzar el sistema. És per això
     que s'ha de seguir un conveni. La clau es construirà com: 'state1_state2' i farà referència a una excitació en state1
-    que es propaga a una molècula en state2. E.g, si tenim la propagació d'un singlet_1 a una molècula en l'estat
-    fonamental la clau del procés serà: 's_1_g_s'.
+    que es propaga a una molècula en state2. E.g, si tenim la propagació d'un singlet1 a una molècula en l'estat
+    fonamental la clau del procés serà: 's1_gs'.
 Aquesta informació no és necessaria de cara a un usuari que faci servir sols la interfície més externa, doncs aquest sols
 ha de saber les referències de cada estat. Les etiquetes de cada procés es construïran externament i en cap moment tendrà
 opció de canviar-les. Eventualment les veurà per pantalla. Fóra bo que sabés el significat d'aquestes.
