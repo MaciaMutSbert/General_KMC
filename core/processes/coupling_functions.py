@@ -3,23 +3,6 @@ from scipy.spatial import distance
 from conversion_functions import from_nm_to_au
 
 
-"""
-COUPLING FUNCTIONS:
-En aquest arxiu contruïm un diccionari amb les funcions per calcular els acoplaments electrònics entre el donant i
-l'acceptor. Totes aquestes funcions rebran els mateixos arguments: molecule1 (donor), molecule2 (acceptor) i el diccionari amb 
-les condicions físiques del sistema (conditions). Consta de 3 parts diferenciades:
-        Definició de les funcions que calcularan els diferents acoplaments electrònics
-        Definició del diccionari i les seves claus
-        Definició d'una sèrie de funcions auxiliars.
-A més definim un diccionari, coupling_memory, que anirà guardant els acoplaments calculats i serà usat en cas de que
-ja estigui calculat.
-
-Acoplaments considerats:
-    Acoplament de Förster entre una molècula en l'estat singlet 1 i una en el singlet 0 (estat fonamental).
-        Etiqueta: s1_gs
-        Funció: compute_forster_coupling
-"""
-
 ##########################################################################################
 #                                   COUOPLING FUNCTIONS
 ##########################################################################################
@@ -35,21 +18,30 @@ def compute_forster_coupling(donor, acceptor, conditions):
     :return: Förster coupling between both molecules. We don't implement any correction for short distances.
     """
 
-    u_d = donor.get_transition_moment()
-    u_a = acceptor.get_transition_moment()
-    momentum_projection = np.dot(u_d, u_a)                  # a. u.
-    r_vector = intermolecular_vector(donor, acceptor)       # a. u.
-    r = np.linalg.norm(r_vector)                            # a. u.
-    n = conditions['refractive_index']
+    # definition of the parameters of the donor and acceptor needed in the calculation of the Förster coupling
+
+    u_d = donor.get_transition_moment()                     # transition dipole moment (donor) a.u
+    u_a = acceptor.get_transition_moment()                  # transition dipole moment (acceptor) a.u
+    momentum_projection = np.dot(u_d, u_a)                  # inner product of both a.u
+
+    r_vector = intermolecular_vector(donor, acceptor)       # position vector between donor and acceptor
+    r = np.linalg.norm(r_vector)                            # inter molecular distance a.u
+
+    n = conditions['refractive_index']                      # refractive index of the material
 
     info = str(hash((momentum_projection, r, n, 'förster')))
+    # we define a compact string with the characteristic information of the coupling
+
     if info in coupling_memory:
+        # use of the memory for computed situations
         forster_coupling = coupling_memory[info]
 
     else:
-        k = orientational_factor(u_d, u_a, r_vector)
-        forster_coupling = k**2 * momentum_projection / (n**2 * r**3)
-        coupling_memory[info] = forster_coupling
+        k = orientational_factor(u_d, u_a, r_vector)            # orientational factor between molecules
+
+        forster_coupling = k**2 * momentum_projection / (n**2 * r**3)       # electronic coupling a.u
+
+        coupling_memory[info] = forster_coupling                            # memory update for new couplings
 
     return forster_coupling
 

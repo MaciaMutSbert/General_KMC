@@ -133,6 +133,8 @@ def update_step(chosen_process, molecules, centre_indexes):
         centre_indexes.remove(chosen_process['donor'])
         # modification of the excited molecules indexes list
 
+    # No return function. Updates molecules and centre_indexes.
+
 
 ###########################################################################################################
 #                           ASSISTANT FUNCTIONS: spectral overlaps

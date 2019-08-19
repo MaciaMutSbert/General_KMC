@@ -1,6 +1,6 @@
 from initialize_systems import get_system
 from core import update_system, check_finish
-from analysis_functions import update_trajectory
+from analysis import update_trajectory
 import numpy as np
 import json
 from molecules import Molecule
@@ -35,8 +35,8 @@ conditions = {'temperature': 273.15,            # temperature of the system (K)
 #######################################################################################################################
 
 trajectories = []                               # list with the trajectories of all excitons
-num_trajectories = 2                        # number of trajectories that will be simulated
-max_steps = 10                               # maximum number of steps for trajectory allowed
+num_trajectories = 1000                         # number of trajectories that will be simulated
+max_steps = 10000                               # maximum number of steps for trajectory allowed
 
 for j in range(num_trajectories):
 
