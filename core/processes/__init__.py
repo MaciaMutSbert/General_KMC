@@ -60,7 +60,7 @@ def get_transfer_rates(centre, neighbour_indexes, system):
         else:
             # for the possible couplings computes the transfer rate by the Fermi's Golden Rule.
             for key in possible_couplings:
-                e_coupling = possible_couplings[key]
+                e_coupling = possible_couplings[key](donor, acceptor, conditions)
 
                 rate = 2*pi * e_coupling**2 * spectral_overlap          # rate in a.u -- Fermi's Golden Rule
                 transfer_rates.append(from_ns_to_au(rate, 'direct'))    # rate in ns⁻¹

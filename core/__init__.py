@@ -34,7 +34,7 @@ def update_system(system):
         # merging of the new list with the rates and processes previously computed
 
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
-    # chooses one of the processes using the Kinetic Monte-Carlo algorithm
+    # chooses one of the processes and gives it a duration using the Kinetic Monte-Carlo algorithm
 
     update_step(chosen_process, molecules, centre_indexes)        # updates both lists according to the chosen process
 
@@ -86,7 +86,7 @@ def get_processes_and_rates(centre, neighbour_indexes, system):
     # calls an external function that computes the decay rates for all possible decay processes of the centre.
     # Uses a method of the class Molecule
 
-    # merges all processes in a list and equally for the rates
+    # merges all processes in a list and the same for the rates
     # the indexes of the list must coincide (same length. rate 'i' is related to process 'i')
     process_list = decay_processes + transfer_processes
     rate_list = decay_rates + transfer_rates
@@ -94,16 +94,14 @@ def get_processes_and_rates(centre, neighbour_indexes, system):
     return process_list, rate_list
 
 
-"""
-Things to be changed:
-    process and rates must be splitted when calling get_transfer/decay_rates
-    in get_decay_rates the order of the arguments has to be changed (centre, system)
-    process_rate_splitter won't be needed anymore.
-"""
+####################################################################################################################
+
+####################################################################################################################
 
 
 def process_rate_splitter(transfer_rates, decay_rates, centre_index):
     """
+    NOT USED ANYMORE
     :param transfer_rates: Dictionary with the transferred molecule index as key and
     another dictionary {'process': rate} as argument
     :param decay_rates: Dictionary with the decay process as key and its rate as argument

@@ -1,6 +1,6 @@
 from initialize_systems import get_system
-from core.__init__ import update_system, check_finish
-from analysis_functions import get_trajectory
+from core import update_system, check_finish
+from analysis_functions import update_trajectory
 import numpy as np
 import json
 from molecules import Molecule
@@ -35,15 +35,15 @@ conditions = {'temperature': 273.15,            # temperature of the system (K)
 #######################################################################################################################
 
 trajectories = []                               # list with the trajectories of all excitons
-num_trajectories = 1000                         # number of trajectories that will be simulated
-max_steps = 10000                               # maximum number of steps for trajectory allowed
+num_trajectories = 2                        # number of trajectories that will be simulated
+max_steps = 10                               # maximum number of steps for trajectory allowed
 
 for j in range(num_trajectories):
 
     system = get_system(conditions=conditions,                  # dictionary with the physical conditions of the simulation
                         molecule=molecule,
                         lattice={'dimensions': [1000],          # dictionary lattice. dimensions: supercell of the crystall
-                                 'lattice_parameter': 1.0},     # lattice parameter (nm)
+                                 'lattice_parameter': [1.0]},     # lattice parameter (nm)
                         amorphous=None,                         # dictionary with a set of parameters for a disordered system
                         orientation='parallel',                 # orientation of the molecules: 'parallel', 'antiparallel', 'random'
                         initial_excitation={'s1': ['centre']})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
@@ -51,43 +51,54 @@ for j in range(num_trajectories):
 
 #    system is a dictionary with three keys:
 #       molecules: List of objects class Molecule
-#        conditions: dictionary with the physical conditions of the system such as temperature, refractive index...
-#        centre_indexes: list with the indexes of the excited molecules.
+#       conditions: dictionary with the physical conditions of the system such as temperature, refractive index...
+#       lattice/amorphous: dictionary with the morphology information
+#   Tricky entrances:
+#       centre_indexes: list with the indexes of the excited molecules.
+#       type (label for the system)
 #######################################################################################################################
 
-    time = [0.0]
-    path = []
+    path = []                          # list with the path followed by the system
+
+    trajectory = {'time': [0.0], 'n': [], 'positions': [], 'process': []}
+    # trajectory of the system. Gives the number of excited states, its positions and the process occurred at each time
+    # first output of the programm
 
     for i in range(max_steps):
 
         change_step, step_time = update_system(system)
+        # returns the process occurred {donor, process, acceptor} and the duration of this process
+        # also modifies system updating the dictionary with the information of change_step.
 
-        time.append(time[-1] + step_time)
         path.append(change_step)
         print(i)
 
+        update_trajectory(trajectory, change_step, step_time, system)
+        # the dictionary trajectory is updated with the information of the occurred process
+
         if check_finish(system) is True:
+            # checks if all excitons have decayed
             break
 
         if i == max_steps-1:
+            # wars the user if the maximum number of steps has been reached.
             print('Maximum number of steps reached!!')
 
     print('j= ', j)
-    trajectories.append(get_trajectory(path, time, system))
+    trajectories.append(trajectory)
 
 
 ###########################################################################################################
 # We collect all the outputs in a dictionary system_information and write it in the output_file
 
-system_information = {'conditions': conditions, 'state_energies': state_energies,
-                      'relaxation_energies': relaxation_energies, 'transition_moment': list(transition_moment),
-                      'order': order, 'dimensions': dimensions, 'lattice_parameter':  lattice_parameter,
-                      'orientation':  orientation,  'reference_orientation': list(reference_orientation),
-                      'excitons': excitons}
+system_information = {'conditions': conditions, 'state_energies': {'gs': 0, 's1': 2.5},
+                      'reorganization_energies': {'gs': 0, 's1': 0.7}, 'transition_moment': [1.2, 0, 0],
+                      'lattice': {'dimensions': [1000], 'lattice_parameter': [1.0]},
+                      'orientation':  'parallel', 'excitons': {'s1': ['centre']}}
 
 output = {'system_information': system_information, 'trajectories': trajectories, 'steps': max_steps}
 
-with open("results_file_test_neighbour.json", 'w') as write_file:
+with open(output_file_name, 'w') as write_file:
     json.dump(output, write_file)
 
 
