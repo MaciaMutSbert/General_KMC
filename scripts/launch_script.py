@@ -23,7 +23,7 @@ All energies must be given in eV. By default initialized at gs.
 
 molecule = Molecule(state_energies={'gs': 0, 's1': 2.5},                # excitation energies of the electronic states (eV)
                     reorganization_energies={'gs': 0, 's1': 0.7},       # reorganization energies of the states (eV)
-                    transition_moment=np.array([1.2, 0, 0]))            # transition dipole moment of the molecule (a.u)
+                    transition_moment=np.array([1.0, 0, 0]))            # transition dipole moment of the molecule (a.u)
 
 #######################################################################################################################
 
@@ -81,7 +81,7 @@ for j in range(num_trajectories):
             break
 
         if i == max_steps-1:
-            # wars the user if the maximum number of steps has been reached.
+            # warns the user if the maximum number of steps has been reached.
             print('Maximum number of steps reached!!')
 
     print('j= ', j)
@@ -94,10 +94,10 @@ for j in range(num_trajectories):
 # s'ha de veure com s'enllaça la informació que donam aquí amb la que es defineix a l'input #############
 
 system_information = {'conditions': system['conditions'], 'lattice': system['lattice'],
-                      'orientation': 'parallel', 'type': system['type']}
+                      'orientation': 'parallel', 'type': system['type'], 'excitons': {'s1': ['centre']}}
 
 molecule_information = {'state_energies': {'gs': 0, 's1': 2.5}, 'reorganization_energies': {'gs': 0, 's1': 0.7},
-                        'transition_moment': [1.2, 0, 0]}
+                        'transition_moment': [1.0, 0, 0]}
 
 
 output = {'system_information': system_information, 'molecules': molecule_information,

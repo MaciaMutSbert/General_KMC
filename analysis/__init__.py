@@ -15,15 +15,16 @@ def update_trajectory(trajectory, change_step, time_step, system):
 
     # excitons positions update:
     if len(system['centres']) == 0:
-        # if there is not any excited molecule saves exciton positions as None.
+        # if there is not any excited molecule saves the position of the last excited molecule.
         exciton_positions = None
+
 
     else:
         exciton_positions = []             # list with all the positions of the excited molecules (simultaneous)
         for centre in system['centres']:
 
-            exciton_coordinates =(system['molecules'][centre].molecular_coordinates())       # cartesian coordinates
-            excited_state = system['molecules'][centre].electronic_state()                  # electronic state
+            exciton_coordinates =list(system['molecules'][centre].molecular_coordinates())       # cartesian coordinates
+            excited_state = system['molecules'][centre].electronic_state()                       # electronic state
 
             # a tetra vector is built (x,y,z, state)
             exciton_point = [exciton_coordinates, excited_state]

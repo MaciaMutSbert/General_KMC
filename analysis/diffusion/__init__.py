@@ -21,15 +21,15 @@ def statistical_diffusion_study(trajectories, theoretical_values, system_informa
 
     linear_regression = linregress(mean_lifetimes, mean_square_distances)
 
-    # the diffusion constant is the slope of the line gained by the linear regression of the data
-    diffusion_constant = linear_regression[0]
-
     # PLOT OF <l²> vs <t> at each step
     diffusion_line(mean_square_distances, mean_lifetimes, linear_regression)
 
     # Diffusion length value (using theoretical lifetime):
     dimensionality = len(system_information['lattice']['dimensions'])
     theo_lifetime = theoretical_values['lifetime']
+
+    # the diffusion constant is the slope of the line gained by the linear regression of the data
+    diffusion_constant = linear_regression[0] / 2 * dimensionality
 
     return {'diffusion_constant': diffusion_constant,
             'diffusion_length': np.sqrt(2*dimensionality*diffusion_constant*theo_lifetime)}
@@ -66,6 +66,10 @@ def get_r2_t_averaged_lists(trajectories):
 
             else:
                 distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i][0][0]))**2
+                # we take the exciton position at step i.
+                # first 0 index --> position of the firts exciton (in case there were more excitons transferring)
+                # second 0 index --> takes the coordinates of the excited molecule (ignores the electronic state)
+
                 time_i = trajectory['time'][i]
 
                 squared_distances.append(distance_i_squared)
@@ -111,11 +115,14 @@ def diffusion_parameters(trajectories, theoretical_values, system_information):
 
     for trajectory in trajectories:
         coordinates = trajectory['positions'][-2][0][0]
-        print(coordinates)
+        # we take the position of the last excited molecule. position -1 is None (would be the same as -2 since it
+        # accounts for a decay process)
+        # first 0 index --> position of the first exciton (in case there were more excitons transferring)
+        # second 0 index --> takes the coordinates of the excited molecule (ignores the electronic state)
+
         final_distance_squared = np.linalg.norm(np.array(coordinates)) ** 2
         final_time = trajectory['time'][-1]
-        print(final_time)
-
+        # time -1 takes into account the decay time too
 
         # squared final distances and total times for each trajectory are collected
         squared_distances.append(final_distance_squared)

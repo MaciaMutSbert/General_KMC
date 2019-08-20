@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def final_distances_histogram(squared_distances, bins=15):
+def final_distances_histogram(squared_distances, bins=10):
     """
     :param squared_distances:
     :param bins:

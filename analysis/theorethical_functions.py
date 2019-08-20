@@ -27,7 +27,7 @@ def theoretical_diffusion_values(system_information, molecule_information):
 
     # molecule information.     Again a generic object of molecule is initialized
 
-    excited_state = 's1'
+    excited_state = list(system_information['excitons'].keys())[0]
     # in a diffusion study there will be only on exciton, so only one key
 
     reorganization = molecule_information['reorganization_energies'][excited_state]
@@ -48,10 +48,8 @@ def theoretical_diffusion_values(system_information, molecule_information):
     decay_rates = generic_molecule.decay_rates()
     decay_sum = 0
     for decay in decay_rates:
-        print(decay_rates[decay])
         decay_sum =+ decay_rates[decay]
     life_time = 1 / decay_sum
-    print(life_time)
 
     ############################################################################################################
 
