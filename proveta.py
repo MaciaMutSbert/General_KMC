@@ -91,12 +91,17 @@ for j in range(num_trajectories):
 ###########################################################################################################
 # We collect all the outputs in a dictionary system_information and write it in the output_file
 
-system_information = {'conditions': conditions, 'state_energies': {'gs': 0, 's1': 2.5},
-                      'reorganization_energies': {'gs': 0, 's1': 0.7}, 'transition_moment': [1.2, 0, 0],
-                      'lattice': {'dimensions': [1000], 'lattice_parameter': [1.0]},
-                      'orientation':  'parallel', 'excitons': {'s1': ['centre']}}
+# s'ha de veure com s'enllaça la informació que donam aquí amb la que es defineix a l'input #############
 
-output = {'system_information': system_information, 'trajectories': trajectories, 'steps': max_steps}
+system_information = {'conditions': system['conditions'], 'lattice': system['lattice'],
+                      'orientation': 'parallel', 'type': system['type']}
+
+molecule_information = {'state_energies': {'gs': 0, 's1': 2.5}, 'reorganization_energies': {'gs': 0, 's1': 0.7},
+                        'transition_moment': [1.2, 0, 0]}
+
+
+output = {'system_information': system_information, 'molecules': molecule_information,
+          'trajectories': trajectories, 'steps': max_steps}
 
 with open(output_file_name, 'w') as write_file:
     json.dump(output, write_file)

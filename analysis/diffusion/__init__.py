@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial import distance
-import matplotlib.pyplot as plt
+from analysis.diffusion.diffusion_plots import final_distances_histogram, diffusion_length_and_lifetime_convergence
 
 
 def statistical_diffusivity(trajectories, trajenctories_steps, dimensionality):
@@ -45,32 +45,64 @@ def statistical_diffusivity(trajectories, trajenctories_steps, dimensionality):
             'life_times': mean_lifetime_list}
 
 
-def diffusion_parameters(trajectories, dimensionality):
+def diffusion_parameters(trajectories, system_information, theoretical_values):
     """
     :param trajectories: list with all the trajectories, each is a dictionary with a list with the positions,
     time to reach each position and the exciton transfer process.
-    :param dimensionality
+    :param system_information
+    :param theoretical_values
     :return: the diffusion length computed as the root mean square of the final positions of the trajectory
              the exciton life time computed as the average of the total time advance
              the diffusion constant computed with the two parameters above
     """
+
+    # dimensionality. Given by the length of the list dimensions
+    dimensionality = len(system_information['lattice']['dimensions'])
+
+    ############################################################################################################
+    # the experimental diffusion length is computed as the root mean square of
+    # the final position distances of the exciton
     squared_distances = []
+
+    # the life time of the exciton is taken as the average of the total
+    # time duration of the exciton over all trajectories
+    durations = []
+    ############################################################################################################
+
+    # the convergence of the root mean square of the final distances and total duration to the theoretical
+    # values when adding trajectories will also be studied.
+    root_mean_square = []
     lifetimes = []
+
     for trajectory in trajectories:
         final_distance_squared = np.linalg.norm(np.array(trajectory['positions'][-1])) ** 2
         final_time = trajectory['time_advance'][-1]
 
+        # squared final distances and total times for each trajectory are collected
         squared_distances.append(final_distance_squared)
-        lifetimes.append(final_time)
+        durations.append(final_time)
 
-    "Histograma amb les posicions finals"
-    plt.hist(np.sqrt(squared_distances), bins=15)
-    plt.title('Final positions histogram')
-    plt.show()
+        # we average these list for each new value added
+        root_mean_square.append(np.sqrt(np.average(squared_distances)))
+        lifetimes.append(np.average(np.average(durations)))
 
-    return {'diffusion_length': np.sqrt(np.average(squared_distances)),
-            'exciton_lifetime': np.average(lifetimes),
-            'diffusion_constant': np.average(squared_distances) / (2 * dimensionality * np.average(lifetimes))}
+    ############################################################################################################
+
+    #   CONVERGENCE OF THE EXPERIMENTAL VALUES PLOT
+    diffusion_length_and_lifetime_convergence(root_mean_square, lifetimes, theoretical_values)
+
+    #   FINAL DISTANCES HISTOGRAM
+    final_distances_histogram(squared_distances)
+
+    #############################################################################################
+
+    # returns the diffusion parameters in a dictionary
+    return {'diffusion_length': root_mean_square[-1],
+            'exciton_lifetime': lifetimes[-1],
+            'diffusion_constant': np.average(squared_distances) / (2 * dimensionality * lifetimes[-1])}
+
+
+###############################################################################################################
 
 
 def statistics(sample_set):
