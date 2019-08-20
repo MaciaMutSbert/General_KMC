@@ -1,7 +1,7 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from analysis.diffusion import statistical_diffusivity, diffusion_parameters
+from analysis.diffusion import statistical_diffusion_study, diffusion_parameters
 from analysis.theorethical_functions import theoretical_diffusion_values
 
 
@@ -30,32 +30,21 @@ diffusion_theoretical = theoretical_diffusion_values(system_information, molecul
 # offers 3 plots:
 #       convergence of the diffusion length and exciton values to the theoretical values
 #       histogram of the final distances of the exciton
-diffusion_experimental = diffusion_parameters(trajectories, system_information, diffusion_theoretical)
+diffusion_experimental = diffusion_parameters(trajectories, diffusion_theoretical, system_information)
 
 ################################################################################################################
 
+# calculation of the diffusion constant from the statistical study of the points of the trajectory
+# uses the theoretical value of the lifetime to compute the diffusion length
+# plot offered:
+#       points (<r²>, <t>) over the trajectories at each step
+#       lineal regression of these set of values: the slope of the line is the diffusion constant.
 
+diffusion_statistical = statistical_diffusion_study(trajectories, diffusion_theoretical, system_information)
 
+################################################################################################################
 
-"Dictionary with a list of diffusion parameters computed for every iteration"
-diffusion_statistical_study = statistical_diffusivity(trajectories, trajectory_steps, dimensionality)
-
-stad_diffusion_constant = np.average(np.array(diffusion_statistical_study['diffusion_constants']))
-stad_diffusion_length = stad_diffusion_constant * diffusion_theoretical['life_time']
-
-diffusion_statistical_values = {'diffusion_constant': stad_diffusion_constant,
-                                'diffusion_length': stad_diffusion_length}
-
-print('\n Statistical values:')
-print(diffusion_statistical_values)
-
-
-
-print('\n Experimental values')
-print(diffusion_experimental)
-
-
-diffusion_results_1d = {'theorical': diffusion_theoretical, 'statistical': diffusion_statistical_values,
+diffusion_results_1d = {'theorical': diffusion_theoretical, 'statistical': diffusion_statistical,
                         'experimental': diffusion_experimental}
 
 with open('diffusion_results_1d.json', 'w') as write_file:

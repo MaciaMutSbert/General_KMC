@@ -1,51 +1,45 @@
 import numpy as np
 from scipy.spatial import distance
-from analysis.diffusion.diffusion_plots import final_distances_histogram, diffusion_length_and_lifetime_convergence
+from scipy.stats import linregress
+from analysis.diffusion.diffusion_plots import final_distances_histogram, diffusion_length_and_lifetime_convergence,\
+    diffusion_line
 
 
-def statistical_diffusivity(trajectories, trajenctories_steps, dimensionality):
+def statistical_diffusion_study(trajectories, theoretical_values, system_information):
     """
     :param trajectories: list with all the trajectories, each is a dictionary with a list with the positions,
     time to reach each position and the exciton transfer process.
-    :param hops: Number of steps of the trajectory (len of the lists in trajectory), the same for all of them
-    :param dimensionality
+    :param theoretical_values: theoretical values computed
+    :param system_information:
     :return: the diffusivity constant computed using all the points of all the trajectories.
         For each step we computed the mean square of the distance and the mean time.
         Doing the lineal regression of all these couple of values, the diffusivity constant is defined as the
         slope of the line (except for a dimensional parameter depending of the dimensionality.
     """
 
-    mean_square_distance_list = []
-    mean_lifetime_list = []
-    set_of_points = []
+    # STATISTICAL CALCULATION OF D
+    mean_square_distances, mean_lifetimes = get_r2_t_averaged_lists(trajectories)
 
-    steps = 250               # prenem un número fixe de steps per fer l'estudi estadístic (triat per tenir el resultat òptim).
-    print(steps)
-    for i in range(1, steps):
-        squared_distances = []
-        time = []
-        for trajectory in trajectories:
-            if i >= len(trajectory['positions']):
-                count = 0
-            else:
-                distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i]))**2
-                time_i = trajectory['time_advance'][i]
+    linear_regression = linregress(mean_lifetimes, mean_square_distances)
 
-                squared_distances.append(distance_i_squared)
-                time.append(time_i)
+    # the diffusion constant is the slope of the line gained by the linear regression of the data
+    diffusion_constant = linear_regression[0]
 
-        mean_square_distance_list.append(np.average(np.array(squared_distances)))
-        mean_lifetime_list.append(np.average(np.array(time)))
+    # PLOT OF <l²> vs <t> at each step
+    diffusion_line(mean_square_distances, mean_lifetimes, linear_regression)
 
-        set_of_points.append([np.average(squared_distances), np.average(time)])
+    # Diffusion length value (using theoretical lifetime):
+    dimensionality = len(system_information['lattice']['dimensions'])
+    theo_lifetime = theoretical_values['lifetime']
 
-    diffusion_constant_list = np.array(mean_square_distance_list) / (np.array(mean_lifetime_list) *2*dimensionality)
-
-    return {'diffusion_constants': diffusion_constant_list, 'mean_square_distances':mean_square_distance_list,
-            'life_times': mean_lifetime_list}
+    return {'diffusion_constant': diffusion_constant,
+            'diffusion_length': np.sqrt(2*dimensionality*diffusion_constant*theo_lifetime)}
 
 
-def diffusion_parameters(trajectories, system_information, theoretical_values):
+
+
+
+def diffusion_parameters(trajectories, theoretical_values, system_information):
     """
     :param trajectories: list with all the trajectories, each is a dictionary with a list with the positions,
     time to reach each position and the exciton transfer process.
@@ -105,6 +99,48 @@ def diffusion_parameters(trajectories, system_information, theoretical_values):
 ###############################################################################################################
 
 
+def get_r2_t_averaged_lists(trajectories):
+    """
+    :param trajectories: list with all the trajectories, each is a dictionary with a list with the positions,
+    time to reach each position and the exciton transfer process.
+    :return: list with the mean square distances of the trajectories at every step
+             list with the average time over all trajectories at every step
+    """
+
+    mean_square_distance_list = []                  # mean square distances at each step
+    mean_lifetime_list = []                         # averaged time over the trajectories at each step
+
+    # a fixed number of steps is defined. Taken as the averaged length of trajectories:
+    lengths = []
+    for trajectory in trajectories:
+        lengths.append(len(trajectory['positions']))
+    steps = np.average(np.array(lengths))
+
+    for i in range(0, steps):
+        squared_distances = []              # list of the squared distances of all trajectories at a fixed step
+        time = []                           # analogous for the time
+
+        for trajectory in trajectories:
+
+            if i >= len(trajectory['positions']):
+                count = 0           # no values added if the trajectory is shorter than the fixed step (length)
+
+            else:
+                distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i]))**2
+                time_i = trajectory['time_advance'][i]
+
+                squared_distances.append(distance_i_squared)
+                time.append(time_i)
+
+        mean_square_distance_list.append(np.average(np.array(squared_distances)))
+        mean_lifetime_list.append(np.average(np.array(time)))
+
+    return mean_square_distance_list, mean_lifetime_list
+
+
+###############################################################################################################
+
+
 def statistics(sample_set):
     average = np.average(np.array(sample_set))
     deviation = np.std(np.array(sample_set))
@@ -112,62 +148,3 @@ def statistics(sample_set):
     return average, deviation
 
 
-###############################################################################################################
-
-#               NOT USED FUNCTIONS
-
-
-def moved_length(initial_position, final_position):
-    return distance.euclidean(np.array(initial_position), np.array(final_position))
-
-
-def final_position(path_list, system):
-    """
-    :param path_list: List indicating the path of the exciton with dict(donor, process, acceptor)
-    :param system: includes the list of molecules
-    :return: the coordinates of the last acceptor
-    """
-    final_index = path_list[-1]['acceptor']
-
-    return system['molecules'][final_index].coordinates
-
-
-def initial_position(path_list, system):
-    """
-    :param path_list: List indicating the path of the exciton with dict(donor, process, acceptor)
-    :param system: includes the list of molecules
-    :return: the coordinates of the first donor
-    """
-    initial_index = path_list[0]['donor']
-
-    return system['molecules'][initial_index].coordinates
-
-
-def exciton_shift(initial_positions, final_positions):
-    """
-    :param initial_positions:
-    :param final_positions:
-    :return: List of the exciton covered distances.
-    """
-    shift_list = []
-
-    for i, initial in enumerate(initial_positions):
-        shift = distance.euclidean(np.array(initial), np.array(final_positions[i]))
-        shift_list.append(shift)
-
-    return shift_list
-
-
-def x_y_splitter(final_positions):
-    """
-    :param final_positions:
-    :return: List with final x positions and analogously for y.
-    """
-    x_list = []
-    y_list = []
-
-    for final in final_positions:
-        x_list.append(final[0])
-        y_list.append(final[1])
-
-    return x_list, y_list
