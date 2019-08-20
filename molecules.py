@@ -161,8 +161,8 @@ class Molecule:
 
         More if(s) entrances shall be added if more electronic states are considered.
         """
-        decay_rates = []
-        decay_processes = []
+
+        decay_rates = {}
 
         if self.state == 's1':
 
@@ -176,10 +176,9 @@ class Molecule:
             decay_process = 'Singlet_radiative_decay'
             # for a first singlet state only radiative decay is considered.
 
-            decay_rates.append(from_ns_to_au(rate, 'direct'))
-            decay_processes.append(decay_process)
+            decay_rates[decay_process] = from_ns_to_au(rate, 'direct')
 
-        return [decay_processes, decay_rates]
+        return decay_rates
 
     def get_transition_moment(self):
         """

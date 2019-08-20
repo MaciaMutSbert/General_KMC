@@ -5,7 +5,7 @@ from analysis.diffusion import statistical_diffusion_study, diffusion_parameters
 from analysis.theorethical_functions import theoretical_diffusion_values
 
 
-input_file_name = '1d_simulation_trajectories.json'             # name of the file with the simulation data (.json)
+input_file_name = 'example_1d_simulation.json'             # name of the file with the simulation data (.json)
 
 with open(input_file_name, 'r') as read_file:                   # reading of the file (.json)
     simulation_data = json.load(read_file)
@@ -42,29 +42,29 @@ diffusion_experimental = diffusion_parameters(trajectories, diffusion_theoretica
 
 diffusion_statistical = statistical_diffusion_study(trajectories, diffusion_theoretical, system_information)
 
+
 ################################################################################################################
 
-diffusion_results_1d = {'theorical': diffusion_theoretical, 'statistical': diffusion_statistical,
-                        'experimental': diffusion_experimental}
+#   The results are saved in a json format file as a nested dictionary.
+#   A pretty print is also offered
+
+print('Theorethical values:')
+print(diffusion_theoretical)
+print("""--------------------
+        Simulation values:""")
+print(diffusion_experimental)
+print("""--------------------
+        Statistical values:""")
+print(diffusion_statistical)
+
+
+diffusion_results_1d = {'theorical': diffusion_theoretical, 'experimental': diffusion_experimental,
+                        'statistical': diffusion_statistical}
 
 with open('diffusion_results_1d.json', 'w') as write_file:
     json.dump(diffusion_results_1d, write_file)
 
 
-r_square = diffusion_statistical_study['mean_square_distances']
-lifetime = diffusion_statistical_study['life_times']
-
-
-"Gràfica r**2 vs t (lifetime), ha de ser una recta de pendent D"
-plt.plot(lifetime, r_square, 'ro')
-plt.xlabel('Exciton lifetime (ns)')
-plt.ylabel('Mean square distances (nm^2)')
-plt.title('Diffusion constant, r^2 vs t')
-plt.show()
-
-"Histograma amb les posicions finals"
-plt.hist(diffusion_experimental['max_distances'])
-plt.show()
 
 
 

@@ -35,7 +35,6 @@ def update_system(system):
 
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
     # chooses one of the processes and gives it a duration using the Kinetic Monte-Carlo algorithm
-
     update_step(chosen_process, molecules, centre_indexes)        # updates both lists according to the chosen process
 
     # finally the chosen process and the advanced time are returned

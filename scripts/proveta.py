@@ -35,7 +35,7 @@ conditions = {'temperature': 273.15,            # temperature of the system (K)
 #######################################################################################################################
 
 trajectories = []                               # list with the trajectories of all excitons
-num_trajectories = 1000                         # number of trajectories that will be simulated
+num_trajectories = 1                         # number of trajectories that will be simulated
 max_steps = 10000                               # maximum number of steps for trajectory allowed
 
 for j in range(num_trajectories):
@@ -71,7 +71,7 @@ for j in range(num_trajectories):
         # also modifies system updating the dictionary with the information of change_step.
 
         path.append(change_step)
-        print(i)
+        # print(i)
 
         update_trajectory(trajectory, change_step, step_time, system)
         # the dictionary trajectory is updated with the information of the occurred process

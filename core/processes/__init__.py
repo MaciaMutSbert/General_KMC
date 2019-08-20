@@ -65,7 +65,7 @@ def get_transfer_rates(centre, neighbour_indexes, system):
                 rate = 2*pi * e_coupling**2 * spectral_overlap          # rate in a.u -- Fermi's Golden Rule
                 transfer_rates.append(from_ns_to_au(rate, 'direct'))    # rate in ns⁻¹
 
-                transfer_processes.append({'donor': centre, 'process': key, 'acceptor': neighbour})
+                transfer_processes.append({'donor': int(centre), 'process': key, 'acceptor': int(neighbour)})
 
     return transfer_processes, transfer_rates
 
@@ -87,19 +87,21 @@ def get_decay_rates(centre, system):
     info = str(hash(donor.state))
     # we define a compact string with the characteristic information of the decays: electronic state
 
+    decay_processes = []
+    decay_rates = []
+
     if info in decay_memory:
         decay_complete = decay_memory[info]
         # the decay memory defined is used if the decay have been already computed
 
-    # decay_complete has two lists: decay_processes and decay_rates
-
     else:
         decay_complete = donor.decay_rates()
         decay_memory[info] = decay_complete
-        # new computed decays are added to the memory
 
-    decay_processes = decay_complete[0]
-    decay_rates = decay_complete[1]
+    for key in decay_complete:
+        decay_processes.append({'donor': centre, 'process': key, 'acceptor': centre})
+        decay_rates.append(decay_complete[key])
+
     return decay_processes, decay_rates
 
 
@@ -118,8 +120,7 @@ def update_step(chosen_process, molecules, centre_indexes):
 
     New if(s) entrances shall be defined for more processes.
     """
-
-    if chosen_process['process'] == 's1_gs':
+    if chosen_process['process'] is 's1_gs':
         molecules[chosen_process['donor']].set_state('gs')          # des excitation of the donor
         molecules[chosen_process['acceptor']].set_state('s1')       # excitation of the acceptor
 
@@ -130,8 +131,9 @@ def update_step(chosen_process, molecules, centre_indexes):
     if chosen_process['process'] == 'Singlet_radiative_decay':
         molecules[chosen_process['donor']].set_state('gs')          # des excitation of the donor
 
-        centre_indexes.remove(chosen_process['donor'])
+        centre_indexes.remove(chosen_process['acceptor'])
         # modification of the excited molecules indexes list
+
 
     # No return function. Updates molecules and centre_indexes.
 

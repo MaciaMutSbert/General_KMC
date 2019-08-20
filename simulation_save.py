@@ -1,5 +1,4 @@
-from proveta import diffusion_length, diffusion_length_time_residence, final_positions, exciton_shift, ld_rms,\
-    ld_rms_average, life_time
+from scripts.proveta import diffusion_length, final_positions, exciton_shift, ld_rms_average, life_time
 from result_analysis import x_y_splitter
 import matplotlib.pyplot as plt
 import numpy as np

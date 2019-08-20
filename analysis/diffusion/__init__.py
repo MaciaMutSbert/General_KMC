@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.spatial import distance
 from scipy.stats import linregress
 from analysis.diffusion.diffusion_plots import final_distances_histogram, diffusion_length_and_lifetime_convergence,\
     diffusion_line
@@ -36,7 +35,49 @@ def statistical_diffusion_study(trajectories, theoretical_values, system_informa
             'diffusion_length': np.sqrt(2*dimensionality*diffusion_constant*theo_lifetime)}
 
 
+###############################################################################################################
 
+
+def get_r2_t_averaged_lists(trajectories):
+    """
+    :param trajectories: list with all the trajectories, each is a dictionary with a list with the positions,
+    time to reach each position and the exciton transfer process.
+    :return: list with the mean square distances of the trajectories at every step
+             list with the average time over all trajectories at every step
+    """
+
+    mean_square_distance_list = []                  # mean square distances at each step
+    mean_lifetime_list = []                         # averaged time over the trajectories at each step
+
+    # a fixed number of steps is defined. Taken as the averaged length of trajectories:
+    lengths = []
+    for trajectory in trajectories:
+        lengths.append(len(trajectory['positions']))
+    steps = np.average(np.array(lengths))
+
+    for i in range(0, steps):
+        squared_distances = []              # list of the squared distances of all trajectories at a fixed step
+        time = []                           # analogous for the time
+
+        for trajectory in trajectories:
+
+            if i >= len(trajectory['positions']):
+                count = 0           # no values added if the trajectory is shorter than the fixed step (length)
+
+            else:
+                distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i]))**2
+                time_i = trajectory['time_advance'][i]
+
+                squared_distances.append(distance_i_squared)
+                time.append(time_i)
+
+        mean_square_distance_list.append(np.average(np.array(squared_distances)))
+        mean_lifetime_list.append(np.average(np.array(time)))
+
+    return mean_square_distance_list, mean_lifetime_list
+
+
+###############################################################################################################
 
 
 def diffusion_parameters(trajectories, theoretical_values, system_information):
@@ -94,57 +135,3 @@ def diffusion_parameters(trajectories, theoretical_values, system_information):
     return {'diffusion_length': root_mean_square[-1],
             'exciton_lifetime': lifetimes[-1],
             'diffusion_constant': np.average(squared_distances) / (2 * dimensionality * lifetimes[-1])}
-
-
-###############################################################################################################
-
-
-def get_r2_t_averaged_lists(trajectories):
-    """
-    :param trajectories: list with all the trajectories, each is a dictionary with a list with the positions,
-    time to reach each position and the exciton transfer process.
-    :return: list with the mean square distances of the trajectories at every step
-             list with the average time over all trajectories at every step
-    """
-
-    mean_square_distance_list = []                  # mean square distances at each step
-    mean_lifetime_list = []                         # averaged time over the trajectories at each step
-
-    # a fixed number of steps is defined. Taken as the averaged length of trajectories:
-    lengths = []
-    for trajectory in trajectories:
-        lengths.append(len(trajectory['positions']))
-    steps = np.average(np.array(lengths))
-
-    for i in range(0, steps):
-        squared_distances = []              # list of the squared distances of all trajectories at a fixed step
-        time = []                           # analogous for the time
-
-        for trajectory in trajectories:
-
-            if i >= len(trajectory['positions']):
-                count = 0           # no values added if the trajectory is shorter than the fixed step (length)
-
-            else:
-                distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i]))**2
-                time_i = trajectory['time_advance'][i]
-
-                squared_distances.append(distance_i_squared)
-                time.append(time_i)
-
-        mean_square_distance_list.append(np.average(np.array(squared_distances)))
-        mean_lifetime_list.append(np.average(np.array(time)))
-
-    return mean_square_distance_list, mean_lifetime_list
-
-
-###############################################################################################################
-
-
-def statistics(sample_set):
-    average = np.average(np.array(sample_set))
-    deviation = np.std(np.array(sample_set))
-
-    return average, deviation
-
-
