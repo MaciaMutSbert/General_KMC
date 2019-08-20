@@ -68,7 +68,7 @@ def diffusion_line(mean_squared_distances, mean_lifetimes, linear_regression):
     :return: Plots the points <l²> vs <t> at every step and also the linear regression.
     """
 
-    regression_l_values = linear_regression[0] * mean_lifetimes + linear_regression[1]
+    regression_l_values = linear_regression[0] * np.array(mean_lifetimes) + linear_regression[1]
 
     plt.plot(mean_lifetimes, regression_l_values, label='Regression. $R^{2} = %.3f$' % linear_regression[2])
     plt.plot(mean_lifetimes, mean_squared_distances, 'ro', label='Simulation values')

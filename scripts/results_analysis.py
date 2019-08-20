@@ -1,6 +1,4 @@
 import json
-import numpy as np
-import matplotlib.pyplot as plt
 from analysis.diffusion import statistical_diffusion_study, diffusion_parameters
 from analysis.theorethical_functions import theoretical_diffusion_values
 

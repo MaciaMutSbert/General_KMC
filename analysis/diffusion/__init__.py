@@ -53,7 +53,7 @@ def get_r2_t_averaged_lists(trajectories):
     lengths = []
     for trajectory in trajectories:
         lengths.append(len(trajectory['positions']))
-    steps = np.average(np.array(lengths))
+    steps = int(np.average(np.array(lengths)))
 
     for i in range(0, steps):
         squared_distances = []              # list of the squared distances of all trajectories at a fixed step
@@ -61,12 +61,12 @@ def get_r2_t_averaged_lists(trajectories):
 
         for trajectory in trajectories:
 
-            if i >= len(trajectory['positions']):
+            if i >= len(trajectory['positions'])-1:
                 count = 0           # no values added if the trajectory is shorter than the fixed step (length)
 
             else:
-                distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i]))**2
-                time_i = trajectory['time_advance'][i]
+                distance_i_squared = np.linalg.norm(np.array(trajectory['positions'][i][0][0]))**2
+                time_i = trajectory['time'][i]
 
                 squared_distances.append(distance_i_squared)
                 time.append(time_i)
@@ -110,8 +110,12 @@ def diffusion_parameters(trajectories, theoretical_values, system_information):
     lifetimes = []
 
     for trajectory in trajectories:
-        final_distance_squared = np.linalg.norm(np.array(trajectory['positions'][-1])) ** 2
-        final_time = trajectory['time_advance'][-1]
+        coordinates = trajectory['positions'][-2][0][0]
+        print(coordinates)
+        final_distance_squared = np.linalg.norm(np.array(coordinates)) ** 2
+        final_time = trajectory['time'][-1]
+        print(final_time)
+
 
         # squared final distances and total times for each trajectory are collected
         squared_distances.append(final_distance_squared)

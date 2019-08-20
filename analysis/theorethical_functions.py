@@ -21,24 +21,24 @@ def theoretical_diffusion_values(system_information, molecule_information):
     T = system_information['conditions']['temperature']             # temperature (K)
     n = system_information['conditions']['refractive_index']        # refractive index
 
-    d = len(system_information['dimensions'])                       # dimensionality of the system
+    d = len(system_information['lattice']['dimensions'])                       # dimensionality of the system
 
     ############################################################################################################
 
     # molecule information.     Again a generic object of molecule is initialized
 
-    excited_state = system_information['excitons'].keys()[0]
+    excited_state = 's1'
     # in a diffusion study there will be only on exciton, so only one key
 
     reorganization = molecule_information['reorganization_energies'][excited_state]
     # reorganization energy of the excited electronic state. eV
 
-    transition_moment_vector = system_information['transition_moment']          # transition dipole moment (a.u)
+    transition_moment_vector = molecule_information['transition_moment']          # transition dipole moment (a.u)
     transition_moment = np.linalg.norm(transition_moment_vector)                # modulus
 
     # initialization of a generic instance of class molecule
-    generic_molecule = Molecule(state_energies=system_information['state_energies'],
-                                state='s_1', reorganization_energies=system_information['relaxation_energies'],
+    generic_molecule = Molecule(state_energies=molecule_information['state_energies'],
+                                state='s1', reorganization_energies=molecule_information['reorganization_energies'],
                                 transition_moment=transition_moment_vector)
 
     ############################################################################################################
@@ -48,8 +48,10 @@ def theoretical_diffusion_values(system_information, molecule_information):
     decay_rates = generic_molecule.decay_rates()
     decay_sum = 0
     for decay in decay_rates:
+        print(decay_rates[decay])
         decay_sum =+ decay_rates[decay]
     life_time = 1 / decay_sum
+    print(life_time)
 
     ############################################################################################################
 

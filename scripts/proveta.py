@@ -35,7 +35,7 @@ conditions = {'temperature': 273.15,            # temperature of the system (K)
 #######################################################################################################################
 
 trajectories = []                               # list with the trajectories of all excitons
-num_trajectories = 1                         # number of trajectories that will be simulated
+num_trajectories = 100                         # number of trajectories that will be simulated
 max_steps = 10000                               # maximum number of steps for trajectory allowed
 
 for j in range(num_trajectories):
@@ -101,7 +101,7 @@ molecule_information = {'state_energies': {'gs': 0, 's1': 2.5}, 'reorganization_
 
 
 output = {'system_information': system_information, 'molecules': molecule_information,
-          'trajectories': trajectories, 'steps': max_steps}
+          'trajectories': trajectories, 'max_steps': max_steps}
 
 with open(output_file_name, 'w') as write_file:
     json.dump(output, write_file)

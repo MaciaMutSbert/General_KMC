@@ -22,10 +22,11 @@ def update_trajectory(trajectory, change_step, time_step, system):
         exciton_positions = []             # list with all the positions of the excited molecules (simultaneous)
         for centre in system['centres']:
 
-            exciton_point = list(system['molecules'][centre].molecular_coordinates())       # cartesian coordinates
-            exciton_point.append(system['molecules'][centre].electronic_state())            # electronic state
-            # a tetra vector is built (x,y,z, state)
+            exciton_coordinates =(system['molecules'][centre].molecular_coordinates())       # cartesian coordinates
+            excited_state = system['molecules'][centre].electronic_state()                  # electronic state
 
+            # a tetra vector is built (x,y,z, state)
+            exciton_point = [exciton_coordinates, excited_state]
             exciton_positions.append(exciton_point)
 
     trajectory['positions'].append(exciton_positions)
@@ -36,20 +37,3 @@ def update_trajectory(trajectory, change_step, time_step, system):
     # No return function: only updates trajectory.
 
 
-###############################################################################################################
-
-#               NOT USED FUNCTION
-
-
-def get_trajectory(path_collector, time_advance, system_):
-    molecules = system_['molecules']
-    positions = []
-    states = []
-
-    positions.append(list(molecules[path_collector[0]['donor']].molecular_coordinates()))
-
-    for path in path_collector:
-        positions.append(list(molecules[path['acceptor']].molecular_coordinates()))
-        states.append(path['process'])
-
-    return {'positions': positions, 'time_advance': time_advance, 'state': states}

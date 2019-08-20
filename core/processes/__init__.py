@@ -87,17 +87,18 @@ def get_decay_rates(centre, system):
     info = str(hash(donor.state))
     # we define a compact string with the characteristic information of the decays: electronic state
 
-    decay_processes = []
-    decay_rates = []
+    decay_processes = []            # list of decays processes: dicts(donor, process, acceptor)
+    decay_rates = []                # list of the decay rates (numerical values)
 
     if info in decay_memory:
         decay_complete = decay_memory[info]
         # the decay memory defined is used if the decay have been already computed
 
     else:
-        decay_complete = donor.decay_rates()
-        decay_memory[info] = decay_complete
+        decay_complete = donor.decay_rates()        # returns a dict {decay_process, decay_rate}
+        decay_memory[info] = decay_complete         # saves it if not in memory
 
+    # splits the dictionary in two lists
     for key in decay_complete:
         decay_processes.append({'donor': centre, 'process': key, 'acceptor': centre})
         decay_rates.append(decay_complete[key])
@@ -133,7 +134,6 @@ def update_step(chosen_process, molecules, centre_indexes):
 
         centre_indexes.remove(chosen_process['acceptor'])
         # modification of the excited molecules indexes list
-
 
     # No return function. Updates molecules and centre_indexes.
 
