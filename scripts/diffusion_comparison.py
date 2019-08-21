@@ -32,7 +32,7 @@ ref_squared_distance_set = 2 * ref_diffusion_constant * ref_time_set
 ################################################
 
 # NEW DATA. TRANSITION DIPOLE MOMENT = [2,0,0]
-file_1 = 'diffusion_results_1d_mu_2.json'
+file_1 = 'diffusion_results_1d_mu_1-1.json'
 
 with open(file_1, 'r') as readfile:
     data_1 = json.load(readfile)
@@ -50,7 +50,7 @@ squared_distance_set_1 = 2 * diffusion_constant_1 * time_set_1
 
 # PLOTS l² vs t for both cases
 plt.plot(ref_time_set, ref_squared_distance_set, color='b', label='$ mu = 1, D= %.3f $' % ref_diffusion_constant)
-plt.plot(time_set_1, squared_distance_set_1, color='r', label='$ mu = 2, D= %.3f $' % diffusion_constant_1)
+plt.plot(time_set_1, squared_distance_set_1, color='r', label='$ mu = 1.1, D= %.3f $' % diffusion_constant_1)
 plt.xlabel('$ Time, ns $')
 plt.ylabel('$ l^2, nm $')
 plt.legend()

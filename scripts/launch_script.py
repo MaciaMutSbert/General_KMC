@@ -8,7 +8,7 @@ from molecules import Molecule
 
 #######################################################################################################################
 
-output_file_name = 'example_1d_simulation_mu_2.json'       # name of the output file where the trajectories will be saved
+output_file_name = 'example_1d_simulation_mu_1-1.json'       # name of the output file where the trajectories will be saved
                                                         # .json format
 
 #######################################################################################################################
@@ -22,7 +22,7 @@ All energies must be given in eV. By default initialized at gs.
 """
 state_energies = {'gs': 0, 's1': 2.5}                           # excitation energies of the electronic states (eV)
 reorganization_energies = {'gs': 0, 's1': 0.7}                  # reorganization energies of the states (eV)
-transition_dipole_moment = np.array([2.0, 0, 0])                # transition dipole moment of the molecule (a.u)
+transition_dipole_moment = np.array([1.1, 0, 0])                # transition dipole moment of the molecule (a.u)
 
 molecule = Molecule(state_energies=state_energies,
                     reorganization_energies=reorganization_energies,
