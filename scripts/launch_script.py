@@ -8,7 +8,7 @@ from molecules import Molecule
 
 #######################################################################################################################
 
-output_file_name = 'example_1d_simulation_2.json'         # name of the output file where the trajectories will be saved
+output_file_name = 'example_1d_simulation_2.json'       # name of the output file where the trajectories will be saved
                                                         # .json format
 
 #######################################################################################################################
