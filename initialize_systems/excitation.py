@@ -31,7 +31,7 @@ def get_excited_index(position, centre_list, molecules, tolerance):
     """
 
     if type(position) == int:
-        return position
+        return pick_index(position, centre_list, molecules)
 
     if type(position) == list:
         return pick_with_coordinates(position, centre_list, molecules, tolerance)
@@ -140,8 +140,11 @@ def pick_centre(centre_list, molecules, tolerance):
         index = pick_random(centre_list, molecules)
 
     if index is None:
-        print('Not centre found. Picks the closest molecule to the centre')
-        index = pick_closest(position=[0.0, 0.0, 0.0], molecules=molecules, centre_list=centre_list)
+        index, closest = pick_closest(position=[0.0, 0.0, 0.0], molecules=molecules, centre_list=centre_list)
+
+        if closest is True:
+            print('No molecule found in the desired position. Picks the closest.')
+            print('New position:', molecules[index].molecular_coordinates())
 
     return index
 
@@ -177,7 +180,8 @@ def pick_with_coordinates(position, centre_list, molecules, tolerance):
     :param molecules: list of all instances of class molecule
     :param tolerance: Since the centre may not coincide with the exact point we give this extra parameter.
     The function looks for a molecule in a cercle of radius = tolerance centered in the desired point
-    It is taken as the average over the lattice parameters in ordered systems and as 0.2 nm in disordered systems    :return:
+    It is taken as the average over the lattice parameters in ordered systems and as 0.2 nm in disordered systems
+    :return: the index of the excited molecule
     """
 
     desired_position = np.array(position)           # cartesian coordinates of the excited molecule
@@ -185,7 +189,7 @@ def pick_with_coordinates(position, centre_list, molecules, tolerance):
     index = None                                    # index will be considered None until a int is chosen
 
     for (i, molecule) in enumerate(molecules):
-        molecular_position = molecules.molecular_coordinates()              # position of molecule i
+        molecular_position = molecule.molecular_coordinates()              # position of molecule i
 
         inter_distance = distance.euclidean(desired_position, molecular_position)
         # distance between molecule i and the desired position
@@ -201,11 +205,11 @@ def pick_with_coordinates(position, centre_list, molecules, tolerance):
         index = pick_random(centre_list, molecules)
 
     if index is None:                           # if no molecule has been found in the position picks the closest.
+        index, closest = pick_closest(position, molecules, centre_list)
 
-        print('No molecule found in the desired position. Picks the closest.'
-              'Position', position)
-
-        index = pick_closest(position, molecules, centre_list)
+        if closest is True:
+            print('No molecule found in the desired position. Picks the closest.')
+            print('New position:', molecules[index].molecular_coordinates())
 
     return index
 
@@ -215,9 +219,10 @@ def pick_closest(position, molecules, centre_list):
     :param position: list with the coordinates of the excited molecule
     :param molecules: list of all instances of class molecule
     :param centre_list: list with the indexes of the excited molecules
-    :return:
+    :return: the index of the excited molecule
     """
     index = None                        # index is set to None until a number is chosen
+    closest = True                      # if true a closest molecule has been found
 
     desired_position = np.array(position)   # cartesian coordinates of the molecule
 
@@ -240,12 +245,36 @@ def pick_closest(position, molecules, centre_list):
         index = pick_random(centre_list, molecules)
 
     if index is None:
+        index = pick_random(centre_list, molecules)
         print('No molecule close to the desired position. Picks one randomly')
-        print('Position:', position)
+        print('New position:', molecules[index].molecular_coordinates())
+        closest = False
+
+    return index, closest
+
+
+def pick_index(position, centre_list, molecules):
+    """
+    :param position: index of molecules list where the exciton will be setted
+    :param centre_list: list with the excited molecules
+    :param molecules: list of all instances of class molecule
+    :return: the index of the excited molecule
+    """
+
+    if 0 <= position < len(molecules):
+        index = position
+
+        if index in centre_list:
+            index = pick_random(centre_list, molecules)
+
+    elif -len(molecules) <= position < 0:
+        index = len(molecules) + position
+
+        if index in centre_list:
+            index = pick_random(centre_list, molecules)
+
+    else:
+        print('Index out of range. Index chosen randomly')
         index = pick_random(centre_list, molecules)
 
     return index
-
-
-
-

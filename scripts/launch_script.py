@@ -8,7 +8,7 @@ from molecules import Molecule
 
 #######################################################################################################################
 
-output_file_name = 'example_1d_simulation_2.json'       # name of the output file where the trajectories will be saved
+output_file_name = 'example_1d_simulation.json'       # name of the output file where the trajectories will be saved
                                                         # .json format
 
 #######################################################################################################################
@@ -38,7 +38,7 @@ conditions = {'temperature': 273.15,            # temperature of the system (K)
 #######################################################################################################################
 
 trajectories = []                               # list with the trajectories of all excitons
-num_trajectories = 100                         # number of trajectories that will be simulated
+num_trajectories = 300                         # number of trajectories that will be simulated
 max_steps = 10000                               # maximum number of steps for trajectory allowed
 
 for j in range(num_trajectories):
@@ -51,13 +51,12 @@ for j in range(num_trajectories):
                         orientation='parallel',                 # orientation of the molecules: 'parallel', 'antiparallel', 'random'
                         initial_excitation={'s1': ['centre']})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
 
-
 #    system is a dictionary with three keys:
 #       molecules: List of objects class Molecule
 #       conditions: dictionary with the physical conditions of the system such as temperature, refractive index...
 #       lattice/amorphous: dictionary with the morphology information
 #   Tricky entrances:
-#       centre_indexes: list with the indexes of the excited molecules.
+#       centres: list with the indexes of the excited molecules.
 #       type (label for the system)
 #######################################################################################################################
 
