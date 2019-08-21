@@ -8,7 +8,7 @@ from molecules import Molecule
 
 #######################################################################################################################
 
-output_file_name = 'example_1d_simulation.json'         # name of the output file where the trajectories will be saved
+output_file_name = 'example_1d_simulation_2.json'         # name of the output file where the trajectories will be saved
                                                         # .json format
 
 #######################################################################################################################
@@ -20,10 +20,13 @@ Possible states:
     's1': first singlet state 
 All energies must be given in eV. By default initialized at gs.
 """
+state_energies = {'gs': 0, 's1': 2.5}                           # excitation energies of the electronic states (eV)
+reorganization_energies = {'gs': 0, 's1': 0.7}                  # reorganization energies of the states (eV)
+transition_dipole_moment = np.array([1.0, 0, 0])                # transition dipole moment of the molecule (a.u)
 
-molecule = Molecule(state_energies={'gs': 0, 's1': 2.5},                # excitation energies of the electronic states (eV)
-                    reorganization_energies={'gs': 0, 's1': 0.7},       # reorganization energies of the states (eV)
-                    transition_moment=np.array([1.0, 0, 0]))            # transition dipole moment of the molecule (a.u)
+molecule = Molecule(state_energies=state_energies,
+                    reorganization_energies=reorganization_energies,
+                    transition_moment=transition_dipole_moment)
 
 #######################################################################################################################
 
@@ -96,8 +99,8 @@ for j in range(num_trajectories):
 system_information = {'conditions': system['conditions'], 'lattice': system['lattice'],
                       'orientation': 'parallel', 'type': system['type'], 'excitons': {'s1': ['centre']}}
 
-molecule_information = {'state_energies': {'gs': 0, 's1': 2.5}, 'reorganization_energies': {'gs': 0, 's1': 0.7},
-                        'transition_moment': [1.0, 0, 0]}
+molecule_information = {'state_energies': state_energies, 'reorganization_energies': reorganization_energies,
+                        'transition_moment': list(transition_dipole_moment)}
 
 
 output = {'system_information': system_information, 'molecules': molecule_information,

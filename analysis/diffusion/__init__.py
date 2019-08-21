@@ -114,9 +114,8 @@ def diffusion_parameters(trajectories, theoretical_values, system_information):
     lifetimes = []
 
     for trajectory in trajectories:
-        coordinates = trajectory['positions'][-2][0][0]
-        # we take the position of the last excited molecule. position -1 is None (would be the same as -2 since it
-        # accounts for a decay process)
+        coordinates = trajectory['positions'][-1][0][0]
+        # we take the position of the last excited molecule.
         # first 0 index --> position of the first exciton (in case there were more excitons transferring)
         # second 0 index --> takes the coordinates of the excited molecule (ignores the electronic state)
 
