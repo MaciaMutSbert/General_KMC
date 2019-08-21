@@ -70,8 +70,8 @@ def merge_json_files(file1, file2):
     with open(file2, 'r') as read_file2:
         data_2 = json.load(read_file2)
 
-    heading_1 = [data_1['system_information'], data_1['molecules']]
-    heading_2 = [data_2['system_information'], data_2['molecules']]
+    heading_1 = data_1['system_information']
+    heading_2 = data_2['system_information']
 
     if heading_1 == heading_2:
         trajectories_1 = data_1['trajectories']

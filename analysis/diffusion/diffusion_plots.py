@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import json
 
 
 def final_distances_histogram(squared_distances, bins=10):
@@ -75,4 +76,6 @@ def diffusion_line(mean_squared_distances, mean_lifetimes, linear_regression):
     plt.xlabel('$<t>, ns$')
     plt.ylabel('$<l^{2}>, nm$')
     plt.title('Statistical study of $D$')
+    plt.legend()
     plt.show()
+

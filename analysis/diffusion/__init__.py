@@ -143,5 +143,5 @@ def diffusion_parameters(trajectories, theoretical_values, system_information):
 
     # returns the diffusion parameters in a dictionary
     return {'diffusion_length': root_mean_square[-1],
-            'exciton_lifetime': lifetimes[-1],
+            'lifetime': lifetimes[-1],
             'diffusion_constant': np.average(squared_distances) / (2 * dimensionality * lifetimes[-1])}

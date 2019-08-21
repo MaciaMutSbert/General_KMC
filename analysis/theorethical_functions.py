@@ -4,10 +4,9 @@ from molecules import Molecule
 from conversion_functions import from_ev_to_au, from_ns_to_au
 
 
-def theoretical_diffusion_values(system_information, molecule_information):
+def theoretical_diffusion_values(system_information):
     """
     :param system_information: dictionary with the system information (parameter to parameter)
-    :param molecule_information: dictionary with the internal properties of the molecule
     :return: dictionary with the theoretical lifetime, diffusion constant and length. (In the cases that they can be
     defined).
     """
@@ -30,15 +29,15 @@ def theoretical_diffusion_values(system_information, molecule_information):
     excited_state = list(system_information['excitons'].keys())[0]
     # in a diffusion study there will be only on exciton, so only one key
 
-    reorganization = molecule_information['reorganization_energies'][excited_state]
+    reorganization = system_information['reorganization_energies'][excited_state]
     # reorganization energy of the excited electronic state. eV
 
-    transition_moment_vector = molecule_information['transition_moment']          # transition dipole moment (a.u)
+    transition_moment_vector = system_information['transition_moment']          # transition dipole moment (a.u)
     transition_moment = np.linalg.norm(transition_moment_vector)                # modulus
 
     # initialization of a generic instance of class molecule
-    generic_molecule = Molecule(state_energies=molecule_information['state_energies'],
-                                state='s1', reorganization_energies=molecule_information['reorganization_energies'],
+    generic_molecule = Molecule(state_energies=system_information['state_energies'],
+                                state='s1', reorganization_energies=system_information['reorganization_energies'],
                                 transition_moment=transition_moment_vector)
 
     ############################################################################################################

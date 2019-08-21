@@ -8,7 +8,7 @@ from molecules import Molecule
 
 #######################################################################################################################
 
-output_file_name = 'example_1d_simulation.json'       # name of the output file where the trajectories will be saved
+output_file_name = 'example_1d_simulation_mu_2.json'       # name of the output file where the trajectories will be saved
                                                         # .json format
 
 #######################################################################################################################
@@ -22,7 +22,7 @@ All energies must be given in eV. By default initialized at gs.
 """
 state_energies = {'gs': 0, 's1': 2.5}                           # excitation energies of the electronic states (eV)
 reorganization_energies = {'gs': 0, 's1': 0.7}                  # reorganization energies of the states (eV)
-transition_dipole_moment = np.array([1.0, 0, 0])                # transition dipole moment of the molecule (a.u)
+transition_dipole_moment = np.array([2.0, 0, 0])                # transition dipole moment of the molecule (a.u)
 
 molecule = Molecule(state_energies=state_energies,
                     reorganization_energies=reorganization_energies,
@@ -96,13 +96,12 @@ for j in range(num_trajectories):
 # s'ha de veure com s'enllaça la informació que donam aquí amb la que es defineix a l'input #############
 
 system_information = {'conditions': system['conditions'], 'lattice': system['lattice'],
-                      'orientation': 'parallel', 'type': system['type'], 'excitons': {'s1': ['centre']}}
+                      'orientation': 'parallel', 'type': system['type'], 'excitons': {'s1': ['centre']},
+                      'state_energies': state_energies, 'reorganization_energies': reorganization_energies,
+                      'transition_moment': list(transition_dipole_moment)}
 
-molecule_information = {'state_energies': state_energies, 'reorganization_energies': reorganization_energies,
-                        'transition_moment': list(transition_dipole_moment)}
 
-
-output = {'system_information': system_information, 'molecules': molecule_information,
+output = {'system_information': system_information,
           'trajectories': trajectories, 'max_steps': max_steps}
 
 with open(output_file_name, 'w') as write_file:
