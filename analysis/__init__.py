@@ -113,9 +113,29 @@ def get_l2_t_from_file(diffusion_file):
 
     time_set = np.arange(0, lifetime, 0.1)
 
-    squared_distance_set = 2 * diffusion_constant * time_set
+    squared_distance_set = (2 * diffusion_constant * time_set)
     # the 2 factor stands for the double of the dimensionality
 
     changed_parameter = data['changed_parameter']
 
     return time_set, squared_distance_set, diffusion_constant, changed_parameter
+
+
+def get_diffusion_vs_mu(diffusion_file):
+    """
+    :param diffusion_file: json file with diffusion results
+    :return: Reads the file and returns:
+        D, lifetime, L_d, mu
+    """
+
+    with open(diffusion_file, 'r') as readfile:
+        data = json.load(readfile)
+
+    diffusion_constant = data['experimental']['diffusion_constant']
+    lifetime = data['experimental']['lifetime']
+    diffusion_length = data['experimental']['diffusion_length']
+
+    mu = np.linalg.norm(np.array(data['conditions']['transition_moment']))
+
+    return diffusion_constant, lifetime, diffusion_length, mu
+

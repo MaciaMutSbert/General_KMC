@@ -11,12 +11,8 @@ example_simulation directory.
 Given the exciton lifetime a set of equidistant time points between 0 and the lifetime is
 constructed. Then with the diffusion constant we compute a set for l². We plot both sets.
 The slope of the line will be D and the final point will be (lifetime, diffusion_length).
-
-As example a comparison between the diffusion of a singlet exciton in a molecular lattice with transition dipole
-moment = [1,0,0] and another with [2,0,0] is presented.
 """
 
-# REFERENCE DATA
 reference_file = 'diffusion_results_1d.json'
 file_1 = 'diffusion_results_1d_mu_1-1.json'
 file_2 = 'diffusion_results_1d_mu_0-9.json'
