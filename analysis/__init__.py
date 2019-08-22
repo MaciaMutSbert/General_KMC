@@ -1,4 +1,5 @@
 import json
+import numpy as np
 
 
 def update_trajectory(trajectory, change_step, time_step, system):
@@ -94,3 +95,27 @@ def merge_json_files(file1, file2):
         print('Trajectories taken in different conditions.')
         return
 
+
+def get_l2_t_from_file(diffusion_file):
+    """
+    :param diffusion_file: json file with diffusion results
+    :return: The function takes from the file the experimental values of D and lifetime, It returns a list
+    with values of time from 0 to lifetime. With D computes the respective values of l².
+    The aim of this function is to get this sets of data to plot several of them and be able to compare the slopes.
+    As well, the value of the lifetime and diffusion length will be seen in this plot (the last point of each line).
+    """
+
+    with open(diffusion_file, 'r') as readfile:
+        data = json.load(readfile)
+
+    diffusion_constant = data['experimental']['diffusion_constant']
+    lifetime = data['experimental']['lifetime']
+
+    time_set = np.arange(0, lifetime, 0.1)
+
+    squared_distance_set = 2 * diffusion_constant * time_set
+    # the 2 factor stands for the double of the dimensionality
+
+    changed_parameter = data['changed_parameter']
+
+    return time_set, squared_distance_set, diffusion_constant, changed_parameter

@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+from analysis import get_l2_t_from_file
 
 """
 In this script the user can get the plot of l² vs t for different diffusion situations.
@@ -17,40 +18,37 @@ moment = [1,0,0] and another with [2,0,0] is presented.
 
 # REFERENCE DATA
 reference_file = 'diffusion_results_1d.json'
-
-with open(reference_file, 'r') as readfile:
-    reference_data = json.load(readfile)
-
-ref_diffusion_constant = reference_data['experimental']['diffusion_constant']
-ref_lifetime = reference_data['experimental']['lifetime']
-
-ref_time_set = np.arange(0, ref_lifetime, 0.1)
-
-ref_squared_distance_set = 2 * ref_diffusion_constant * ref_time_set
-# the 2 factor stands for the double of the dimensionality
-
-################################################
-
-# NEW DATA. TRANSITION DIPOLE MOMENT = [2,0,0]
 file_1 = 'diffusion_results_1d_mu_1-1.json'
+file_2 = 'diffusion_results_1d_mu_0-9.json'
+file_3 = 'diffusion_results_1d_mu_0-8.json'
+file_4 = 'diffusion_results_1d_mu_0-7.json'
+file_5 = 'diffusion_results_1d_mu_0-6.json'
+file_6 = 'diffusion_results_1d_mu_0-5.json'
+file_7 = 'diffusion_results_1d_mu_0-4.json'
 
-with open(file_1, 'r') as readfile:
-    data_1 = json.load(readfile)
+file_list = [reference_file, file_1, file_2, file_3, file_4, file_5, file_6, file_7]
 
-diffusion_constant_1 = data_1['experimental']['diffusion_constant']
-lifetime_1 = data_1['experimental']['lifetime']
+time_set_list = []
+squared_distance_set_list = []
+diffusion_constant_list = []
+changes_list = []
 
-time_set_1 = np.arange(0, lifetime_1, 0.1)
+for file in file_list:
 
-squared_distance_set_1 = 2 * diffusion_constant_1 * time_set_1
+    time_set, squared_distance_set, diffusion_constant, changed_parameter = get_l2_t_from_file(file)
 
-
-##########################################################################
+    time_set_list.append(time_set)
+    squared_distance_set_list.append(squared_distance_set)
+    diffusion_constant_list.append(diffusion_constant)
+    changes_list.append(changed_parameter)
 
 
 # PLOTS l² vs t for both cases
-plt.plot(ref_time_set, ref_squared_distance_set, color='b', label='$ mu = 1, D= %.3f $' % ref_diffusion_constant)
-plt.plot(time_set_1, squared_distance_set_1, color='r', label='$ mu = 1.1, D= %.3f $' % diffusion_constant_1)
+for i in range(len(time_set_list)):
+
+    plt.plot(time_set_list[i], squared_distance_set_list[i], label=changes_list[i]+'  $D = %.3f$ '
+                                                                    % diffusion_constant_list[i])
+
 plt.xlabel('$ Time, ns $')
 plt.ylabel('$ l^2, nm $')
 plt.legend()

@@ -3,9 +3,9 @@ from analysis.diffusion import statistical_diffusion_study, diffusion_parameters
 from analysis.theorethical_functions import theoretical_diffusion_values
 
 
-input_file_name = 'example_1d_simulation_mu_1-1.json'              # name of the file with the simulation data (.json)
-changed_parameter = '$%\mu = 1.1$'                             # says which parameter is different from the reference set
-output_name = 'diffusion_results_1d_mu_1-1.json'
+input_file_name = 'example_1d_simulation_mu_0-6.json'              # name of the file with the simulation data (.json)
+changed_parameter = 'mu = 0.6'                             # says which parameter is different from the reference set
+output_name = 'diffusion_results_1d_mu_0-6.json'
 
 with open(input_file_name, 'r') as read_file:                   # reading of the file (.json)
     simulation_data = json.load(read_file)
