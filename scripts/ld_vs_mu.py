@@ -1,6 +1,14 @@
 import matplotlib.pyplot as plt
-from analysis import get_diffusion_vs_mu
+from KiMonETSim.analysis import get_diffusion_vs_mu
 
+"""
+In this script the user can get the plots of the diffusion length, constant and exciton lifetime vs the 
+modulus of the transition dipole moment.
+
+The inputs of this script are the name of the files with the diffusion results for each case.
+The script reads them and returns the 4 desired values. Collecting each magnitude independently plots the
+dependencies. 
+"""
 
 reference_file = 'diffusion_results_1d.json'
 file_1 = 'diffusion_results_1d_mu_1-1.json'

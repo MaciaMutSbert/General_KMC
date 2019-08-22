@@ -1,15 +1,15 @@
-from initialize_systems import get_system
-from core import update_system, check_finish
-from analysis import update_trajectory
+from KiMonETSim.initialize_systems import get_system
+from KiMonETSim.core import update_system, check_finish
+from KiMonETSim.analysis import update_trajectory
+from KiMonETSim.molecules import Molecule
 import numpy as np
 import json
-from molecules import Molecule
 
 
 #######################################################################################################################
 
-output_file_name = 'example_1d_simulation_mu_0-6.json'       # name of the output file where the trajectories will be saved
-                                                        # .json format
+output_file_name = 'example_1d_simulation_mu_0-6.json'      # name of the output file where the trajectories will be saved
+                                                            # .json format
 
 #######################################################################################################################
 

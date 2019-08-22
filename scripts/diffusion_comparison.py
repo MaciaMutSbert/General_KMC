@@ -1,7 +1,5 @@
-import json
-import numpy as np
 import matplotlib.pyplot as plt
-from analysis import get_l2_t_from_file
+from KiMonETSim.analysis import get_l2_t_from_file
 
 """
 In this script the user can get the plot of l² vs t for different diffusion situations.
