@@ -9,6 +9,8 @@ example_simulation directory.
 Given the exciton lifetime a set of equidistant time points between 0 and the lifetime is
 constructed. Then with the diffusion constant we compute a set for l². We plot both sets.
 The slope of the line will be D and the final point will be (lifetime, diffusion_length).
+
+For running this script the files and the same script has to be in the same directory.
 """
 
 reference_file = 'diffusion_results_1d.json'

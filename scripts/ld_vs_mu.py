@@ -8,6 +8,8 @@ modulus of the transition dipole moment.
 The inputs of this script are the name of the files with the diffusion results for each case.
 The script reads them and returns the 4 desired values. Collecting each magnitude independently plots the
 dependencies. 
+
+For running this script the files and the same script has to be in the same directory.
 """
 
 reference_file = 'diffusion_results_1d.json'

@@ -20,8 +20,7 @@ def get_transfer_rates(centre, neighbour_indexes, system, exciton_index):
     :param neighbour_indexes: neighbour indexes list
     :param system: Dictionary with the list of molecules and additional physical information
     :param exciton_index
-    :return: Dictionary with the possible transfer processes between the two involved molecules
-    as keys and its rates as arguments.
+    :return: Two lists, one with the transfer rates and the other with the transfer processes.
     For each possible acceptor in neighbour_indexes computes the transfer rate using the Fermi's Golden Rule:
         - For the spectral overlap the Marcus Formula is used for all cases.
         - For the electronic coupling an external dictionary is defined. It contains the possible couplings between
@@ -69,6 +68,10 @@ def get_transfer_rates(centre, neighbour_indexes, system, exciton_index):
                 transfer_processes.append({'donor': int(centre), 'process': key, 'acceptor': int(neighbour),
                                            'index': exciton_index})
 
+    # the process include: the index of the donor (in molecules), the key of the process,
+    # the index of the acceptor (in molecules) and the index of the exciton (in centres).
+    # This last parameter acts as the name of the exciton
+
     return transfer_processes, transfer_rates
 
 
@@ -106,6 +109,10 @@ def get_decay_rates(centre, system, exciton_index):
         decay_processes.append({'donor': centre, 'process': key, 'acceptor': centre, 'index': exciton_index})
         decay_rates.append(decay_complete[key])
 
+    # the process include: the index of the donor (in molecules), the key of the process,
+    # the index of the acceptor (in molecules) and the index of the exciton (in centres).
+    # This last parameter acts as the name of the exciton
+
     return decay_processes, decay_rates
 
 
@@ -129,13 +136,17 @@ def update_step(chosen_process, molecules, centre_indexes):
         molecules[chosen_process['acceptor']].set_state('s1')       # excitation of the acceptor
 
         centre_indexes[chosen_process['index']] = chosen_process['acceptor']
-        # modification of the excited molecules indexes list
+        # modification of the excited molecules indexes list.
 
     if chosen_process['process'] == 'Singlet_radiative_decay':
         molecules[chosen_process['donor']].set_state('gs')          # des excitation of the donor
 
         centre_indexes[chosen_process['index']] = None
         # modification of the excited molecules indexes list
+
+    # When updating the centre_indexes list, the changed index is the index given by process. So the position with
+    # the donor (given by index) is overwritten with the acceptor.
+    # If it is a decay, this position, from now on, will be considered as None.
 
     # No return function. Updates molecules and centre_indexes.
 

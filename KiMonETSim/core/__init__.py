@@ -52,7 +52,8 @@ def check_finish(system):
     :return: Checks if the list of excited molecules is empty. When empty the excitations have all decayed and
     the simulation will finish.
     """
-
+    # all_none checks if all positions of a list are None. In the case of centres, if all are None means that all
+    # excitons have decayed.
     return all_none(system['centres'])
 
 

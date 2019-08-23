@@ -16,11 +16,16 @@ def update_trajectory(trajectory, change_step, time_step, system):
     trajectory['time'].append(trajectory['time'][-1] + time_step)
 
     # excitons positions and quantity update
-    exciton_positions = []  # list with all the positions of the excited molecules (simultaneous)
-    n = 0  # number of excitons
+    exciton_positions = []      # list with all the positions of the excited molecules (simultaneous)
+    n = 0                       # number of excitons
 
     if all_none(system['centres']) is True:
         # if there is not any excited molecule saves the position of the last excited molecule.
+
+        # This will be the last position of the trajectory:
+        # The time will be the decay time
+        # The exciton position could not be saved since it gives no different information from the previous point
+        # (during the decay, the exciton does not change its position). n = 0
 
         last_excited = change_step['acceptor']
         exciton_coordinates = list(system['molecules'][last_excited].molecular_coordinates())   # cartesian coordinates

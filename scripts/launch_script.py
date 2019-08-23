@@ -49,7 +49,7 @@ for j in range(num_trajectories):
                                  'lattice_parameter': [1.0]},     # lattice parameter (nm)
                         amorphous=None,                         # dictionary with a set of parameters for a disordered system
                         orientation='parallel',                 # orientation of the molecules: 'parallel', 'antiparallel', 'random'
-                        initial_excitation={'s1': ['centre', 750, 'first']})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
+                        initial_excitation={'s1': ['centre', 750]})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
 
 #    system is a dictionary with three keys:
 #       molecules: List of objects class Molecule
