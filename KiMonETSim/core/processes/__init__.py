@@ -14,11 +14,12 @@ overlap_memory = {}
 ###########################################################################################################
 
 
-def get_transfer_rates(centre, neighbour_indexes, system):
+def get_transfer_rates(centre, neighbour_indexes, system, exciton_index):
     """
     :param centre: Index of the studies excited molecule
     :param neighbour_indexes: neighbour indexes list
     :param system: Dictionary with the list of molecules and additional physical information
+    :param exciton_index
     :return: Dictionary with the possible transfer processes between the two involved molecules
     as keys and its rates as arguments.
     For each possible acceptor in neighbour_indexes computes the transfer rate using the Fermi's Golden Rule:
@@ -54,7 +55,7 @@ def get_transfer_rates(centre, neighbour_indexes, system):
             rate = 0
             transfer_rates.append(rate)
 
-            process = {'donor': centre, 'process': prefix_key, 'acceptor': neighbour}
+            process = {'donor': centre, 'process': prefix_key, 'acceptor': neighbour, 'index': exciton_index}
             transfer_processes.append(process)
 
         else:
@@ -65,7 +66,8 @@ def get_transfer_rates(centre, neighbour_indexes, system):
                 rate = 2*pi * e_coupling**2 * spectral_overlap          # rate in a.u -- Fermi's Golden Rule
                 transfer_rates.append(from_ns_to_au(rate, 'direct'))    # rate in ns⁻¹
 
-                transfer_processes.append({'donor': int(centre), 'process': key, 'acceptor': int(neighbour)})
+                transfer_processes.append({'donor': int(centre), 'process': key, 'acceptor': int(neighbour),
+                                           'index': exciton_index})
 
     return transfer_processes, transfer_rates
 
@@ -75,10 +77,11 @@ def get_transfer_rates(centre, neighbour_indexes, system):
 ###########################################################################################################
 
 
-def get_decay_rates(centre, system):
+def get_decay_rates(centre, system, exciton_index):
     """
     :param centre: index of the excited molecule
     :param system: Dictionary with all the information of the system
+    :param exciton_index
     :return: A dictionary with the possible decay rates
     For computing them the method get_decay_rates of class molecule is call.
     """
@@ -100,7 +103,7 @@ def get_decay_rates(centre, system):
 
     # splits the dictionary in two lists
     for key in decay_complete:
-        decay_processes.append({'donor': centre, 'process': key, 'acceptor': centre})
+        decay_processes.append({'donor': centre, 'process': key, 'acceptor': centre, 'index': exciton_index})
         decay_rates.append(decay_complete[key])
 
     return decay_processes, decay_rates
@@ -125,14 +128,13 @@ def update_step(chosen_process, molecules, centre_indexes):
         molecules[chosen_process['donor']].set_state('gs')          # des excitation of the donor
         molecules[chosen_process['acceptor']].set_state('s1')       # excitation of the acceptor
 
-        centre_indexes.remove(chosen_process['donor'])
-        centre_indexes.append(chosen_process['acceptor'])
+        centre_indexes[chosen_process['index']] = chosen_process['acceptor']
         # modification of the excited molecules indexes list
 
     if chosen_process['process'] == 'Singlet_radiative_decay':
         molecules[chosen_process['donor']].set_state('gs')          # des excitation of the donor
 
-        centre_indexes.remove(chosen_process['acceptor'])
+        centre_indexes[chosen_process['index']] = None
         # modification of the excited molecules indexes list
 
     # No return function. Updates molecules and centre_indexes.

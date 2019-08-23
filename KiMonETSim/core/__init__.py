@@ -1,6 +1,7 @@
 from KiMonETSim.core.neighbourhood_and_connectivity import neighbourhood
 from KiMonETSim.core.kmc_implementation import kmc_algorithm
 from KiMonETSim.core.processes import get_transfer_rates, update_step, get_decay_rates
+from KiMonETSim import all_none
 
 
 def update_system(system):
@@ -21,17 +22,18 @@ def update_system(system):
     process_collector = []                          # list with the respective processes (for all centers)
     # the indexes of both lists coincide.
 
-    for centre in centre_indexes:
-        neighbour_indexes = neighbourhood(centre, system, radius=system['conditions']['neighbourhood_radius'])
-        # looks for the all molecules in a circle of radius centered at the position of the excited molecule
+    for i, centre in enumerate(centre_indexes):
+        if type(centre) == int:
+            neighbour_indexes = neighbourhood(centre, system, radius=system['conditions']['neighbourhood_radius'])
+            # looks for the all molecules in a circle of radius centered at the position of the excited molecule
 
-        process_list, rate_list = get_processes_and_rates(centre, neighbour_indexes, system)
-        # for each center computes all the decay rates and all the transfer rates for all neighbours
-        # return them as a list
+            process_list, rate_list = get_processes_and_rates(centre, neighbour_indexes, system, i)
+            # for each center computes all the decay rates and all the transfer rates for all neighbours
+            # return them as a list
 
-        rate_collector += rate_list
-        process_collector += process_list
-        # merging of the new list with the rates and processes previously computed
+            rate_collector += rate_list
+            process_collector += process_list
+            # merging of the new list with the rates and processes previously computed
 
     chosen_process, time = kmc_algorithm(rate_collector, process_collector)
     # chooses one of the processes and gives it a duration using the Kinetic Monte-Carlo algorithm
@@ -51,11 +53,7 @@ def check_finish(system):
     the simulation will finish.
     """
 
-    if len(system['centres']) == 0:
-        return True
-
-    else:
-        return False
+    return all_none(system['centres'])
 
 
 ##############################################################################################################
@@ -63,8 +61,9 @@ def check_finish(system):
 ##############################################################################################################
 
 
-def get_processes_and_rates(centre, neighbour_indexes, system):
+def get_processes_and_rates(centre, neighbour_indexes, system, i):
     """
+    :param i: index of the exciton
     :param centre: Index of the studied excited molecule. Donor
     :param neighbour_indexes: Indexes of the neighbours (candidates to acceptors)
     :param system: Dictionary with the information of the system.
@@ -77,11 +76,11 @@ def get_processes_and_rates(centre, neighbour_indexes, system):
                 The list indexes coincide.
     """
 
-    transfer_processes, transfer_rates = get_transfer_rates(centre, neighbour_indexes, system)
+    transfer_processes, transfer_rates = get_transfer_rates(centre, neighbour_indexes, system, i)
     # calls an external function that computes the transfer rates for all possible transfer processes between
     # the centre and all its neighbours
 
-    decay_processes, decay_rates = get_decay_rates(centre, system)
+    decay_processes, decay_rates = get_decay_rates(centre, system, i)
     # calls an external function that computes the decay rates for all possible decay processes of the centre.
     # Uses a method of the class Molecule
 

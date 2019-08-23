@@ -8,7 +8,7 @@ import json
 
 #######################################################################################################################
 
-output_file_name = 'example_1d_simulation_mu_0-6.json'      # name of the output file where the trajectories will be saved
+output_file_name = '2_excitons_simulation_1d.json'      # name of the output file where the trajectories will be saved
                                                             # .json format
 
 #######################################################################################################################
@@ -38,7 +38,7 @@ conditions = {'temperature': 273.15,            # temperature of the system (K)
 #######################################################################################################################
 
 trajectories = []                               # list with the trajectories of all excitons
-num_trajectories = 300                         # number of trajectories that will be simulated
+num_trajectories = 1                         # number of trajectories that will be simulated
 max_steps = 10000                               # maximum number of steps for trajectory allowed
 
 for j in range(num_trajectories):
@@ -49,7 +49,7 @@ for j in range(num_trajectories):
                                  'lattice_parameter': [1.0]},     # lattice parameter (nm)
                         amorphous=None,                         # dictionary with a set of parameters for a disordered system
                         orientation='parallel',                 # orientation of the molecules: 'parallel', 'antiparallel', 'random'
-                        initial_excitation={'s1': ['centre']})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
+                        initial_excitation={'s1': ['centre', 750, 'first']})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
 
 #    system is a dictionary with three keys:
 #       molecules: List of objects class Molecule
@@ -62,8 +62,9 @@ for j in range(num_trajectories):
 
     path = []                          # list with the path followed by the system
 
-    trajectory = {'time': [0.0], 'n': [], 'positions': [], 'process': []}
-    # trajectory of the system. Gives the number of excited states, its positions and the process occurred at each time
+    trajectory = {'time': [0.0], 'n': [], 'positions': [], 'process': [], 'exciton_altered': []}
+    # trajectory of the system. Gives the number of excited states, its positions, the process occurred at each time
+    # and the exciton that suffered the process (named with an integer)
     # first output of the programm
 
     for i in range(max_steps):
@@ -77,6 +78,7 @@ for j in range(num_trajectories):
 
         update_trajectory(trajectory, change_step, step_time, system)
         # the dictionary trajectory is updated with the information of the occurred process
+        print(change_step)
 
         if check_finish(system) is True:
             # checks if all excitons have decayed

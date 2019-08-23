@@ -1,5 +1,6 @@
 import json
 import numpy as np
+from KiMonETSim import all_none
 
 
 def update_trajectory(trajectory, change_step, time_step, system):
@@ -14,14 +15,11 @@ def update_trajectory(trajectory, change_step, time_step, system):
     # time update:
     trajectory['time'].append(trajectory['time'][-1] + time_step)
 
-    # number of excitons update:
-    trajectory['n'].append(len(system['centres']))
-
-
-    # excitons positions update:
+    # excitons positions and quantity update
     exciton_positions = []  # list with all the positions of the excited molecules (simultaneous)
+    n = 0  # number of excitons
 
-    if len(system['centres']) == 0:
+    if all_none(system['centres']) is True:
         # if there is not any excited molecule saves the position of the last excited molecule.
 
         last_excited = change_step['acceptor']
@@ -36,20 +34,25 @@ def update_trajectory(trajectory, change_step, time_step, system):
 
     else:
         for centre in system['centres']:
+            if type(centre) == int:
+                exciton_coordinates = list(system['molecules'][centre].molecular_coordinates())      # cartesian coordinates
+                excited_state = system['molecules'][centre].electronic_state()                       # electronic state
 
-            exciton_coordinates = list(system['molecules'][centre].molecular_coordinates())      # cartesian coordinates
-            excited_state = system['molecules'][centre].electronic_state()                       # electronic state
+                # a tetra vector is built ([x,y,z], state)
+                exciton_point = [exciton_coordinates, excited_state]
 
-            # a tetra vector is built ([x,y,z], state)
-            exciton_point = [exciton_coordinates, excited_state]
-
-            # collector of the positions of all excitons transferring.
-            exciton_positions.append(exciton_point)
+                # collector of the positions of all excitons transferring.
+                exciton_positions.append(exciton_point)
+                n = n + 1
 
     trajectory['positions'].append(exciton_positions)
+    trajectory['n'].append(n)
 
-    # process occurred:
+    # process occurred.
     trajectory['process'].append(change_step['process'])
+
+    # exciton that suffered the process
+    trajectory['exciton_altered'].append(change_step['index'])
 
     # No return function: only updates trajectory.
 
@@ -138,4 +141,6 @@ def get_diffusion_vs_mu(diffusion_file):
     mu = np.linalg.norm(np.array(data['conditions']['transition_moment']))
 
     return diffusion_constant, lifetime, diffusion_length, mu
+
+
 
