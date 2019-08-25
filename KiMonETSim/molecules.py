@@ -164,7 +164,12 @@ class Molecule:
 
         decay_rates = {}
 
-        if self.state == 's1':
+        if self.state == 'gs':
+            process = 'No decay for a molecule at the ground state.'
+            print(process)
+            decay_rates[process] = 0
+
+        elif self.state == 's1':
 
             desexcitation_energy = self.state_energies[self.state] - self.state_energies['gs']      # energy in eV
             desexcitation_energy = from_ev_to_au(desexcitation_energy, 'direct')                    # energy in a.u.

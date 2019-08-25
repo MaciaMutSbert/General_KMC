@@ -51,6 +51,11 @@ for j in range(num_trajectories):
                         orientation='parallel',                 # orientation of the molecules: 'parallel', 'antiparallel', 'random'
                         initial_excitation={'s1': ['centre']})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
 
+    if system is None:
+        # there may be a case which two incompatible parameters have been given. In such case system is set None
+        print('Incompatible inputs')
+        break
+
 #    system is a dictionary with three keys:
 #       molecules: List of objects class Molecule
 #       conditions: dictionary with the physical conditions of the system such as temperature, refractive index...
