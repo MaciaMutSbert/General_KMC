@@ -38,7 +38,7 @@ conditions = {'temperature': 273.15,            # temperature of the system (K)
 #######################################################################################################################
 
 trajectories = []                               # list with the trajectories of all excitons
-num_trajectories = 1                         # number of trajectories that will be simulated
+num_trajectories = 1000                         # number of trajectories that will be simulated
 max_steps = 10000                               # maximum number of steps for trajectory allowed
 
 for j in range(num_trajectories):
@@ -49,7 +49,12 @@ for j in range(num_trajectories):
                                  'lattice_parameter': [1.0]},     # lattice parameter (nm)
                         amorphous=None,                         # dictionary with a set of parameters for a disordered system
                         orientation='parallel',                 # orientation of the molecules: 'parallel', 'antiparallel', 'random'
-                        initial_excitation={'s1': ['centre', 750]})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
+                        initial_excitation={'s1': ['centre']})  # intial excitation of the system (excited states and the positions of the excitons in the lattice)
+
+    if system is None:
+        # there may be a case which two incompatible parameters have been given. In such case system is set None
+        print('Incompatible inputs')
+        break
 
 #    system is a dictionary with three keys:
 #       molecules: List of objects class Molecule
@@ -59,8 +64,6 @@ for j in range(num_trajectories):
 #       centres: list with the indexes of the excited molecules.
 #       type (label for the system)
 #######################################################################################################################
-
-    path = []                          # list with the path followed by the system
 
     trajectory = {'time': [0.0], 'n': [], 'positions': [], 'process': [], 'exciton_altered': []}
     # trajectory of the system. Gives the number of excited states, its positions, the process occurred at each time
@@ -72,8 +75,6 @@ for j in range(num_trajectories):
         change_step, step_time = update_system(system)
         # returns the process occurred {donor, process, acceptor} and the duration of this process
         # also modifies system updating the dictionary with the information of change_step.
-
-        path.append(change_step)
         # print(i)
 
         update_trajectory(trajectory, change_step, step_time, system)

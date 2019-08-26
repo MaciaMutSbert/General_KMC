@@ -67,7 +67,7 @@ def get_disordered_system(conditions,
 
     if orientation is 'antiparallel':           # anti parallelism is not defined for an amorphous system
         print('Not anti parallel orientation considered for an amorphous material')
-        return
+        return None
 
     molecules = []                  # list of instances of class molecule
     molecule_count = 0
