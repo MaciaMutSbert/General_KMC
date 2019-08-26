@@ -11,7 +11,7 @@ coupling_memory = {}
 
 def compute_forster_coupling(donor, acceptor, conditions):
     """
-    :param donor: excited moleculen. Donor
+    :param donor: excited molecules. Donor
     :param acceptor: neighbouring molecule. Possible acceptor
     :param conditions: dictionary with physical conditions
     :return: Förster coupling between both molecules. We don't implement any correction for short distances.

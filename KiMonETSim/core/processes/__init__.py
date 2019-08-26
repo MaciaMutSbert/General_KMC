@@ -170,8 +170,8 @@ def marcus_overlap_formula(donor, acceptor, conditions):
     gibbs_energy = donor.state_energies[excited_state] - acceptor.state_energies[excited_state]
     # Gibbs energy: energy difference between the equilibrium points of the excited states
 
-    reorganization = donor.get_reorganization_state_energy()
-    # donor reorganization energy of the excited state
+    reorganization = acceptor.get_reorganization_state_energy()
+    # acceptor reorganization energy of the excited state
 
     info = str(hash((T, gibbs_energy, reorganization, 'marcus')))
     # we define a compact string with the characteristic information of the spectral overlap
